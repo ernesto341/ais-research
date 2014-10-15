@@ -4,7 +4,10 @@ LIB             =  ./lib
 CFLAGS          =  -Wall -Wextra -ggdb -O2 -pthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
 
-all: tcpreassembly libntoh sfhash common 4d 6d example
+all: tcpreassembly libntoh sfhash common 4d 6d itoa share example
+
+itoa:
+	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c
 
 6d:
 	$(CC) -o $(LIB)/ipv6defrag.o -c $(INC)/ipv6defrag.c
@@ -19,10 +22,13 @@ sfhash:
 	$(CC) -o $(LIB)/sfhash.o -c $(INC)/sfhash.c
 
 tcpreassembly:
-	$(CC) -o $(LIB)/tcpreassembly.o -c $(INC)/tcpreassembly.c
+	$(CC) -o $(LIB)/tcpreassembly.o -c $(INC)/tcpreassembly.c -Wunused-parameter
 
 libntoh:
 	$(CC) -o $(LIB)/libntoh.o -c $(INC)/libntoh.c
+
+share:
+	$(CC) -o $(LIB)/share.o -c $(INC)/share.c
 
 
 example:

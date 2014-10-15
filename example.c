@@ -90,7 +90,8 @@
 #include <pcap.h>
 #include <libntoh.h>
 
-#include <itoa.h>
+//#include <itoa.h>
+#include <share.h>
 
 typedef struct
 {
@@ -118,13 +119,13 @@ unsigned char * hdr_data = NULL;
  * 850 given as sufficient for most headers to minimize resize operations
  * thanks to stackoverflow forum, typo.pl
  */
-static uint32_t hdr_size = 850;
-static const uint32_t shm_size = fngPntLen * sizeof(int) * (SIGQTY + 1);
-static const uint32_t t5_size = sizeof(char) * 1024 * SIGQTY;
-static uint32_t shmkey = 651;
-static uint32_t t5shmkey = 959;
-int shmid = 0;
-int t5shmid = 0;
+uint32_t hdr_size = 850;
+const uint32_t shm_size = fngPntLen * sizeof(int) * (SIGQTY + 1);
+const uint32_t t5_size = sizeof(char) * 1024 * SIGQTY;
+uint32_t shmkey[6] = {6511, 5433, 9884, 1763, 5782, 6284};
+uint32_t t5shmkey[5] = {959, 653, 987, 627, 905};
+int * shmid = NULL;
+int * t5shmid = NULL;
 int ** shm = NULL;
 int ** sigs = NULL;
 char ** t5s = NULL;
@@ -132,34 +133,8 @@ char ** t5shm = NULL;
 
 inline static void inCtr(int ** s)
 {
-        (*s[0])++;
-        (*s[0]) = (((*s[0]) % SIGQTY) > 0 ? ((*s[0]) % SIGQTY) : (*s[0]) % SIGQTY + 1); // 1 - 5
-}
-
-inline static void freeMem (void)
-{
-        int i = 0;
-        if (sigs)
-        {
-                while (i < (SIGQTY + 1))
-                {
-                        free(sigs[i++]);
-                }
-                free(sigs);
-        }
-        i = 0;
-        if (t5s)
-        {
-                while (i < (SIGQTY))
-                {
-                        free(t5s[i++]);
-                }
-                free(t5s);
-        }
-        if (hdr_data)
-        {
-                free(hdr_data);
-        }
+        (s[0][0])++;
+        (s[0][0]) = (((s[0][0]) % SIGQTY) > 0 ? ((s[0][0]) % SIGQTY) : (s[0][0]) % SIGQTY + 1); // 1 - 5
 }
 
 /**
@@ -170,10 +145,6 @@ void shandler ( int sign )
         if ( sign != 0 )
                 signal ( sign , &shandler );
 
-        shmdt(shm);
-        shmctl(shmid, IPC_RMID, 0);
-        shmdt(t5shm);
-        shmctl(t5shmid, IPC_RMID, 0);
         freeMem();
 
         pcap_close( handle );
@@ -324,7 +295,7 @@ void write_hdr_data ( void )
          */
 
         strcpy (path, "Finger Print:");
-        if (sigs == NULL || sigs[(*sigs[0])] == NULL)
+        if (sigs == NULL || sigs[(sigs[0][0])] == NULL)
         {
                 strcat(path, "\nNo fingerprint found\n\0");
                 write(fd, path, strlen(path));
@@ -395,7 +366,7 @@ void write_hdr_data ( void )
                 {
                         strcat (path, ">    -  ");
                 }
-                strcat (path, itoa(sigs[((*sigs[0])-1) > 0 ? (*sigs[0])-1 : SIGQTY-((*sigs[0])-1)][i]));
+                strcat (path, itoa(sigs[((sigs[0][0])-1) > 0 ? (sigs[0][0])-1 : SIGQTY-((sigs[0][0])-1)][i]));
                 strcat (path, "\n");
                 write ( fd , path , strlen(path) );
                 i++;
@@ -698,10 +669,14 @@ uint8_t extractHttpHdr (const char * udata)
         {
                 hdr_data[j++] = udata[i++];
                 /* HERE *
-                 * not sure about effectiveness of this statement
+                 * not sure about effectiveness of these statement
                  * when i dump the header, i get the entire stream
                  */
                 if (i > 3 && (udata[i] == 0x0a && udata[i-1] == 0x0d && udata[i-2] == 0x0a && udata[i-3] == 0x0d))
+                {
+                        eoh = 0;
+                }
+                else if (i > 3 && (udata[i] == 0x0d && udata[i-1] == 0x0a && udata[i-2] == 0x0d && udata[i-3] == 0x0a))
                 {
                         eoh = 0;
                 }
@@ -713,33 +688,15 @@ uint8_t extractHttpHdr (const char * udata)
         return (eoh);
 }
 
-inline static void initShm(void)
-{
-        t5shmid = shmget(t5shmkey, t5_size, IPC_CREAT | IPC_EXCL | 0655);
-        if (t5shmid < 0)
-        {
-                write(2, "\nunable to get t5 shared memory\n", 32);
-                _exit(-1);
-        }
-        t5shm = shmat(t5shmid, (void *) 0, 0);
-        shmid = shmget(shmkey, shm_size, IPC_CREAT | IPC_EXCL | 0655);
-        if (shmid < 0)
-        {
-                write(2, "\nunable to get sig shared memory\n", 33);
-                _exit(-1);
-        }
-        shm = shmat(shmid, (void *) 0, 0);
-}
-
 inline uint8_t dumpToShm(void)
 {
         /* lock shared memory */
         /* do the dump to shm routine */
-        while (*shm[0] != *sigs[0])
+        while (shm[0][0] != sigs[0][0])
         {
-                memcpy(shm+(sizeof(int) * fngPntLen * (*shm[0])), sigs[(*shm[0])], (sizeof(int) * fngPntLen));
-                memcpy(t5shm+(sizeof(char) * 1024 * (*shm[0] - 1)), t5s[(*shm[0]) - 1], (sizeof(char) * 1024));
-                if (*(shm[0] + 4) == 5)
+                memcpy(shm+(sizeof(int) * fngPntLen * (shm[0][0])), sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
+                memcpy(t5shm+(sizeof(char) * 1024 * (shm[0][0] - 1)), t5s[(shm[0][0]) - 1], (sizeof(char) * 1024));
+                if ((shm[0][1]) == 5)
                 {
                         /* unlock shared memory */
                         write(2, "\n\t[ALERT]\t---\tOverwriting a signature!\n\n", 40);
@@ -747,7 +704,7 @@ inline uint8_t dumpToShm(void)
                 else
                 {
                         /* unlock shared memory */
-                        *(shm[0] + 4) = *(shm[0] + 4) + 1; // pending
+                        shm[0][1] += 1; // pending
                 }
                 //        inCtr(&(shm[0])); // pos
                 inCtr(shm); // pos
@@ -760,30 +717,36 @@ inline uint8_t dumpToShm(void)
         return (0);
 }
 
-inline static void initMem (void)
-{
-        int i = 0;
-        sigs = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
-        while (i < (SIGQTY + 1))
-        {
-                sigs[i++] = (int *)malloc(sizeof(int) * fngPntLen);
-        }
-        i = 0;
-        t5s = (char **)malloc(t5_size);
-        while (i < (SIGQTY))
-        {
-                t5s[i++] = (char *)malloc(sizeof(char) * 1024);
-        }
-        *sigs[0] = 1; // count/position
-        *(sigs[0] + 4) = 0; // pending
-        hdr_data = (unsigned char *)malloc(sizeof(unsigned char) * hdr_size * 5);
-        hdr_size *= 5;
-}
-
 inline static void extractSig(void)
 {
-        sigs[(*sigs[0])] = pcktFingerPrint(hdr_data, strlen((char *)hdr_data));
+        sigs[(sigs[0][0])] = pcktFingerPrint(hdr_data, strlen((char *)hdr_data));
         inCtr(sigs);
+}
+
+inline uint32_t getSrcPrt(const char * path)
+{
+        int i = 0;
+        while (path[i] != ':')
+        {
+                i++;
+        }
+        i++;
+        return ((uint32_t)(atoi((char *)(&(path[i])))));
+}
+
+inline uint32_t getDstPrt(const char * path)
+{
+        int i = 0;
+        while (path[i] != ':')
+        {
+                i++;
+        }
+        while (path[i] != ':')
+        {
+                i++;
+        }
+        i++;
+        return ((uint32_t)(atoi((char *)(&(path[i])))));
 }
 
 /**
@@ -833,87 +796,36 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
         /* HERE */
         //                        generic_write_data((void *)payload);
 
-        //pending_more_hdr_data = extractHttpHdr((const char *)(payload));
-        /* got entire header, dump to shm */
-        if (pending_more_hdr_data == 0)
+        if (pinfo != 0)
         {
-                if (pinfo != 0)
+                uint32_t port = getDstPrt((pinfo->path));
+                if (port == 80 || port == 8080)
                 {
-                        //memcpy(t5s[(*shm[0]) - 1], &(pinfo->path), sizeof(char) * 1024);
-                        //write(2, t5s[(*shm[0]) - 1], sizeof(char) * 1024);
+                        pending_more_hdr_data = extractHttpHdr((const char *)(payload));
+                        /* got entire header, dump to shm */
+                        if (pending_more_hdr_data == 0)
+                        {
+                        /*
+                                memcpy(t5s[(shm[0][0]) - 1], &(pinfo->path), sizeof(char) * 1024);
+                                write(2, t5s[(shm[0][0]) - 1], sizeof(char) * 1024);
+                        */
+                                extractSig();
+                                //if(dumpToShm() != 0)
+                                {
+                                        fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
+                                }
+                                //write_hdr_data();
+                        }
                 }
-                else
-                {
-                        //t5s[(*shm[0]) - 1] = (char *)"0.0.0.0:0-0.0.0.0:0";
-                }
-        /*
-                extractSig();
-                if(dumpToShm() != 0)
-                {
-                        fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
-                }
-                //write_hdr_data();
-        */
         }
 
         /* add this segment to the stream */
         switch ( ( ret = ntoh_tcp_add_segment( tcp_session , stream, iphdr, total_len, (void*)pinfo ) ) )
         {
                 case NTOH_OK:
-                                /*
-                        if (pending_more_hdr_data == 1)
-                        {
-                                //                        generic_write_data((void *)payload);
-
-                                pending_more_hdr_data = extractHttpHdr((const char *)(payload));
-                                if (pending_more_hdr_data == 0)
-                                {
-                                        if (pinfo != 0)
-                                        {
-                                                memcpy(t5s[(*shm[0]) - 1], &(pinfo->path), sizeof(char) * 1024);
-                        //write(2, t5s[(*shm[0]) - 1], sizeof(char) * 1024);
-                                        }
-                                        else
-                                        {
-                                                t5s[(*shm[0]) - 1] = (char *)"0.0.0.0:0-0.0.0.0:0";
-                                        }
-                                        extractSig();
-                                        if(dumpToShm() != 0)
-                                        {
-                                                fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
-                                        }
-                                        //write_hdr_data();
-                                }
-                        }
-                                */
                         break;
 
                 case NTOH_SYNCHRONIZING:
-                        /*
-                        if (pending_more_hdr_data == 1)
-                        {
-                                //                        generic_write_data((void *)payload);
-
-                                pending_more_hdr_data = extractHttpHdr((const char *)(payload));
-                                if (pending_more_hdr_data == 0)
-                                {
-                                        if (pinfo != 0)
-                                        {
-                                                //memcpy(t5s[(*shm[0]) - 1], &(pinfo->path), sizeof(char) * 1024);
-                                        }
-                                        else
-                                        {
-                                                t5s[(*shm[0]) - 1] = (char *)"0.0.0.0:0-0.0.0.0:0";
-                                        }
-                                        extractSig();
-                                        if(dumpToShm() != 0)
-                                        {
-                                                fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
-                                        }
-                                        //write_hdr_data();
-                                }
-                        }
-                        */
                         free_peer_info ( pinfo );
                         break;
 
@@ -1173,7 +1085,6 @@ int main ( int argc , char *argv[] )
         /*******************************************/
 
         initMem();
-        initShm();
         ntoh_init ();
 
         if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
@@ -1192,6 +1103,11 @@ int main ( int argc , char *argv[] )
         }
 
         fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
+
+        fflush(stderr);
+
+        shm[0][0] = 1;
+        sigs[0][0] = 1;
 
         /* capture starts */
         while ( ( packet = pcap_next( handle, &header ) ) != 0 )
