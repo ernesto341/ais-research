@@ -22,7 +22,7 @@ sfhash:
 	$(CC) -o $(LIB)/sfhash.o -c $(INC)/sfhash.c
 
 tcpreassembly:
-	$(CC) -o $(LIB)/tcpreassembly.o -c $(INC)/tcpreassembly.c -Wunused-parameter
+	$(CC) -o $(LIB)/tcpreassembly.o -c $(INC)/tcpreassembly.c
 
 libntoh:
 	$(CC) -o $(LIB)/libntoh.o -c $(INC)/libntoh.c

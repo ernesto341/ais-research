@@ -695,7 +695,7 @@ inline uint8_t dumpToShm(void)
         while (shm[0][0] != sigs[0][0])
         {
                 memcpy(shm+(sizeof(int) * fngPntLen * (shm[0][0])), sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
-                memcpy(t5shm+(sizeof(char) * 1024 * (shm[0][0] - 1)), t5s[(shm[0][0]) - 1], (sizeof(char) * 1024));
+                memcpy(t5shm+(sizeof(char) * 44 * (shm[0][0] - 1)), t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
                 if ((shm[0][1]) == 5)
                 {
                         /* unlock shared memory */
@@ -711,9 +711,6 @@ inline uint8_t dumpToShm(void)
         }
         /* reset vars */
         pending_more_hdr_data = 0;
-        //free(hdr_data);
-        //hdr_data = NULL;
-        //hdr_size = 850;
         return (0);
 }
 
@@ -810,7 +807,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                                 write(2, t5s[(shm[0][0]) - 1], sizeof(char) * 1024);
                         */
                                 extractSig();
-                                //if(dumpToShm() != 0)
+                                if(dumpToShm() != 0)
                                 {
                                         fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
                                 }
