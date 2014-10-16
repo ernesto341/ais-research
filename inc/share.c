@@ -142,6 +142,7 @@ inline void iShmids(void)
 inline void aShmids(void)
 {
         i = 0;
+        unsigned int j = 0;
         while (i < (bufSize + 1))
         {
                 shm[i] = shmat(shmid[i], (void *) 0, 0);
@@ -160,8 +161,19 @@ inline void aShmids(void)
                         write(2, buf, 18);
                         _exit(-1);
                 }
+                j = 0;
+                while (j < fngPntLen)
+                {
+                        shm[i][j++] = 0;
+                }
+                j = 0;
+                while (j < t5TplLen)
+                {
+                        shm[i][j++] = '0';
+                }
                 i++;
         }
+
 }
 
 void initMem(void)

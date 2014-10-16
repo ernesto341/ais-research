@@ -25,7 +25,7 @@
 #include <string.h>
 #include <stdint.h>
 
-uint8_t Contains (char * str, char * pattern)
+char * Contains (char * str, char * pattern)
 {
         if (str == NULL || pattern == NULL)
         {
@@ -33,7 +33,7 @@ uint8_t Contains (char * str, char * pattern)
                 {
                         printf("In Contains, str or pattern are NULL\r\n");
                 }
-                return (0);
+                return (NULL);
         }
         uint32_t str_len = strlen(str);
         uint32_t pattern_len = strlen(pattern);
@@ -43,7 +43,7 @@ uint8_t Contains (char * str, char * pattern)
                 {
                         printf("In Contains, str == pattern\r\n");
                 }
-                return (1);
+                return (str);
         }
         if (pattern_len < 1)
         {
@@ -51,7 +51,7 @@ uint8_t Contains (char * str, char * pattern)
                 {
                         printf("In Contains, pattern_len < 1\r\n");
                 }
-                return (0);
+                return (NULL);
         }
         if (str_len < pattern_len)
         {
@@ -59,7 +59,7 @@ uint8_t Contains (char * str, char * pattern)
                 {
                         printf("In Contains, str_len < pattern_len\r\n");
                 }
-                return (0);
+                return (NULL);
         }
         if (DEBUG)
         {
@@ -72,13 +72,14 @@ uint8_t Contains (char * str, char * pattern)
         {
                 while (i < str_len)
                 {
-                        if (str[i++] == pattern[0])
+                        if (str[i] == pattern[0])
                         {
                                 /* found */
-                                return (1);
+                                return (&(str[i]));
                         }
+                        i++;
                 }
-                return (0);
+                return (NULL);
         }
         /* only check up to max len */
         if (DEBUG)
@@ -121,13 +122,13 @@ uint8_t Contains (char * str, char * pattern)
                                 }
                                 if (good == 0)
                                 {
-                                        return (1);
+                                        return (&(str[i]));
                                 }
                         }
                 }
                 i++;
         }
-        return (0);
+        return (NULL);
 }
 
 #endif

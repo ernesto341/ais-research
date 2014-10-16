@@ -57,13 +57,6 @@
  *
  */
 
-
-
-
-/*
- * This example save the data sent by each peer in a separated file called: [src_ip]:[src_port]-[dst_ip]:[dst_port]
- */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,6 +66,7 @@
 #include <signal.h>
 #include <errno.h>
 #include <ctype.h>
+
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -81,10 +75,6 @@
 
 #ifndef __FAVOR_BSD
 # define __FAVOR_BSD
-#endif
-
-#ifndef fngPntLen
-#define fngPntLen 14
 #endif
 
 #include <netinet/tcp.h>
@@ -99,6 +89,15 @@
 #include <itoa.h>
 #include <share.h>
 #include <globals.h>
+
+#ifndef fngPntLen
+#define fngPntLen 14
+#endif
+
+#ifndef _t5TplLen
+#define _t5TplLen
+static const uint32_t t5TplLen = 44;
+#endif
 
 typedef struct
 {
@@ -685,7 +684,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         eoh = 0;
                 }
-                else if (j == hdr_size)
+                else if (j >= hdr_size-1)
                 {
                         resizeHdr();
                 }
@@ -695,29 +694,41 @@ uint8_t extractHttpHdr (const char * udata)
 
 inline uint8_t dumpToShm(void)
 {
-//        fprintf(stderr, "in dumpToShm, shm[0][0] = %d\r\n", shm[0][0]);
-//        fflush(stderr);
+        //        fprintf(stderr, "in dumpToShm, shm[0][0] = %d\r\n", shm[0][0]);
+        //        fflush(stderr);
         /* lock shared memory */
-        /* do the dump to shm routine */
-        while (shm[0][0] != sigs[0][0])
+        if (shm[0][FLAGS] == CREAD || shm[0][FLAGS] == 0)
         {
-                memcpy(shm[((shm[0][0]))], sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
-                memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
-                if ((shm[0][1]) == 5)
+                shm[0][FLAGS] = PWING;
+                /* do the dump to shm routine */
+                while (shm[0][0] != sigs[0][0])
                 {
-                        /* unlock shared memory */
-                        write(2, "\n\t[ALERT]\t---\tOverwriting a signature!\n\n", 40);
+                        memcpy(shm[((shm[0][0]))], sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
+                        memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
+                        if ((shm[0][1]) == 5)
+                        {
+                                /* unlock shared memory */
+                                shm[0][FLAGS] = PWTEN;
+                                write(2, "\n\t[ALERT]\t---\tOverwriting a signature!\n\n", 40);
+                        }
+                        else
+                        {
+                                /* unlock shared memory */
+                                shm[0][FLAGS] = PWTEN;
+                                shm[0][1] += 1; // pending
+                        }
+                        inCtr(shm); // pos
                 }
-                else
-                {
-                        /* unlock shared memory */
-                        shm[0][1] += 1; // pending
-                }
-                inCtr(shm); // pos
+                /* reset vars */
+                pending_more_hdr_data = 0;
+                return (0);
         }
-        /* reset vars */
-        pending_more_hdr_data = 0;
-        return (0);
+        else
+        {
+                fprintf(stderr, "%d\r\n", shm[0][FLAGS]);
+                fflush(stderr);
+                return ((uint8_t)(shm[0][FLAGS]));
+        }
 }
 
 inline static void extractSig(void)
@@ -813,14 +824,20 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                                 /* lock memory */
                                 memcpy(t5s[(shm[0][0]) - 1], (char *)(pinfo->path), strlen(pinfo->path));
                                 /* unlock memory */
-//                                write(2, "\r\n\ttcp tuple 5\t---\t", 19);
-//                                write(2, (char *)(pinfo->path), strlen(pinfo->path));
-//                                fflush(stderr);
+                                //                                write(2, "\r\n\ttcp tuple 5\t---\t", 19);
+                                //                                write(2, (char *)(pinfo->path), strlen(pinfo->path));
+                                //                                fflush(stderr);
                                 extractSig();
-                                if(dumpToShm() != 0)
+                                ret = dumpToShm();
+                                if(ret != 0)
                                 {
-                                        fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n");
+                                        fprintf(stderr, "\n\t[Error] --- Unable to dump HTTP header to shared memory\n\t\tReason: %s\n", ret == CRING ? "CRING" : (ret == PWING ? "PWING" : "Unknown"));
                                 }
+                                else
+                                {
+                                        fprintf(stderr, "\n\tSuccessfully dumped signature to shared memory\n");
+                                }
+                                ret = 0;
                                 //write_hdr_data();
                         }
                 }
@@ -1115,6 +1132,11 @@ int main ( int argc , char *argv[] )
 
         shm[0][0] = 1;
         sigs[0][0] = 1;
+        shm[0][1] = 0;
+        sigs[0][1] = 0;
+        shm[0][FLAGS] = 0;
+        sigs[0][FLAGS] = 0;
+
 
         /* capture starts */
         while ( ( packet = pcap_next( handle, &header ) ) != 0 )
