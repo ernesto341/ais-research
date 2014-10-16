@@ -29,6 +29,13 @@
  ********************************************************************************/
 
 /*
+ * PWING = 1 --- Producer is writing to shared memory
+ * PWTEN = 2 --- Producer has written to shared memory
+ * CRING = 3 --- Consumer is reading from shared memory
+ * CREAD = 4 --- Consumer has read from shared memory
+ *
+ *
+ *
  * TO DO:
  *
  * in dumptoshm routine,
@@ -90,8 +97,9 @@
 #include <pcap.h>
 #include <libntoh.h>
 
-//#include <itoa.h>
+#include <itoa.h>
 #include <share.h>
+#include <globals.h>
 
 typedef struct
 {
@@ -120,8 +128,6 @@ unsigned char * hdr_data = NULL;
  * thanks to stackoverflow forum, typo.pl
  */
 uint32_t hdr_size = 850;
-const uint32_t shm_size = fngPntLen * sizeof(int) * (SIGQTY + 1);
-const uint32_t t5_size = sizeof(char) * 1024 * SIGQTY;
 uint32_t shmkey[6] = {6511, 5433, 9884, 1763, 5782, 6284};
 uint32_t t5shmkey[5] = {959, 653, 987, 627, 905};
 int * shmid = NULL;
@@ -134,7 +140,7 @@ char ** t5shm = NULL;
 inline static void inCtr(int ** s)
 {
         (s[0][0])++;
-        (s[0][0]) = (((s[0][0]) % SIGQTY) > 0 ? ((s[0][0]) % SIGQTY) : (s[0][0]) % SIGQTY + 1); // 1 - 5
+        (s[0][0]) = (((s[0][0]) % SIGQTY) != 0 ? ((s[0][0]) % SIGQTY) : 5); // 1 - 5
 }
 
 /**
@@ -690,12 +696,14 @@ uint8_t extractHttpHdr (const char * udata)
 
 inline uint8_t dumpToShm(void)
 {
+//        fprintf(stderr, "in dumpToShm, shm[0][0] = %d\r\n", shm[0][0]);
+//        fflush(stderr);
         /* lock shared memory */
         /* do the dump to shm routine */
         while (shm[0][0] != sigs[0][0])
         {
-                memcpy(shm+(sizeof(int) * fngPntLen * (shm[0][0])), sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
-                memcpy(t5shm+(sizeof(char) * 44 * (shm[0][0] - 1)), t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
+                memcpy(shm[((shm[0][0]))], sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
+                memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
                 if ((shm[0][1]) == 5)
                 {
                         /* unlock shared memory */
@@ -706,7 +714,6 @@ inline uint8_t dumpToShm(void)
                         /* unlock shared memory */
                         shm[0][1] += 1; // pending
                 }
-                //        inCtr(&(shm[0])); // pos
                 inCtr(shm); // pos
         }
         /* reset vars */
@@ -790,11 +797,13 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
         else
                 pinfo = 0;
 
-        /* HERE */
-        //                        generic_write_data((void *)payload);
-
         if (pinfo != 0)
         {
+                /* HERE 
+                 *
+                 * maybe replace dst port with Contians(header, "HTTP")
+                 *
+                 * */
                 uint32_t port = getDstPrt((pinfo->path));
                 if (port == 80 || port == 8080)
                 {
@@ -802,10 +811,12 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                         /* got entire header, dump to shm */
                         if (pending_more_hdr_data == 0)
                         {
-                        /*
-                                memcpy(t5s[(shm[0][0]) - 1], &(pinfo->path), sizeof(char) * 1024);
-                                write(2, t5s[(shm[0][0]) - 1], sizeof(char) * 1024);
-                        */
+                                /* lock memory */
+                                memcpy(t5s[(shm[0][0]) - 1], (char *)(pinfo->path), strlen(pinfo->path));
+                                /* unlock memory */
+//                                write(2, "\r\n\ttcp tuple 5\t---\t", 19);
+//                                write(2, (char *)(pinfo->path), strlen(pinfo->path));
+//                                fflush(stderr);
                                 extractSig();
                                 if(dumpToShm() != 0)
                                 {

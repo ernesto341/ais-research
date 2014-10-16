@@ -32,8 +32,6 @@ extern int * shmid;
 extern int * t5shmid;
 extern unsigned char * hdr_data;
 extern uint32_t hdr_size;
-extern const uint32_t t5_size;
-extern const uint32_t shm_size;
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];
 
