@@ -41,10 +41,14 @@ dhs: /usr/local/lib/libpcap.a
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
-	rm -rf *.o
-	rm -rf *.gch
+	rm -f *.o
+	rm -f *.gch
 	rm -f err
 	rm -f core
 	rm -f dhs
 	rm -f retrieve
+	rm -f $(LIB)/*.o
+	rm -f $(LIB)/*.gch
+	rm -f $(INC)/*.o
+	rm -f $(INC)/*.gch
 
