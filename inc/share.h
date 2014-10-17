@@ -18,6 +18,7 @@
 #include <sys/shm.h>
 
 #include <itoa.h>
+#include <globals.h>
 
 #ifndef SIGQTY
 #define SIGQTY 5

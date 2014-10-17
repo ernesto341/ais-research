@@ -4,7 +4,10 @@ LIB             =  ./lib
 CFLAGS          =  -Wall -Wextra -ggdb -O2 -pthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
 
-all: tcpreassembly libntoh sfhash common 4d 6d itoa share example
+all: tcpreassembly libntoh sfhash common 4d 6d itoa share example retrieve
+
+retrieve:
+	g++ $(INCFLAGS) $(CFLAGS) retrieve.cpp -o retrieve
 
 itoa:
 	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c
@@ -46,6 +49,7 @@ clean:
 	rm -f /home/ernest/research/generic_dump
 	rm -f /home/ernest/research/hdr_and_sig
 	rm -f example
+	rm -f retrieve
 	rm -f $(INC)/*.o
 	rm -f $(INC)/*.gch
 	rm -f $(LIB)/*.o
