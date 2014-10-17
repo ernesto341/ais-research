@@ -20,6 +20,10 @@ static const uint32_t t5TplLen = 44;
 #define fngPntLen 14
 #endif
 
+#ifndef DEBUG
+#define DEBUG 0
+#endif
+
 unsigned int i = 0;
 
 inline void dShmids(void)
@@ -80,8 +84,11 @@ inline void iData(void)
         t5s = (char **)malloc(sizeof(char *) * bufSize);
         if (hdr_data == NULL || t5s == NULL)
         {
-                strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                write(2, buf, 38);
+                if (DEBUG)
+                {
+                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        write(2, buf, 38);
+                }
                 _exit(-1);
         }
         i = 0;
@@ -103,8 +110,11 @@ inline void iShms(void)
         t5shm = (char **)malloc(sizeof(char *) * (bufSize + 1));
         if (shm == NULL || t5shm == NULL)
         {
-                strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                write(2, buf, 38);
+                if (DEBUG)
+                {
+                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        write(2, buf, 38);
+                }
                 _exit(-1);
         }
 }
@@ -120,19 +130,25 @@ inline void iShmids(void)
                 shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, IPC_CREAT | IPC_EXCL | 0600);
                 if (shmid[i] < 0)
                 {
-                        strncpy(buf, "unable to get shm with key ", 27);
-                        strncat(buf, itoa(shmkey[i]), strlen(itoa(shmkey[i])));
-                        strncat(buf, "\r\n", 2);
-                        write(2, buf, strlen(buf));
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to get shm with key ", 27);
+                                strncat(buf, itoa(shmkey[i]), strlen(itoa(shmkey[i])));
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, strlen(buf));
+                        }
                         _exit(-1);
                 }
                 t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, IPC_CREAT | IPC_EXCL | 0600);
                 if (t5shmid[i] < 0)
                 {
-                        strncpy(buf, "unable to get t5shm with key ", 29);
-                        strncat(buf, itoa(t5shmkey[i]), strlen(itoa(t5shmkey[i])));
-                        strncat(buf, "\r\n", 2);
-                        write(2, buf, strlen(buf));
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to get t5shm with key ", 29);
+                                strncat(buf, itoa(t5shmkey[i]), strlen(itoa(t5shmkey[i])));
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, strlen(buf));
+                        }
                         _exit(-1);
                 }
                 i++;
@@ -149,16 +165,22 @@ inline void aShmids(void)
                 t5shm[i] = shmat(t5shmid[i], (void *) 0, 0);
                 if ((void *)shm[i] == (void *)-1)
                 {
-                        strncpy(buf, "unable to attach shm", 14);
-                        strncat(buf, "\r\n", 2);
-                        write(2, buf, 16);
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to attach shm", 14);
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, 16);
+                        }
                         _exit(-1);
                 }
                 if ((void *)t5shm[i] == (void *)-1)
                 {
-                        strncpy(buf, "unable to attach t5shm", 16);
-                        strncat(buf, "\r\n", 2);
-                        write(2, buf, 18);
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to attach t5shm", 16);
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, 18);
+                        }
                         _exit(-1);
                 }
                 j = 0;

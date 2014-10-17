@@ -42,7 +42,10 @@
  *
  * TO DO:
  *
+ * REMOVE AUTO RESET OF FLAGS IN SHM
+ *
  * Handle SIGSEGV gracefully
+ * Ensure no buffer overflows, use resize
  *
  */
 
@@ -226,7 +229,7 @@ inline char *get_proto_description ( unsigned short proto )
 
 void generic_write_data ( void * data )
 {
-        if (data == NULL || strlen((char *)data) < 1)
+        if (data == NULL || strlen((const char *)data) < 1)
         {
                 if (DEBUG)
                 {
@@ -236,23 +239,25 @@ void generic_write_data ( void * data )
         }
         int fd = 0;
 
-        char path [2056];
-        strncpy (path, "/home/ernest/research/generic_dump\0", 35);
+        //char path [2056];
+        //strncpy (path, "/home/ernest/research/generic_dump\0", 35);
 
-        if ( (fd = open ( path , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
+        if ( (fd = open ( (const char *)"/home/ernest/research/generic_dump" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error opening data file \"%s\"" , path );
+                        fprintf ( stderr , "\n[e] Error opening data file \"/home/ernest/research/generic_dump\"");
                 }
                 return;
         }
 
+        /*
         strncpy (path, "\0", 1);
         strncpy (path, (const char *)data, strlen((const char *)data));
         strncat (path, "\r\n\0", 3);
+        */
 
-        write ( fd , path , strlen(path) );
+        write ( fd , (const char *)data , strlen((const char *)data) );
         close ( fd );
         return;
 }
@@ -266,19 +271,19 @@ void write_hdr_data ( void )
         }
         int fd = 0;
 
-        char path [10240];
-        strncpy (path, "/home/ernest/research/hdr_and_sig\0", 34);
+        char path [512];
+//        strncpy (path, "/home/ernest/research/hdr_and_sig\0", 34);
 
-        if ( (fd = open ( path , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
+        if ( (fd = open ( (const char *)"/home/ernest/research/hdr_and_sig" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error opening data file \"%s\"" , path );
+                        fprintf ( stderr , "\n[e] Error opening data file \"/home/ernest/research/hdr_and_sig\"");
                 }
                 return;
         }
 
-        write ( fd , (char *)hdr_data , strlen((char *)hdr_data) );
+        write ( fd , (const char *)hdr_data , strlen((const char *)hdr_data) );
         write ( fd , "\n" , 1 );
 
         /*FINGER PRINT EXPLANATION:
@@ -368,6 +373,7 @@ void write_hdr_data ( void )
                 {
                         strncat (path, ">    -  ", 8);
                 }
+                /* IMPROVE */
                 strcat (path, itoa(sigs[((sigs[0][0])-1) > 0 ? (sigs[0][0])-1 : SIGQTY-((sigs[0][0])-1)][i]));
                 strncat (path, "\r\n", 2);
                 write ( fd , path , strlen(path) );
@@ -444,6 +450,14 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         int qstnmrk = 0;
         unsigned char *target = (unsigned char *)curPcktData;
         int *fngPnt = malloc(sizeof(int) * fngPntLen);
+        if (fngPnt == NULL)
+        {
+                if (DEBUG)
+                {
+                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory\r\n");
+                }
+                shandler(0);
+        }
 
         for(;(*target != '\n' && *target != '\r') && i < len; i++)
         {
@@ -765,7 +779,7 @@ inline uint8_t dumpToShm(void)
                 while (shm[0][0] != sigs[0][0])
                 {
                         memcpy(shm[((shm[0][0]))], sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
-                        memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * 44));
+                        memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * t5TplLen));
                         /* unlock shared memory */
                         shm[0][FLAGS] = PWTEN;
                         if ((shm[0][1]) == 5)
@@ -806,10 +820,15 @@ inline static void extractSig(void)
 
 inline uint32_t getSrcPrt(const char * path)
 {
-        int i = 0;
-        while (path[i] != ':')
+        unsigned int i = 0;
+        unsigned int len = strlen(path);
+        while (path[i] != ':' && i < len)
         {
                 i++;
+        }
+        if (i >= len)
+        {
+                return (0);
         }
         i++;
         return ((uint32_t)(atoi((char *)(&(path[i])))));
@@ -817,14 +836,19 @@ inline uint32_t getSrcPrt(const char * path)
 
 inline uint32_t getDstPrt(const char * path)
 {
-        int i = 0;
-        while (path[i] != ':')
+        unsigned int i = 0;
+        unsigned int len = strlen(path);
+        while (path[i] != ':' && i < len)
         {
                 i++;
         }
-        while (path[i] != ':')
+        while (path[i] != ':' && i < len)
         {
                 i++;
+        }
+        if (i >= len)
+        {
+                return (0);
         }
         i++;
         return ((uint32_t)(atoi((char *)(&(path[i])))));
@@ -1277,12 +1301,15 @@ int main ( int argc , char *argv[] )
         /*******************************************/
 
         initMem();
+
+        /* initialize some values */
         sigs[0][0] = 1;
         sigs[0][1] = 0;
         sigs[0][FLAGS] = 0;
         shm[0][0] = 1;
         shm[0][1] = 0;
         shm[0][FLAGS] = 0;
+
         ntoh_init ();
 
         if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
