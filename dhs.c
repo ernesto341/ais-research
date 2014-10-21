@@ -42,8 +42,6 @@
  *
  * TO DO:
  *
- * REMOVE AUTO RESET OF FLAGS IN SHM
- *
  * Handle SIGSEGV gracefully
  * Ensure no buffer overflows, use resize
  *
@@ -126,13 +124,14 @@ int * shmid = NULL;
 int * t5shmid = NULL;
 int ** shm = NULL;
 int ** sigs = NULL;
+int ** ret_sigs = NULL;
 char ** t5s = NULL;
 char ** t5shm = NULL;
 
-inline static void inCtr(int ** s)
+inline static void inCtr(int *** s)
 {
-        (s[0][0])++;
-        (s[0][0]) = (((s[0][0]) % SIGQTY) != 0 ? ((s[0][0]) % SIGQTY) : 5); // 1 - 5
+        ((*s)[0][0])++;
+        ((*s)[0][0]) = ((((*s)[0][0]) % SIGQTY) != 0 ? (((*s)[0][0]) % SIGQTY) : 5); // 1 - 5
 }
 
 /**
@@ -154,6 +153,8 @@ void shandler ( int sign )
         fprintf( stderr, "\r\n\t\tX      -----   Inactive   -----      X\r\n\r\n" );
         exit( sign );
 }
+
+/* retrieve */
 
 /**
  * @brief Returns a struct which stores some peer information
@@ -252,10 +253,10 @@ void generic_write_data ( void * data )
         }
 
         /*
-        strncpy (path, "\0", 1);
-        strncpy (path, (const char *)data, strlen((const char *)data));
-        strncat (path, "\r\n\0", 3);
-        */
+           strncpy (path, "\0", 1);
+           strncpy (path, (const char *)data, strlen((const char *)data));
+           strncat (path, "\r\n\0", 3);
+           */
 
         write ( fd , (const char *)data , strlen((const char *)data) );
         close ( fd );
@@ -272,7 +273,7 @@ void write_hdr_data ( void )
         int fd = 0;
 
         char path [512];
-//        strncpy (path, "/home/ernest/research/hdr_and_sig\0", 34);
+        //        strncpy (path, "/home/ernest/research/hdr_and_sig\0", 34);
 
         if ( (fd = open ( (const char *)"/home/ernest/research/hdr_and_sig" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
@@ -793,12 +794,12 @@ inline uint8_t dumpToShm(void)
                         {
                                 shm[0][1] += 1; // pending
                         }
-                        inCtr(shm); // pos
+                        inCtr(&shm); // pos
                 }
                 /* reset vars */
                 pending_more_hdr_data = 0;
                 /* reset the flag to what I expect it to be - CREAD - for testing purposes HERE */
-                shm[0][FLAGS] = CREAD;
+//                shm[0][FLAGS] = CREAD;
                 return (0);
         }
         else
@@ -815,7 +816,7 @@ inline uint8_t dumpToShm(void)
 inline static void extractSig(void)
 {
         sigs[(sigs[0][0])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
-        inCtr(sigs);
+        inCtr(&sigs);
 }
 
 inline uint32_t getSrcPrt(const char * path)
@@ -1295,6 +1296,7 @@ int main ( int argc , char *argv[] )
 
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
+        signal( SIGSEGV, &shandler );
 
         /*******************************************/
         /** libntoh initialization process starts **/
@@ -1310,75 +1312,99 @@ int main ( int argc , char *argv[] )
         shm[0][1] = 0;
         shm[0][FLAGS] = 0;
 
-        ntoh_init ();
+        /* HERE
+         * split child here
+         */
 
-        if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
+        /*
+        pid_t child = fork();
+
+        if (child == 0) // parent
         {
+        */
+
+                ntoh_init ();
+
+                if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
+                {
+                        if (DEBUG)
+                        {
+                                fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
+                        }
+                        exit ( -5 );
+                }
+
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
+                        fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
                 }
-                exit ( -5 );
-        }
 
-        if (DEBUG)
-        {
-                fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
-        }
+                if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
+                {
+                        ntoh_tcp_free_session ( tcp_session );
+                        if (DEBUG)
+                        {
+                                fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
+                        }
+                        exit ( -6 );
+                }
 
-        if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
-        {
-                ntoh_tcp_free_session ( tcp_session );
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
+                        fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
+
+                        fflush(stderr);
                 }
-                exit ( -6 );
+
+                /* capture starts */
+                while ( ( packet = pcap_next( handle, &header ) ) != 0 )
+                {
+                        /* get packet headers */
+                        ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
+                        if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
+                        {
+                                continue;
+                        }
+
+                        /* it is an IPv4 fragment */
+                        if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
+                        {
+                                send_ipv4_fragment ( ip , &ipv4_callback );
+                        }
+                        /* or a TCP segment */
+                        else if ( ip->ip_p == IPPROTO_TCP )
+                        {
+                                send_tcp_segment ( ip , &tcp_callback );
+                        }
+                }
+
+                tcps = ntoh_tcp_count_streams( tcp_session );
+                ipf = ntoh_ipv4_count_flows ( ipv4_session );
+
+                /* no streams left */
+                if ( ipf + tcps > 0 )
+                {
+                        if (DEBUG)
+                        {
+                                fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
+                                pause();
+                        }
+                }
+
+                shandler( 0 );
+                /*
         }
 
-        if (DEBUG)
+        else
         {
-                fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
-
-                fflush(stderr);
-        }
-
-        /* capture starts */
-        while ( ( packet = pcap_next( handle, &header ) ) != 0 )
-        {
-                /* get packet headers */
-                ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
-                if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
+                unsigned int i = 0;
+                ret_sigs = (int **)malloc(sizeof(int *) * (SIGQTY));
+                while (i < (SIGQTY))
                 {
-                        continue;
-                }
-
-                /* it is an IPv4 fragment */
-                if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
-                {
-                        send_ipv4_fragment ( ip , &ipv4_callback );
-                }
-                /* or a TCP segment */
-                else if ( ip->ip_p == IPPROTO_TCP )
-                {
-                        send_tcp_segment ( ip , &tcp_callback );
+                        ret_sigs[i++] = (int *)malloc(sizeof(int) * fngPntLen);
                 }
         }
-
-        tcps = ntoh_tcp_count_streams( tcp_session );
-        ipf = ntoh_ipv4_count_flows ( ipv4_session );
-
-        /* no streams left */
-        if ( ipf + tcps > 0 )
-        {
-                if (DEBUG)
-                {
-                        fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
-                        pause();
-                }
-        }
-
-        shandler( 0 );
+        */
 
         //dummy return
         return (0);

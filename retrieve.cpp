@@ -5,12 +5,17 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <errno.h>
+#include <signal.h>
 #include <sys/types.h>
 #include <sys/shm.h>
 
 #include <globals.h>
 
 using namespace std;
+
+#ifndef DEBUG
+#define DEBUG 1
+#endif
 
 char buf[1024];
 
@@ -95,6 +100,10 @@ inline void dShmids(void)
 
 inline void fShms(void)
 {
+        if (t5shm)
+        {
+                free(t5shm);
+        }
         if (shm)
         {
                 free(shm);
@@ -103,6 +112,10 @@ inline void fShms(void)
 
 inline void fShmids(void)
 {
+        if (t5shmid)
+        {
+                free(t5shmid);
+        }
         if (shmid)
         {
                 free(shmid);
@@ -127,6 +140,43 @@ inline void iShmids(void)
         srand(time(NULL));
         shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
         t5shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
+        if (shmid == NULL || t5shmid == NULL)
+        {
+                if (DEBUG)
+                {
+                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        write(2, buf, 38);
+                }
+                _exit(-1);
+        }
+        while (i < (bufSize + 1))
+        {
+                shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, 0666);
+                if (shmid[i] < 0)
+                {
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to get shm with key ", 27);
+                                strncat(buf, itoa(shmkey[i]), strlen(itoa(shmkey[i])));
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, strlen(buf));
+                        }
+                        _exit(-1);
+                }
+                t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, 0666);
+                if (t5shmid[i] < 0)
+                {
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "unable to get t5shm with key ", 29);
+                                strncat(buf, itoa(t5shmkey[i]), strlen(itoa(t5shmkey[i])));
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, strlen(buf));
+                        }
+                        _exit(-1);
+                }
+                i++;
+        }
 }
 
 inline void aShmids(void)
@@ -179,19 +229,41 @@ void shandler ( int sign )
 
 int main (void)
 {
+
+        signal( SIGINT, &shandler );
+        signal( SIGTERM, &shandler );
+        if (DEBUG)
+        {
+                fprintf(stderr, "retrieve\n\tcalling ishms()\r\n");
+        }
         iShms();
+        if (DEBUG)
+        {
+                fprintf(stderr, "\tcalling ishmids()\r\n");
+        }
         iShmids();
+        if (DEBUG)
+        {
+                fprintf(stderr, "\tcalling ashmids()\r\n");
+        }
         aShmids();
 
         // Retrieve
 
+        if (DEBUG)
+        {
+                fprintf(stderr, "\tabout to enter\r\n");
+        }
         while (1)
         {
-                while (shm[0][FLAGS] != PWTEN);
+                while (shm[0][FLAGS] != PWTEN)
+                {
+                        fprintf(stderr, "waiting for flag to be PWTEN\r\n");
+                        fflush(stderr);
+                }
                 shm[0][FLAGS] = CRING;
-                write(2, "data written, retrieving\r\n", 26);
-                sleep(1);
-                write(2, "retrieved, releasing\r\n", 22);
+                write(2, "data written, retrieving...\r\n", 26);
+                write(2, "SIMULATED retrieved, releasing\r\n", 22);
                 shm[0][FLAGS] = CREAD;
         }
 

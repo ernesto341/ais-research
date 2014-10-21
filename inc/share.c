@@ -21,7 +21,7 @@ static const uint32_t t5TplLen = 44;
 #endif
 
 #ifndef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 unsigned int i = 0;
@@ -29,7 +29,7 @@ unsigned int i = 0;
 inline void dShmids(void)
 {
         i = 0;
-        while (i < (bufSize + 1))
+        while (i < (bufSize))
         {
                 shmdt(t5shm[i]);
                 shmctl(t5shmid[i], IPC_RMID, 0);
@@ -50,10 +50,41 @@ inline void fData(void)
         {
                 free(hdr_data);
         }
+        unsigned int i = 0;
+        if (sigs)
+        {
+                while (i < bufSize)
+                {
+                        free(sigs[i++]);
+                }
+                free(sigs);
+        }
+        i = 0;
+        if (t5s)
+        {
+                while (i < bufSize)
+                {
+                        free(t5s[i++]);
+                }
+                free(t5s);
+        }
+        i = 0;
+        if (ret_sigs)
+        {
+                while (i < bufSize)
+                {
+                        free(ret_sigs[i++]);
+                }
+                free(ret_sigs);
+        }
 }
 
 inline void fShms(void)
 {
+        if (t5shm)
+        {
+                free(t5shm);
+        }
         if (shm)
         {
                 free(shm);
@@ -62,6 +93,10 @@ inline void fShms(void)
 
 inline void fShmids(void)
 {
+        if (t5shmid)
+        {
+                free(t5shmid);
+        }
         if (shmid)
         {
                 free(shmid);
@@ -107,7 +142,7 @@ inline void iData(void)
 inline void iShms(void)
 {
         shm = (int **)malloc(sizeof(int *) * (bufSize + 1));
-        t5shm = (char **)malloc(sizeof(char *) * (bufSize + 1));
+        t5shm = (char **)malloc(sizeof(char *) * (bufSize));
         if (shm == NULL || t5shm == NULL)
         {
                 if (DEBUG)
@@ -125,9 +160,18 @@ inline void iShmids(void)
         srand(time(NULL));
         shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
         t5shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
+        if (shmid == NULL || t5shmid == NULL)
+        {
+                if (DEBUG)
+                {
+                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        write(2, buf, 38);
+                }
+                _exit(-1);
+        }
         while (i < (bufSize + 1))
         {
-                shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, IPC_CREAT | IPC_EXCL | 0600);
+                shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, IPC_CREAT | 0666);
                 if (shmid[i] < 0)
                 {
                         if (DEBUG)
@@ -139,7 +183,12 @@ inline void iShmids(void)
                         }
                         _exit(-1);
                 }
-                t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, IPC_CREAT | IPC_EXCL | 0600);
+                i++;
+        }
+        i = 0;
+        while (i < (bufSize))
+        {
+                t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, IPC_CREAT | 0666);
                 if (t5shmid[i] < 0)
                 {
                         if (DEBUG)
@@ -162,7 +211,6 @@ inline void aShmids(void)
         while (i < (bufSize + 1))
         {
                 shm[i] = shmat(shmid[i], (void *) 0, 0);
-                t5shm[i] = shmat(t5shmid[i], (void *) 0, 0);
                 if ((void *)shm[i] == (void *)-1)
                 {
                         if (DEBUG)
@@ -173,6 +221,17 @@ inline void aShmids(void)
                         }
                         _exit(-1);
                 }
+                j = 0;
+                while (j < fngPntLen)
+                {
+                        shm[i][j++] = 0;
+                }
+                i++;
+        }
+        i = 0;
+        while (i < bufSize)
+        {
+                t5shm[i] = shmat(t5shmid[i], (void *) 0, 0);
                 if ((void *)t5shm[i] == (void *)-1)
                 {
                         if (DEBUG)
@@ -184,14 +243,9 @@ inline void aShmids(void)
                         _exit(-1);
                 }
                 j = 0;
-                while (j < fngPntLen)
-                {
-                        shm[i][j++] = 0;
-                }
-                j = 0;
                 while (j < t5TplLen)
                 {
-                        shm[i][j++] = '0';
+                        t5shm[i][j++] = '0';
                 }
                 i++;
         }

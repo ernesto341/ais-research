@@ -27,6 +27,7 @@
 /* 0, 1 - 5 */
 extern int ** shm;
 extern int ** sigs;
+extern int ** ret_sigs;
 extern char ** t5s;
 extern char ** t5shm;
 extern int * shmid;
