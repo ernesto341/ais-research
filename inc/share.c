@@ -6,14 +6,12 @@
 
 #include <share.h>
 
-#ifndef _bufSize
-#define _bufSize
-static const uint32_t bufSize = 5;
+#ifndef SIGQTY
+#define SIGQTY 5
 #endif
 
-#ifndef _t5TplLen
-#define _t5TplLen
-static const uint32_t t5TplLen = 44;
+#ifndef t5TplLen
+#define t5TplLen 44
 #endif
 
 #ifndef fngPntLen
@@ -21,7 +19,7 @@ static const uint32_t t5TplLen = 44;
 #endif
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 unsigned int i = 0;
@@ -29,14 +27,14 @@ unsigned int i = 0;
 inline void dShmids(void)
 {
         i = 0;
-        while (i < (bufSize))
+        while (i < (SIGQTY))
         {
                 shmdt(t5shm[i]);
                 shmctl(t5shmid[i], IPC_RMID, 0);
                 i++;
         }
         i = 0;
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
                 shmdt(shm[i]);
                 shmctl(shmid[i], IPC_RMID, 0);
@@ -53,7 +51,7 @@ inline void fData(void)
         unsigned int i = 0;
         if (sigs)
         {
-                while (i < bufSize)
+                while (i < (SIGQTY + 1))
                 {
                         free(sigs[i++]);
                 }
@@ -62,21 +60,13 @@ inline void fData(void)
         i = 0;
         if (t5s)
         {
-                while (i < bufSize)
+                while (i < SIGQTY)
                 {
                         free(t5s[i++]);
                 }
                 free(t5s);
         }
         i = 0;
-        if (ret_sigs)
-        {
-                while (i < bufSize)
-                {
-                        free(ret_sigs[i++]);
-                }
-                free(ret_sigs);
-        }
 }
 
 inline void fShms(void)
@@ -116,7 +106,7 @@ inline void iData(void)
 {
         hdr_data = (unsigned char *)malloc(sizeof(unsigned char) * (hdr_size * 5));
         hdr_size *= 5;
-        t5s = (char **)malloc(sizeof(char *) * bufSize);
+        t5s = (char **)malloc(sizeof(char *) * SIGQTY);
         if (hdr_data == NULL || t5s == NULL)
         {
                 if (DEBUG)
@@ -127,13 +117,13 @@ inline void iData(void)
                 _exit(-1);
         }
         i = 0;
-        while (i < bufSize)
+        while (i < SIGQTY)
         {
                 t5s[i++] = (char *)malloc(sizeof(char) * t5TplLen);
         }
         i = 0;
-        sigs = (int **)malloc(sizeof(int *) * (bufSize + 1));
-        while (i < (bufSize + 1))
+        sigs = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        while (i < (SIGQTY + 1))
         {
                 sigs[i++] = (int *)malloc(sizeof(int) * fngPntLen);
         }
@@ -141,8 +131,8 @@ inline void iData(void)
 
 inline void iShms(void)
 {
-        shm = (int **)malloc(sizeof(int *) * (bufSize + 1));
-        t5shm = (char **)malloc(sizeof(char *) * (bufSize));
+        shm = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
         {
                 if (DEBUG)
@@ -158,8 +148,8 @@ inline void iShmids(void)
 {
         i = 0;
         srand(time(NULL));
-        shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
-        t5shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
+        shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
+        t5shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
         if (shmid == NULL || t5shmid == NULL)
         {
                 if (DEBUG)
@@ -169,7 +159,7 @@ inline void iShmids(void)
                 }
                 _exit(-1);
         }
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
                 shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, IPC_CREAT | 0666);
                 if (shmid[i] < 0)
@@ -186,7 +176,7 @@ inline void iShmids(void)
                 i++;
         }
         i = 0;
-        while (i < (bufSize))
+        while (i < (SIGQTY))
         {
                 t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, IPC_CREAT | 0666);
                 if (t5shmid[i] < 0)
@@ -208,7 +198,7 @@ inline void aShmids(void)
 {
         i = 0;
         unsigned int j = 0;
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
                 shm[i] = shmat(shmid[i], (void *) 0, 0);
                 if ((void *)shm[i] == (void *)-1)
@@ -229,7 +219,7 @@ inline void aShmids(void)
                 i++;
         }
         i = 0;
-        while (i < bufSize)
+        while (i < SIGQTY)
         {
                 t5shm[i] = shmat(t5shmid[i], (void *) 0, 0);
                 if ((void *)t5shm[i] == (void *)-1)

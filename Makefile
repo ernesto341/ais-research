@@ -1,6 +1,7 @@
 INC             =  ./inc
 INCFLAGS        =  -I $(INC) -I /usr/include -I /usr/local/include
 LIB             =  ./lib
+SYM             =  -DPWING=1 -DPWTEN=2 -DCRING=3 -DCREAD=4 -DPDONE=5 -DCDONE=6 -DFLAGS=2
 CFLAGS          =  -Wall -Wextra -ggdb -O2 -pthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
 

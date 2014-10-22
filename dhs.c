@@ -42,26 +42,15 @@
  *
  * TO DO:
  *
- * Handle SIGSEGV gracefully
  * Ensure no buffer overflows, use resize
+ * replace all print statements with putc(int character, FILE io) loops for thread operation
  *
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <fcntl.h>
 #include <getopt.h>
-#include <signal.h>
-#include <errno.h>
-#include <ctype.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
 
 #ifndef __FAVOR_BSD
 # define __FAVOR_BSD
@@ -82,56 +71,50 @@
 
 #define DEBUG 0
 
-#ifndef fngPntLen
-#define fngPntLen 14
-#endif
-
-#ifndef _t5TplLen
-#define _t5TplLen
-static const uint32_t t5TplLen = 44;
-#endif
+#define RECV_CLIENT 1
+#define RECV_SERVER 2
 
 typedef struct
 {
         unsigned char *data;
         size_t data_len;
         char *path;
-} peer_info_t , *ppeer_info_t;
+} peer_info_t, *ppeer_info_t;
 
-#define RECV_CLIENT	1
-#define RECV_SERVER	2
-
-#define SIGQTY 5
+unsigned int i = 0, len = 0;
+char buf[102] = {0};
 
 /* capture handle */
-pcap_t 					*handle = 0;
-pntoh_tcp_session_t		tcp_session = 0;
-pntoh_ipv4_session_t	ipv4_session = 0;
-unsigned short			receive = 0;
+pcap_t *handle = 0;
+pntoh_tcp_session_t tcp_session = 0;
+pntoh_ipv4_session_t ipv4_session = 0;
+unsigned short	receive = 0;
 
 /* header extract and signiture storage, memory */
 uint8_t pending_more_hdr_data = 0;
-unsigned char * hdr_data = NULL;
+unsigned char * hdr_data = 0;
 /* low end of average HTTP header size is 200
  * high end can be over 2kb, hdr_data size will auto adjust as the program runs
  * 850 given as sufficient for most headers to minimize resize operations
  * thanks to stackoverflow forum, typo.pl
  */
 uint32_t hdr_size = 850;
-uint32_t shmkey[6] = {6511, 5433, 9884, 1763, 5782, 6284};
-uint32_t t5shmkey[5] = {959, 653, 987, 627, 905};
-int * shmid = NULL;
-int * t5shmid = NULL;
-int ** shm = NULL;
-int ** sigs = NULL;
-int ** ret_sigs = NULL;
-char ** t5s = NULL;
-char ** t5shm = NULL;
+uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
+uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
+int * shmid = 0;
+int * t5shmid = 0;
+int ** shm = 0;
+int ** sigs = 0;
+char ** t5s = 0;
+char ** t5shm = 0;
 
+char * tmp = 0;
+
+/* a double ptr by reference */
 inline static void inCtr(int *** s)
 {
         ((*s)[0][0])++;
-        ((*s)[0][0]) = ((((*s)[0][0]) % SIGQTY) != 0 ? (((*s)[0][0]) % SIGQTY) : 5); // 1 - 5
+        ((*s)[0][0]) = ((((*s)[0][0]) % SIGQTY) != 0 ? (((*s)[0][0]) % SIGQTY) : SIGQTY); // 1 - 5
 }
 
 /**
@@ -139,10 +122,33 @@ inline static void inCtr(int *** s)
  */
 void shandler ( int sign )
 {
-        if ( sign != 0 )
+        signal( SIGINT, &shandler );
+        signal( SIGTERM, &shandler );
+        signal( SIGSEGV, &shandler );
+
+        if (DEBUG)
         {
-                signal ( sign , &shandler );
+                if (shm[CTL][FLAGS] == CDONE)
+                {
+                        strncpy(buf, "\r\n\t\t[i] --- Signaled to quit by consumer\r\n", 42);
+                        i = 0;
+                        while (i < 42)
+                        {
+                                putc(buf[i], stderr);
+                        }
+                }
+                strncpy(buf, "\r\n\t\t[i] --- Signal: \r\n", 22);
+                tmp = itoa(sign);
+                len = strlen(tmp);
+                strncat(buf, tmp, len);
+                len += 22;
+                i = 0;
+                while (i < len)
+                {
+                        putc(buf[i], stderr);
+                }
         }
+        shm[CTL][FLAGS] = PDONE;
 
         freeMem();
 
@@ -150,11 +156,58 @@ void shandler ( int sign )
 
         ntoh_exit();
 
-        fprintf( stderr, "\r\n\t\tX      -----   Inactive   -----      X\r\n\r\n" );
-        exit( sign );
+        strncpy(buf, "\r\n\t\tX      -----   Inactive   -----      X\r\n\r\n", 46);
+        i = 0;
+        while (i < 46)
+        {
+                putc(buf[i], stderr);
+        }
+        _exit( sign );
 }
 
-/* retrieve */
+void resizeInt(int ** in, unsigned int * len)
+{
+        if (in == 0 || len == 0 || *in == 0)
+        {
+                return;
+        }
+        int * tmp = 0;
+        tmp = (int *)malloc(sizeof(int) * (*len) * 2);
+        if (tmp == 0)
+        {
+                if (DEBUG)
+                {
+                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                        shandler(0);
+                }
+        }
+        memcpy(tmp, (*in), (*len));
+        free(*in);
+        *in = tmp;
+        *len *= 2;
+}
+
+void resizeChar(char ** in, unsigned int * len)
+{
+        if (in == 0 || len == 0 || *in == 0)
+        {
+                return;
+        }
+        char * tmp = 0;
+        tmp = (char *)malloc(sizeof(char) * (*len) * 2);
+        if (tmp == 0)
+        {
+                if (DEBUG)
+                {
+                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                        shandler(0);
+                }
+        }
+        memcpy(tmp, (*in), (*len));
+        free(*in);
+        *in = tmp;
+        *len *= 2;
+}
 
 /**
  * @brief Returns a struct which stores some peer information
@@ -177,7 +230,7 @@ ppeer_info_t get_peer_info ( unsigned char *payload , size_t payload_len , pntoh
 
         ret->path = strndup ( path , sizeof(path) );
 
-        return ret;
+        return (ret);
 }
 
 /**
@@ -206,31 +259,31 @@ inline char *get_proto_description ( unsigned short proto )
         switch ( proto )
         {
                 case IPPROTO_ICMP:
-                        return "ICMP";
+                        return ("ICMP");
 
                 case IPPROTO_TCP:
-                        return "TCP";
+                        return ("TCP");
 
                 case IPPROTO_UDP:
-                        return "UDP";
+                        return ("UDP");
 
                 case IPPROTO_IGMP:
-                        return "IGMP";
+                        return ("IGMP");
 
                 case IPPROTO_IPV6:
-                        return "IPv6";
+                        return ("IPv6");
 
                 case IPPROTO_FRAGMENT:
-                        return "IPv6 Fragment";
+                        return ("IPv6 Fragment");
 
                 default:
-                        return "Undefined";
+                        return ("Undefined");
         }
 }
 
 void generic_write_data ( void * data )
 {
-        if (data == NULL || strlen((const char *)data) < 1)
+        if (data == 0 || strlen((const char *)data) < 1)
         {
                 if (DEBUG)
                 {
@@ -239,9 +292,6 @@ void generic_write_data ( void * data )
                 return;
         }
         int fd = 0;
-
-        //char path [2056];
-        //strncpy (path, "/home/ernest/research/generic_dump\0", 35);
 
         if ( (fd = open ( (const char *)"/home/ernest/research/generic_dump" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
@@ -252,12 +302,6 @@ void generic_write_data ( void * data )
                 return;
         }
 
-        /*
-           strncpy (path, "\0", 1);
-           strncpy (path, (const char *)data, strlen((const char *)data));
-           strncat (path, "\r\n\0", 3);
-           */
-
         write ( fd , (const char *)data , strlen((const char *)data) );
         close ( fd );
         return;
@@ -266,14 +310,13 @@ void generic_write_data ( void * data )
 
 void write_hdr_data ( void )
 {
-        if (hdr_data == NULL || strlen((char *)hdr_data) < 1)
+        if (hdr_data == 0 || strlen((char *)hdr_data) < 1)
         {
                 return;
         }
         int fd = 0;
 
-        char path [512];
-        //        strncpy (path, "/home/ernest/research/hdr_and_sig\0", 34);
+        char path [102];
 
         if ( (fd = open ( (const char *)"/home/ernest/research/hdr_and_sig" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
@@ -285,7 +328,7 @@ void write_hdr_data ( void )
         }
 
         write ( fd , (const char *)hdr_data , strlen((const char *)hdr_data) );
-        write ( fd , "\n" , 1 );
+        write ( fd , "\r\n" , 2 );
 
         /*FINGER PRINT EXPLANATION:
          * array of integers, each slot contains a specified number (integer) that represents the character count 
@@ -305,16 +348,15 @@ void write_hdr_data ( void )
          *INDEX 13              GT              # OF >
          */
 
-        strncpy (path, "Finger Print:", 13);
-        if (sigs == NULL || sigs[(sigs[0][0])] == NULL)
+        write (fd, "Finger Print:", 13);
+        if (sigs == 0 || sigs[(sigs[CTL][0])] == 0)
         {
-                strncat(path, "\r\nNo fingerprint found\r\n\0", 25);
-                write(fd, path, strlen(path));
+                write(fd, "\r\nNo fingerprint found\r\n\0", 25);
                 close ( fd );
                 pending_more_hdr_data = 0;
                 return;
         }
-        int i = 0;
+        i = 0;
         while (i < fngPntLen)
         {
                 strncpy (path, "\r\n", 2);
@@ -374,14 +416,15 @@ void write_hdr_data ( void )
                 {
                         strncat (path, ">    -  ", 8);
                 }
-                /* IMPROVE */
-                strcat (path, itoa(sigs[((sigs[0][0])-1) > 0 ? (sigs[0][0])-1 : SIGQTY-((sigs[0][0])-1)][i]));
+                unsigned int t = sigs[CTL][POS] - 1;
+                char * tmp = itoa(sigs[(t > 0 ? t : SIGQTY)][i]);
+                strncat (path, tmp, strlen(tmp));
                 strncat (path, "\r\n", 2);
                 write ( fd , path , strlen(path) );
                 i++;
         }
 
-        write ( fd , "\n" , 1 );
+        write ( fd , "\r\n" , 2 );
         close ( fd );
         pending_more_hdr_data = 0;
         strncpy((char *)hdr_data, "", 1);
@@ -421,22 +464,22 @@ void write_data ( ppeer_info_t info )
  */
 int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int dataLen)
 {
-        if(curPcktData == NULL || dataLen == 0 )
+        if(curPcktData == 0 || dataLen == 0 )
         {
                 if (DEBUG)
                 {
                         fprintf(stderr, "There was not header to parse\n");
                 }
 
-                return (NULL);
+                return (0);
         }
 
-        int i = 0;
+        i = 0;
         int cmd = 8;
         int cmdSet = 0;
         int proto = 8;
         int protoSet = 0;
-        int len = dataLen;   //calculated during parsing
+        len = dataLen;   //calculated during parsing
         int var = 0;
         int pcnt = 0;
         int apos = 0;
@@ -451,7 +494,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         int qstnmrk = 0;
         unsigned char *target = (unsigned char *)curPcktData;
         int *fngPnt = malloc(sizeof(int) * fngPntLen);
-        if (fngPnt == NULL)
+        if (fngPnt == 0)
         {
                 if (DEBUG)
                 {
@@ -693,9 +736,9 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
 
 inline static void resizeHdr(void)
 {
-        unsigned char * tmp = NULL;
+        unsigned char * tmp = 0;
         tmp = (unsigned char *)malloc(sizeof(unsigned char) * hdr_size * 2);
-        if (tmp == NULL)
+        if (tmp == 0)
         {
                 if (DEBUG)
                 {
@@ -711,15 +754,16 @@ inline static void resizeHdr(void)
 
 uint8_t extractHttpHdr (const char * udata)
 {
-        unsigned int i = 0, j = 0;
+        i = 0;
+        unsigned int j = 0;
         if (pending_more_hdr_data != 0)
         {
                 j = strlen((const char *)hdr_data);
         }
-        if (hdr_data == NULL)
+        if (hdr_data == 0)
         {
                 hdr_data = (unsigned char *)malloc(sizeof(unsigned char) * hdr_size);
-                if (hdr_data == NULL)
+                if (hdr_data == 0)
                 {
                         if (DEBUG)
                         {
@@ -769,21 +813,53 @@ inline uint8_t dumpToShm(void)
 {
         if (DEBUG)
         {
-                fprintf(stderr, "in dumpToShm, shm[0][0] = %d\r\n", shm[0][0]);
+                fprintf(stderr, "in dumpToShm, shm[CTL][POS] = %d\r\n", shm[CTL][POS]);
                 fflush(stderr);
         }
+        //char tmp [512];
         /* try-lock shared memory */
-        if (shm[0][FLAGS] == CREAD || shm[0][FLAGS] == 0)
+        /* HERE */
+        /*
+           switch(shm[CTL][FLAGS])
+           {
+           case PWTEN:
+           strcpy(tmp, (char *)"PWTEN");
+           break;
+           case PWING:
+           strcpy(tmp, (char *)"PWING");
+           break;
+           case CREAD:
+           strcpy(tmp, (char *)"CREAD");
+           break;
+           case CRING:
+           strcpy(tmp, (char *)"CRING");
+           break;
+           case 0:
+           strcpy(tmp, (char *)"0");
+           break;
+           default:
+           strcpy(tmp, (char *)"Improper value recorded!");
+           break;
+           }
+           fprintf(stderr, "in dumpToShm()\r\n\tshm[CTL][POS] = %d\r\n\tsigs[CTL][0] = %d\r\n\tshm[CTL][PEND] = %d\r\n\tshm[CTL][FLAGS] = %d (%s)\r\n",
+           shm[CTL][POS],
+           sigs[CTL][0],
+           shm[CTL][PEND],
+           shm[CTL][FLAGS],
+           tmp);
+           fflush(stderr);
+           */
+        if (shm[CTL][FLAGS] == CREAD || shm[CTL][FLAGS] == 0)
         {
-                shm[0][FLAGS] = PWING;
+
+                shm[CTL][FLAGS] = PWING;
                 /* do the dump to shm routine */
-                while (shm[0][0] != sigs[0][0])
+                while (shm[CTL][POS] != sigs[CTL][0])
                 {
-                        memcpy(shm[((shm[0][0]))], sigs[(shm[0][0])], (sizeof(int) * fngPntLen));
-                        memcpy(t5shm[((shm[0][0] - 1))], t5s[(shm[0][0]) - 1], (sizeof(char) * t5TplLen));
+                        memcpy(shm[((shm[CTL][POS]))], sigs[(shm[CTL][POS])], (sizeof(int) * fngPntLen));
+                        memcpy(t5shm[((shm[CTL][POS] - 1))], t5s[(shm[CTL][POS]) - 1], (sizeof(char) * t5TplLen));
                         /* unlock shared memory */
-                        shm[0][FLAGS] = PWTEN;
-                        if ((shm[0][1]) == 5)
+                        if ((shm[CTL][PEND]) == 5)
                         {
                                 if (DEBUG)
                                 {
@@ -792,37 +868,38 @@ inline uint8_t dumpToShm(void)
                         }
                         else
                         {
-                                shm[0][1] += 1; // pending
+                                shm[CTL][PEND] += 1; // pending
                         }
                         inCtr(&shm); // pos
                 }
+                shm[CTL][FLAGS] = PWTEN;
                 /* reset vars */
                 pending_more_hdr_data = 0;
                 /* reset the flag to what I expect it to be - CREAD - for testing purposes HERE */
-//                shm[0][FLAGS] = CREAD;
+                //shm[CTL][FLAGS] = CREAD;
                 return (0);
         }
         else
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[i] --- Blocked with flag %d\r\n", shm[0][FLAGS]);
+                        fprintf(stderr, "\r\n\t[i] --- Blocked with flag %d\r\n", shm[CTL][FLAGS]);
                         fflush(stderr);
                 }
-                return ((uint8_t)(shm[0][FLAGS]));
+                return ((uint8_t)(shm[CTL][FLAGS]));
         }
 }
 
 inline static void extractSig(void)
 {
-        sigs[(sigs[0][0])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
+        sigs[(sigs[CTL][0])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
         inCtr(&sigs);
 }
 
 inline uint32_t getSrcPrt(const char * path)
 {
-        unsigned int i = 0;
-        unsigned int len = strlen(path);
+        i = 0;
+        len = strlen(path);
         while (path[i] != ':' && i < len)
         {
                 i++;
@@ -837,8 +914,8 @@ inline uint32_t getSrcPrt(const char * path)
 
 inline uint32_t getDstPrt(const char * path)
 {
-        unsigned int i = 0;
-        unsigned int len = strlen(path);
+        i = 0;
+        len = strlen(path);
         while (path[i] != ':' && i < len)
         {
                 i++;
@@ -924,7 +1001,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                         {
                                 /* HERE */
                                 /* try lock memory */
-                                memcpy(t5s[(shm[0][0]) - 1], (const char *)(pinfo->path), strlen((const char *)(pinfo->path)));
+                                memcpy(t5s[(shm[CTL][POS]) - 1], (const char *)(pinfo->path), strlen((const char *)(pinfo->path)));
                                 /* unlock memory */
                                 if (DEBUG)
                                 {
@@ -1097,7 +1174,7 @@ void tcp_callback ( pntoh_tcp_stream_t stream , pntoh_tcp_peer_t orig , pntoh_tc
 /* IPv4 Callback */
 void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_tuple4_t tuple , unsigned char *data , size_t len , unsigned short reason )
 {
-        unsigned int i = 0;
+        i = 0;
 
         if (DEBUG)
         {
@@ -1130,24 +1207,10 @@ void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_tuple4_t tuple , unsign
 
 int main ( int argc , char *argv[] )
 {
-        /* parameters parsing */
-        int c;
 
-        /* pcap */
-        char 				errbuf[PCAP_ERRBUF_SIZE];
-        struct bpf_program 	fp;
-        char 				filter_exp[] = "ip";
-        char 				*source = 0;
-        char 				*filter = filter_exp;
-        const unsigned char *packet = 0;
-        struct pcap_pkthdr 	header;
-
-        /* packet dissection */
-        struct ip		*ip;
-        unsigned int	error;
-
-        /* extra */
-        unsigned int ipf,tcps;
+        signal( SIGINT, &shandler );
+        signal( SIGTERM, &shandler );
+        //        signal( SIGSEGV, &shandler );
 
         fprintf( stderr, "\r\n\t\t######################################" );
         fprintf( stderr, "\r\n\t\t#           Dump HTTP Sigs           #" );
@@ -1175,6 +1238,25 @@ int main ( int argc , char *argv[] )
                 fprintf( stderr, "\n\t-s | --server ----------> Receive server data only\n\n");
                 exit( 1 );
         }
+
+        /* parameters parsing */
+        int c = 0;
+
+        /* pcap */
+        char errbuf[PCAP_ERRBUF_SIZE];
+        struct bpf_program fp;
+        char filter_exp[] = "ip";
+        char *source = 0;
+        char *filter = filter_exp;
+        const unsigned char *packet = 0;
+        struct pcap_pkthdr header;
+
+        /* packet dissection */
+        struct ip	*ip;
+        unsigned int	error;
+
+        /* extra */
+        unsigned int ipf, tcps;
 
         /* check parameters */
         while ( c >= 0 )
@@ -1294,10 +1376,6 @@ int main ( int argc , char *argv[] )
                 }
         }
 
-        signal( SIGINT, &shandler );
-        signal( SIGTERM, &shandler );
-        signal( SIGSEGV, &shandler );
-
         /*******************************************/
         /** libntoh initialization process starts **/
         /*******************************************/
@@ -1305,107 +1383,87 @@ int main ( int argc , char *argv[] )
         initMem();
 
         /* initialize some values */
-        sigs[0][0] = 1;
-        sigs[0][1] = 0;
-        sigs[0][FLAGS] = 0;
-        shm[0][0] = 1;
-        shm[0][1] = 0;
-        shm[0][FLAGS] = 0;
+        sigs[CTL][POS] = 1;
+        sigs[CTL][PEND] = 0;
+        sigs[CTL][FLAGS] = 0;
+        shm[CTL][POS] = 1;
+        shm[CTL][PEND] = 0;
+        shm[CTL][FLAGS] = 0;
 
-        /* HERE
-         * split child here
-         */
+        ntoh_init ();
 
-        /*
-        pid_t child = fork();
-
-        if (child == 0) // parent
+        if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
         {
-        */
-
-                ntoh_init ();
-
-                if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
-                {
-                        if (DEBUG)
-                        {
-                                fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
-                        }
-                        exit ( -5 );
-                }
-
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
+                        fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
                 }
+                exit ( -5 );
+        }
 
-                if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
-                {
-                        ntoh_tcp_free_session ( tcp_session );
-                        if (DEBUG)
-                        {
-                                fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
-                        }
-                        exit ( -6 );
-                }
+        if (DEBUG)
+        {
+                fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
+        }
 
+        if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
+        {
+                ntoh_tcp_free_session ( tcp_session );
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
-
-                        fflush(stderr);
+                        fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
                 }
-
-                /* capture starts */
-                while ( ( packet = pcap_next( handle, &header ) ) != 0 )
-                {
-                        /* get packet headers */
-                        ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
-                        if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
-                        {
-                                continue;
-                        }
-
-                        /* it is an IPv4 fragment */
-                        if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
-                        {
-                                send_ipv4_fragment ( ip , &ipv4_callback );
-                        }
-                        /* or a TCP segment */
-                        else if ( ip->ip_p == IPPROTO_TCP )
-                        {
-                                send_tcp_segment ( ip , &tcp_callback );
-                        }
-                }
-
-                tcps = ntoh_tcp_count_streams( tcp_session );
-                ipf = ntoh_ipv4_count_flows ( ipv4_session );
-
-                /* no streams left */
-                if ( ipf + tcps > 0 )
-                {
-                        if (DEBUG)
-                        {
-                                fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
-                                pause();
-                        }
-                }
-
-                shandler( 0 );
-                /*
+                exit ( -6 );
         }
 
-        else
+        if (DEBUG)
         {
-                unsigned int i = 0;
-                ret_sigs = (int **)malloc(sizeof(int *) * (SIGQTY));
-                while (i < (SIGQTY))
+                fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
+
+                fflush(stderr);
+        }
+
+        /* capture starts */
+        /* accept signal from consumer to quit */
+        while ( ( packet = pcap_next( handle, &header ) ) != 0 && shm[CTL][FLAGS] != CDONE)
+        {
+                /* get packet headers */
+                ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
+                if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
                 {
-                        ret_sigs[i++] = (int *)malloc(sizeof(int) * fngPntLen);
+                        continue;
+                }
+
+                /* it is an IPv4 fragment */
+                if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
+                {
+                        send_ipv4_fragment ( ip , &ipv4_callback );
+                }
+                /* or a TCP segment */
+                else if ( ip->ip_p == IPPROTO_TCP )
+                {
+                        send_tcp_segment ( ip , &tcp_callback );
                 }
         }
-        */
+        if (shm[CTL][FLAGS] == CDONE)
+        {
+        }
 
-        //dummy return
+        tcps = ntoh_tcp_count_streams( tcp_session );
+        ipf = ntoh_ipv4_count_flows ( ipv4_session );
+
+        /* no streams left */
+        if ( ipf + tcps > 0 )
+        {
+                if (DEBUG)
+                {
+                        fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
+                        pause();
+                }
+        }
+
+        shandler( 0 );
+
+        //dummy return, should never be called
         return (0);
 }

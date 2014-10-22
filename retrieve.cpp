@@ -1,99 +1,136 @@
 #include <iostream>
-#include <cstdio>
-#include <cstdlib>
-#include <string.h>
-#include <unistd.h>
-#include <stdint.h>
-#include <errno.h>
-#include <signal.h>
-#include <sys/types.h>
-#include <sys/shm.h>
 
 #include <globals.h>
 
 using namespace std;
 
-#ifndef DEBUG
-#define DEBUG 1
-#endif
+#define DEBUG 0
 
-char buf[1024];
+char buf[102];
 
-#define SIGQTY 5
-
-#ifndef _bufSize
-#define _bufSize
-static const uint32_t bufSize = 5;
-#endif
-
-#ifndef fngPntLen
-#define fngPntLen 14
-#endif
-
-#ifndef _t5TplLen
-#define _t5TplLen
-static const uint32_t t5TplLen = 44;
-#endif
-
-uint32_t shmkey[6] = {6511, 5433, 9884, 1763, 5782, 6284};
-uint32_t t5shmkey[5] = {959, 653, 987, 627, 905};
+uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
+uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
 
 int * shmid = NULL;
 int * t5shmid = NULL;
 int ** shm = NULL;
 char ** t5shm = NULL;
 
+int ** retrieved_sigs = NULL;
+char ** retrieved_t5s = NULL;
+
 char * itoa (int i)
 {
-	 char const digit[] = "0123456789";
-	 char * p = 0;
-	 p = (char *)malloc(sizeof(char) * 11);
-	 if (!p)
-	 {
-		  return (0);
-	 }
-	 if (i < 0)
-	 {
-		  *p++ = '-';
-		  i = -1;
-	 }
-	 int shifter = i;
-	 do
-	 { //Move to where representation ends
-		  ++p;
-		  shifter = shifter/10;
-	 }
-	 while (shifter);
-	 *p = '\0';
-	 do
-	 { //Move back, inserting digits as u go
-		  *--p = digit[i%10];
-		  i = i/10;
-	 }
-	 while (i);
-	 return p;
+        char const digit[] = "0123456789";
+        char * p = 0;
+        p = (char *)malloc(sizeof(char) * 11);
+        if (!p)
+        {
+                return (0);
+        }
+        if (i < 0)
+        {
+                *p++ = '-';
+                i = -1;
+        }
+        int shifter = i;
+        //Move to where representation ends
+        do
+        {
+                ++p;
+                shifter = shifter/10;
+        }
+        while (shifter);
+        *p = '\0';
+        //Move back, inserting digits as u go
+        do
+        {
+                *--p = digit[i%10];
+                i = i/10;
+        }
+        while (i);
+        return (p);
 }
 
 inline static void inCtr(int ** s)
 {
         (*s[0])++;
-        (*s[0]) = (((*s[0]) % SIGQTY) > 0 ? ((*s[0]) % SIGQTY) : (*s[0]) % SIGQTY + 1); // 1 - 5
+        (*s[0]) = (((*s[0]) % SIGQTY) > 0 ? ((*s[0]) % SIGQTY) : SIGQTY); // 1 - 5
 }
 
 unsigned int i = 0;
 
+inline void fData(void)
+{
+        i = 0;
+        if (retrieved_sigs)
+        {
+                while (i < SIGQTY)
+                {
+                        free(retrieved_sigs[i++]);
+                }
+                free(retrieved_sigs);
+        }
+        i = 0;
+        if (retrieved_t5s)
+        {
+                while (i < SIGQTY)
+                {
+                        free(retrieved_t5s[i++]);
+                }
+                free(retrieved_t5s);
+        }
+}
+
 inline void dShmids(void)
 {
         i = 0;
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
-                shmdt(t5shm[i]);
+                if (i < SIGQTY)
+                {
+                        shmdt(t5shm[i]);
+                }
+                shmdt(shm[i]);
                 i++;
         }
-        i = 0;
-        while (i < (bufSize + 1))
+}
+
+inline void iData(void)
+{
+        retrieved_t5s = (char **)malloc(sizeof(char *) * SIGQTY);
+        retrieved_sigs = (int **)malloc(sizeof(int *) * (SIGQTY));
+        if (retrieved_t5s == NULL || retrieved_sigs == NULL)
         {
-                shmdt(shm[i]);
+                if (DEBUG)
+                {
+                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        i = 0;
+                        while (i < 38)
+                        {
+                                putc(buf[i], stderr);
+                        }
+                }
+                _exit(-1);
+        }
+        i = 0;
+        while (i < SIGQTY)
+        {
+                retrieved_t5s[i] = (char *)malloc(sizeof(char) * t5TplLen);
+                retrieved_sigs[i] = (int *)malloc(sizeof(int) * fngPntLen);
+                if (retrieved_t5s[i] == NULL || retrieved_sigs[i] == NULL)
+                {
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                                i = 0;
+                                while (i < 38)
+                                {
+                                        putc(buf[i], stderr);
+                                }
+                        }
+                        _exit(-1);
+                }
                 i++;
         }
 }
@@ -124,8 +161,8 @@ inline void fShmids(void)
 
 inline void iShms(void)
 {
-        shm = (int **)malloc(sizeof(int *) * (bufSize + 1));
-        t5shm = (char **)malloc(sizeof(char *) * (bufSize + 1));
+        shm = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
         {
                 strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
@@ -138,8 +175,8 @@ inline void iShmids(void)
 {
         i = 0;
         srand(time(NULL));
-        shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
-        t5shmid = (int *)malloc(sizeof(int) * (bufSize + 1));
+        shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
+        t5shmid = (int *)malloc(sizeof(int) * (SIGQTY));
         if (shmid == NULL || t5shmid == NULL)
         {
                 if (DEBUG)
@@ -149,7 +186,7 @@ inline void iShmids(void)
                 }
                 _exit(-1);
         }
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
                 shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, 0666);
                 if (shmid[i] < 0)
@@ -163,17 +200,20 @@ inline void iShmids(void)
                         }
                         _exit(-1);
                 }
-                t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, 0666);
-                if (t5shmid[i] < 0)
+                if (i < SIGQTY)
                 {
-                        if (DEBUG)
+                        t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, 0666);
+                        if (t5shmid[i] < 0)
                         {
-                                strncpy(buf, "unable to get t5shm with key ", 29);
-                                strncat(buf, itoa(t5shmkey[i]), strlen(itoa(t5shmkey[i])));
-                                strncat(buf, "\r\n", 2);
-                                write(2, buf, strlen(buf));
+                                if (DEBUG)
+                                {
+                                        strncpy(buf, "unable to get t5shm with key ", 29);
+                                        strncat(buf, itoa(t5shmkey[i]), strlen(itoa(t5shmkey[i])));
+                                        strncat(buf, "\r\n", 2);
+                                        write(2, buf, strlen(buf));
+                                }
+                                _exit(-1);
                         }
-                        _exit(-1);
                 }
                 i++;
         }
@@ -182,11 +222,9 @@ inline void iShmids(void)
 inline void aShmids(void)
 {
         i = 0;
-        unsigned int j = 0;
-        while (i < (bufSize + 1))
+        while (i < (SIGQTY + 1))
         {
                 shm[i] = (int *)shmat(shmid[i], (void *) 0, 0);
-                t5shm[i] = (char *)shmat(t5shmid[i], (void *) 0, 0);
                 if ((void *)shm[i] == (void *)-1)
                 {
                         strncpy(buf, "unable to attach shm", 14);
@@ -194,22 +232,16 @@ inline void aShmids(void)
                         write(2, buf, 16);
                         _exit(-1);
                 }
-                if ((void *)t5shm[i] == (void *)-1)
+                if (i < SIGQTY)
                 {
-                        strncpy(buf, "unable to attach t5shm", 16);
-                        strncat(buf, "\r\n", 2);
-                        write(2, buf, 18);
-                        _exit(-1);
-                }
-                j = 0;
-                while (j < fngPntLen)
-                {
-                        shm[i][j++] = 0;
-                }
-                j = 0;
-                while (j < t5TplLen)
-                {
-                        shm[i][j++] = '0';
+                        t5shm[i] = (char *)shmat(t5shmid[i], (void *) 0, 0);
+                        if ((void *)t5shm[i] == (void *)-1)
+                        {
+                                strncpy(buf, "unable to attach t5shm", 16);
+                                strncat(buf, "\r\n", 2);
+                                write(2, buf, 18);
+                                _exit(-1);
+                        }
                 }
                 i++;
         }
@@ -218,10 +250,26 @@ inline void aShmids(void)
 
 void shandler ( int sign )
 {
+        signal( SIGINT, &shandler );
+        signal( SIGTERM, &shandler );
+        signal( SIGSEGV, &shandler );
+
+        if (DEBUG)
+        {
+                if (shm[CTL][FLAGS] == PDONE)
+                {
+                        fprintf(stderr, "\r\n\t\t[i] --- Signaled to quit by producer\r\n");
+                        fprintf(stderr, "\r\n\t\t[i] --- Sign passed to retrieve shandler is %d\r\n", sign);
+                        fflush(stderr);
+                }
+        }
+        shm[CTL][FLAGS] = CDONE;
+
         dShmids();
 
         fShmids();
         fShms();
+        fData();
 
         fprintf( stderr, "\n\n[+] Retrieve finished!\n" );
         exit( sign );
@@ -232,11 +280,17 @@ int main (void)
 
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
+        signal( SIGSEGV, &shandler );
         if (DEBUG)
         {
                 fprintf(stderr, "retrieve\n\tcalling ishms()\r\n");
         }
         iShms();
+        if (DEBUG)
+        {
+                fprintf(stderr, "\tcalling iData()\r\n");
+        }
+        iData();
         if (DEBUG)
         {
                 fprintf(stderr, "\tcalling ishmids()\r\n");
@@ -249,22 +303,31 @@ int main (void)
         aShmids();
 
         // Retrieve
+        fprintf(stderr, "\tentering loop\r\n");
 
-        if (DEBUG)
+        /* accept signal from producer to quit */
+        while (shm[CTL][FLAGS] != PDONE)
         {
-                fprintf(stderr, "\tabout to enter\r\n");
-        }
-        while (1)
-        {
-                while (shm[0][FLAGS] != PWTEN)
+                if (shm[CTL][FLAGS] == PWTEN)
                 {
-                        fprintf(stderr, "waiting for flag to be PWTEN\r\n");
-                        fflush(stderr);
+                        shm[CTL][FLAGS] = CRING;
+                        if (DEBUG)
+                        {
+                                write(2, "data written, retrieving...\r\n", 26);
+                                write(2, "SIMULATED retrieved, releasing\r\n", 22);
+                                fflush(stderr);
+                        }
+
+                        /* decrement pending counter
+                         * should never go below 0,
+                         * so this test is probably unnecessary
+                         */
+                        if (shm[CTL][PEND] > 0)
+                        {
+                                shm[CTL][PEND]--;
+                        }
+                        shm[CTL][FLAGS] = CREAD;
                 }
-                shm[0][FLAGS] = CRING;
-                write(2, "data written, retrieving...\r\n", 26);
-                write(2, "SIMULATED retrieved, releasing\r\n", 22);
-                shm[0][FLAGS] = CREAD;
         }
 
         shandler (0);
