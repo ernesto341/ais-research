@@ -1,5 +1,5 @@
 .*.swp
-./lib/*.o
+lib/*.o
 dhs
 err
 sigs
