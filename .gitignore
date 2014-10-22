@@ -1,1 +1,7 @@
 .*.swp
+./lib/*.o
+dhs
+err
+sigs
+retrieve
+
