@@ -21,7 +21,7 @@
 #include <globals.h>
 
 /* 0, 1 - 5 */
-extern int ** shm;
+extern volatile sig_atomic_t ** shm;
 extern int ** sigs;
 extern char ** t5s;
 extern char ** t5shm;

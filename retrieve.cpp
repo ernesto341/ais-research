@@ -6,6 +6,8 @@ using namespace std;
 
 #define DEBUG 0
 
+#define SIGBUF 50
+
 char buf[102];
 
 uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
@@ -13,7 +15,7 @@ uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
 
 int * shmid = NULL;
 int * t5shmid = NULL;
-int ** shm = NULL;
+volatile sig_atomic_t ** shm = NULL;
 char ** t5shm = NULL;
 
 int ** retrieved_sigs = NULL;
@@ -91,7 +93,7 @@ inline void dShmids(void)
                 {
                         shmdt(t5shm[i]);
                 }
-                shmdt(shm[i]);
+                shmdt((void *)shm[i]);
                 i++;
         }
 }
@@ -161,7 +163,7 @@ inline void fShmids(void)
 
 inline void iShms(void)
 {
-        shm = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
         t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
         {
@@ -188,7 +190,7 @@ inline void iShmids(void)
         }
         while (i < (SIGQTY + 1))
         {
-                shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, 0666);
+                shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, 0666);
                 if (shmid[i] < 0)
                 {
                         if (DEBUG)
@@ -302,14 +304,23 @@ int main (void)
         }
         aShmids();
 
-        // Retrieve
-        fprintf(stderr, "\tentering loop\r\n");
+        if (DEBUG)
+        {
+                // Retrieve
+                fprintf(stderr, "\tentering loop\r\n");
+        }
 
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE)
         {
                 if (shm[CTL][FLAGS] == PWTEN)
                 {
+
+                        if (DEBUG)
+                        {
+                                // Retrieve
+                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                        }
                         shm[CTL][FLAGS] = CRING;
                         if (DEBUG)
                         {
@@ -317,6 +328,15 @@ int main (void)
                                 write(2, "SIMULATED retrieved, releasing\r\n", 22);
                                 fflush(stderr);
                         }
+                        i = 0;
+                        fprintf(stderr, "\r\nsig:\r\n");
+                        while (i < fngPntLen)
+                        {
+                                fprintf(stderr, "\t%d - %d", i, shm[(shm[CTL][POS])][i]);
+                                fprintf(stderr, "\r\n");
+                                i++;
+                        }
+                                fprintf(stderr, "\r\n");
 
                         /* decrement pending counter
                          * should never go below 0,

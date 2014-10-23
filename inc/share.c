@@ -36,7 +36,7 @@ inline void dShmids(void)
         i = 0;
         while (i < (SIGQTY + 1))
         {
-                shmdt(shm[i]);
+                shmdt((sig_atomic_t *)shm[i]);
                 shmctl(shmid[i], IPC_RMID, 0);
                 i++;
         }
@@ -131,7 +131,7 @@ inline void iData(void)
 
 inline void iShms(void)
 {
-        shm = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
         t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
         {
@@ -161,7 +161,7 @@ inline void iShmids(void)
         }
         while (i < (SIGQTY + 1))
         {
-                shmid[i] = shmget(shmkey[i], sizeof(int) * fngPntLen, IPC_CREAT | 0666);
+                shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, IPC_CREAT | 0666);
                 if (shmid[i] < 0)
                 {
                         if (DEBUG)

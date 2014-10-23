@@ -81,8 +81,7 @@ typedef struct
         char *path;
 } peer_info_t, *ppeer_info_t;
 
-unsigned int i = 0, len = 0;
-char buf[102] = {0};
+unsigned int len = 0;
 
 /* capture handle */
 pcap_t *handle = 0;
@@ -103,7 +102,7 @@ uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
 uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
 int * shmid = 0;
 int * t5shmid = 0;
-int ** shm = 0;
+volatile sig_atomic_t ** shm = 0;
 int ** sigs = 0;
 char ** t5s = 0;
 char ** t5shm = 0;
@@ -126,15 +125,15 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
+        unsigned int i = 0;
         if (DEBUG)
         {
                 if (shm[CTL][FLAGS] == CDONE)
                 {
                         strncpy(buf, "\r\n\t\t[i] --- Signaled to quit by consumer\r\n", 42);
-                        i = 0;
                         while (i < 42)
                         {
-                                putc(buf[i], stderr);
+                                putc(buf[i++], stderr);
                         }
                 }
                 strncpy(buf, "\r\n\t\t[i] --- Signal: \r\n", 22);
@@ -145,7 +144,7 @@ void shandler ( int sign )
                 i = 0;
                 while (i < len)
                 {
-                        putc(buf[i], stderr);
+                        putc(buf[i++], stderr);
                 }
         }
         shm[CTL][FLAGS] = PDONE;
@@ -160,7 +159,7 @@ void shandler ( int sign )
         i = 0;
         while (i < 46)
         {
-                putc(buf[i], stderr);
+                putc(buf[i++], stderr);
         }
         _exit( sign );
 }
@@ -349,14 +348,14 @@ void write_hdr_data ( void )
          */
 
         write (fd, "Finger Print:", 13);
-        if (sigs == 0 || sigs[(sigs[CTL][0])] == 0)
+        if (sigs == 0 || sigs[(sigs[CTL][POS])] == 0)
         {
                 write(fd, "\r\nNo fingerprint found\r\n\0", 25);
                 close ( fd );
                 pending_more_hdr_data = 0;
                 return;
         }
-        i = 0;
+        unsigned int i = 0;
         while (i < fngPntLen)
         {
                 strncpy (path, "\r\n", 2);
@@ -427,7 +426,8 @@ void write_hdr_data ( void )
         write ( fd , "\r\n" , 2 );
         close ( fd );
         pending_more_hdr_data = 0;
-        strncpy((char *)hdr_data, "", 1);
+        free(hdr_data);
+        hdr_data = 0;
 
         return;
 }
@@ -474,7 +474,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
                 return (0);
         }
 
-        i = 0;
+        unsigned int i = 0;
         int cmd = 8;
         int cmdSet = 0;
         int proto = 8;
@@ -754,7 +754,7 @@ inline static void resizeHdr(void)
 
 uint8_t extractHttpHdr (const char * udata)
 {
-        i = 0;
+        unsigned int i = 0;
         unsigned int j = 0;
         if (pending_more_hdr_data != 0)
         {
@@ -816,47 +816,15 @@ inline uint8_t dumpToShm(void)
                 fprintf(stderr, "in dumpToShm, shm[CTL][POS] = %d\r\n", shm[CTL][POS]);
                 fflush(stderr);
         }
-        //char tmp [512];
         /* try-lock shared memory */
-        /* HERE */
-        /*
-           switch(shm[CTL][FLAGS])
-           {
-           case PWTEN:
-           strcpy(tmp, (char *)"PWTEN");
-           break;
-           case PWING:
-           strcpy(tmp, (char *)"PWING");
-           break;
-           case CREAD:
-           strcpy(tmp, (char *)"CREAD");
-           break;
-           case CRING:
-           strcpy(tmp, (char *)"CRING");
-           break;
-           case 0:
-           strcpy(tmp, (char *)"0");
-           break;
-           default:
-           strcpy(tmp, (char *)"Improper value recorded!");
-           break;
-           }
-           fprintf(stderr, "in dumpToShm()\r\n\tshm[CTL][POS] = %d\r\n\tsigs[CTL][0] = %d\r\n\tshm[CTL][PEND] = %d\r\n\tshm[CTL][FLAGS] = %d (%s)\r\n",
-           shm[CTL][POS],
-           sigs[CTL][0],
-           shm[CTL][PEND],
-           shm[CTL][FLAGS],
-           tmp);
-           fflush(stderr);
-           */
         if (shm[CTL][FLAGS] == CREAD || shm[CTL][FLAGS] == 0)
         {
 
                 shm[CTL][FLAGS] = PWING;
                 /* do the dump to shm routine */
-                while (shm[CTL][POS] != sigs[CTL][0])
+                while (shm[CTL][POS] != sigs[CTL][POS])
                 {
-                        memcpy(shm[((shm[CTL][POS]))], sigs[(shm[CTL][POS])], (sizeof(int) * fngPntLen));
+                        memcpy((sig_atomic_t *)shm[(int)((shm[CTL][POS]))], (sig_atomic_t *)sigs[(int)(shm[CTL][POS])], (sizeof(sig_atomic_t) * fngPntLen));
                         memcpy(t5shm[((shm[CTL][POS] - 1))], t5s[(shm[CTL][POS]) - 1], (sizeof(char) * t5TplLen));
                         /* unlock shared memory */
                         if ((shm[CTL][PEND]) == 5)
@@ -870,13 +838,11 @@ inline uint8_t dumpToShm(void)
                         {
                                 shm[CTL][PEND] += 1; // pending
                         }
-                        inCtr(&shm); // pos
+                        inCtr((int ***)(&shm)); // pos
                 }
                 shm[CTL][FLAGS] = PWTEN;
                 /* reset vars */
                 pending_more_hdr_data = 0;
-                /* reset the flag to what I expect it to be - CREAD - for testing purposes HERE */
-                //shm[CTL][FLAGS] = CREAD;
                 return (0);
         }
         else
@@ -892,13 +858,13 @@ inline uint8_t dumpToShm(void)
 
 inline static void extractSig(void)
 {
-        sigs[(sigs[CTL][0])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
+        sigs[(sigs[CTL][POS])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
         inCtr(&sigs);
 }
 
 inline uint32_t getSrcPrt(const char * path)
 {
-        i = 0;
+        unsigned int i = 0;
         len = strlen(path);
         while (path[i] != ':' && i < len)
         {
@@ -914,7 +880,7 @@ inline uint32_t getSrcPrt(const char * path)
 
 inline uint32_t getDstPrt(const char * path)
 {
-        i = 0;
+        unsigned int i = 0;
         len = strlen(path);
         while (path[i] != ':' && i < len)
         {
@@ -1174,7 +1140,7 @@ void tcp_callback ( pntoh_tcp_stream_t stream , pntoh_tcp_peer_t orig , pntoh_tc
 /* IPv4 Callback */
 void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_tuple4_t tuple , unsigned char *data , size_t len , unsigned short reason )
 {
-        i = 0;
+        unsigned int i = 0;
 
         if (DEBUG)
         {
@@ -1447,6 +1413,7 @@ int main ( int argc , char *argv[] )
         }
         if (shm[CTL][FLAGS] == CDONE)
         {
+                shandler( 0 );
         }
 
         tcps = ntoh_tcp_count_streams( tcp_session );
