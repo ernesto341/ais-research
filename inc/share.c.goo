@@ -6,27 +6,21 @@
 
 #include <share.h>
 
+#ifndef SIGQTY
+#define SIGQTY 5
+#endif
+
+#ifndef t5TplLen
+#define t5TplLen 44
+#endif
+
+#ifndef fngPntLen
+#define fngPntLen 14
+#endif
+
 #ifndef DEBUG
 #define DEBUG 0
 #endif
-
-/* storage and control */
-/*
-struct snc
-{
-        const uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
-        const uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
-
-        uint32_t * shmkey;
-        uint32_t * t5shmkey;
-
-        volatile sig_atomic_t ** shm;
-        volatile sig_atomic_t ** t5shm;
-
-        sig_atomic_t ** sigs;
-        sig_atomic_t ** t5s;
-};
-*/
 
 unsigned int i = 0;
 
