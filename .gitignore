@@ -2,6 +2,8 @@
 lib/*.o
 dhs
 err
+dhs_err
+ret_err
 sigs
 retrieve
 

@@ -44,6 +44,8 @@ clean:
 	rm -f *.o
 	rm -f *.gch
 	rm -f err
+	rm -f dhs_err
+	rm -f ret_err
 	rm -f core
 	rm -f dhs
 	rm -f retrieve
