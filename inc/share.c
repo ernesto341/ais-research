@@ -10,110 +10,95 @@
 #define DEBUG 0
 #endif
 
-/* storage and control */
-/*
-struct snc
-{
-        const uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
-        const uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
-
-        uint32_t * shmkey;
-        uint32_t * t5shmkey;
-
-        volatile sig_atomic_t ** shm;
-        volatile sig_atomic_t ** t5shm;
-
-        sig_atomic_t ** sigs;
-        sig_atomic_t ** t5s;
-};
-*/
-
 unsigned int i = 0;
 
-inline void dShmids(void)
+inline void dShmids(psnc_t snc)
 {
         i = 0;
         while (i < (SIGQTY))
         {
-                shmdt(t5shm[i]);
-                shmctl(t5shmid[i], IPC_RMID, 0);
+                shmdt((sig_atomic_t *)snc->t5shm[i]);
+                shmctl(snc->t5shmid[i], IPC_RMID, 0);
                 i++;
         }
         i = 0;
         while (i < (SIGQTY + 1))
         {
-                shmdt((sig_atomic_t *)shm[i]);
-                shmctl(shmid[i], IPC_RMID, 0);
+                shmdt((sig_atomic_t *)snc->shm[i]);
+                shmctl(snc->shmid[i], IPC_RMID, 0);
                 i++;
         }
 }
 
-inline void fData(void)
+inline void fData(psnc_t snc)
 {
         if (hdr_data)
         {
                 free(hdr_data);
         }
         unsigned int i = 0;
-        if (sigs)
+        if (snc->sigs)
         {
                 while (i < (SIGQTY + 1))
                 {
-                        free(sigs[i++]);
+                        free(snc->sigs[i++]);
                 }
-                free(sigs);
+                free(snc->sigs);
         }
         i = 0;
-        if (t5s)
+        if (snc->t5s)
         {
                 while (i < SIGQTY)
                 {
-                        free(t5s[i++]);
+                        free(snc->t5s[i++]);
                 }
-                free(t5s);
+                free(snc->t5s);
         }
         i = 0;
 }
 
-inline void fShms(void)
+inline void fShms(psnc_t snc)
 {
-        if (t5shm)
+        if (snc->t5shm)
         {
-                free(t5shm);
+                free(snc->t5shm);
         }
-        if (shm)
+        if (snc->shm)
         {
-                free(shm);
+                free(snc->shm);
         }
 }
 
-inline void fShmids(void)
+inline void fShmids(psnc_t snc)
 {
-        if (t5shmid)
+        if (snc->t5shmid)
         {
-                free(t5shmid);
+                free(snc->t5shmid);
         }
-        if (shmid)
+        if (snc->shmid)
         {
-                free(shmid);
+                free(snc->shmid);
         }
 }
 
-void freeMem (void)
+void freeMem (psnc_t snc)
 {
-        dShmids();
+        if (snc)
+        {
+                dShmids(snc);
 
-        fShmids();
-        fShms();
-        fData();
+                fShmids(snc);
+                fShms(snc);
+                fData(snc);
+        }
 }
 
-inline void iData(void)
+inline void iData(psnc_t snc)
 {
         hdr_data = (unsigned char *)malloc(sizeof(unsigned char) * (hdr_size * 5));
         hdr_size *= 5;
-        t5s = (char **)malloc(sizeof(char *) * SIGQTY);
-        if (hdr_data == NULL || t5s == NULL)
+        snc->t5s = (sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGQTY);
+        if (hdr_data == 0 || snc->t5s == 0)
         {
                 if (DEBUG)
                 {
@@ -125,21 +110,21 @@ inline void iData(void)
         i = 0;
         while (i < SIGQTY)
         {
-                t5s[i++] = (char *)malloc(sizeof(char) * t5TplLen);
+                snc->t5s[i++] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
         }
         i = 0;
-        sigs = (int **)malloc(sizeof(int *) * (SIGQTY + 1));
+        snc->sigs = (sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
         while (i < (SIGQTY + 1))
         {
-                sigs[i++] = (int *)malloc(sizeof(int) * fngPntLen);
+                snc->sigs[i++] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
         }
 }
 
-inline void iShms(void)
+inline void iShms(psnc_t snc)
 {
-        shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
-        t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
-        if (shm == NULL || t5shm == NULL)
+        snc->shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
+        snc->t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
+        if (snc->shm == 0 || snc->t5shm == 0)
         {
                 if (DEBUG)
                 {
@@ -150,13 +135,13 @@ inline void iShms(void)
         }
 }
 
-inline void iShmids(void)
+inline void iShmids(psnc_t snc)
 {
         i = 0;
         srand(time(NULL));
-        shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
-        t5shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
-        if (shmid == NULL || t5shmid == NULL)
+        snc->shmid = (int32_t *)malloc(sizeof(int32_t) * (SIGQTY + 1));
+        snc->t5shmid = (int32_t *)malloc(sizeof(int32_t) * (SIGQTY));
+        if (snc->shmid == 0 || snc->t5shmid == 0)
         {
                 if (DEBUG)
                 {
@@ -167,8 +152,8 @@ inline void iShmids(void)
         }
         while (i < (SIGQTY + 1))
         {
-                shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, IPC_CREAT | 0666);
-                if (shmid[i] < 0)
+                snc->shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, IPC_CREAT | 0666);
+                if (snc->shmid[i] < 0)
                 {
                         if (DEBUG)
                         {
@@ -184,8 +169,8 @@ inline void iShmids(void)
         i = 0;
         while (i < (SIGQTY))
         {
-                t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, IPC_CREAT | 0666);
-                if (t5shmid[i] < 0)
+                snc->t5shmid[i] = shmget(t5shmkey[i], sizeof(sig_atomic_t) * t5TplLen, IPC_CREAT | 0666);
+                if (snc->t5shmid[i] < 0)
                 {
                         if (DEBUG)
                         {
@@ -200,14 +185,14 @@ inline void iShmids(void)
         }
 }
 
-inline void aShmids(void)
+inline void aShmids(psnc_t snc)
 {
         i = 0;
         unsigned int j = 0;
         while (i < (SIGQTY + 1))
         {
-                shm[i] = shmat(shmid[i], (void *) 0, 0);
-                if ((void *)shm[i] == (void *)-1)
+                snc->shm[i] = shmat(snc->shmid[i], (void *) 0, 0);
+                if ((void *)snc->shm[i] == (void *)-1)
                 {
                         if (DEBUG)
                         {
@@ -217,18 +202,18 @@ inline void aShmids(void)
                         }
                         _exit(-1);
                 }
-                j = 0;
+                j = -1;
                 while (j < fngPntLen)
                 {
-                        shm[i][j++] = 0;
+                        snc->shm[i][j++] = -1;
                 }
                 i++;
         }
         i = 0;
         while (i < SIGQTY)
         {
-                t5shm[i] = shmat(t5shmid[i], (void *) 0, 0);
-                if ((void *)t5shm[i] == (void *)-1)
+                snc->t5shm[i] = shmat(snc->t5shmid[i], (void *) 0, 0);
+                if ((void *)snc->t5shm[i] == (void *)-1)
                 {
                         if (DEBUG)
                         {
@@ -241,20 +226,31 @@ inline void aShmids(void)
                 j = 0;
                 while (j < t5TplLen)
                 {
-                        t5shm[i][j++] = '0';
+                        snc->t5shm[i][j++] = '0';
                 }
                 i++;
         }
 
 }
 
-void initMem(void)
+void initMem(psnc_t snc)
 {
-        iData();
-        iShms();
-        iShmids();
+        if (snc)
+        {
+                iData(snc);
+                iShms(snc);
+                iShmids(snc);
 
-        aShmids();
+                aShmids(snc);
+
+                /* initialize some values */
+                snc->sigs[CTL][POS] = 1;
+                snc->sigs[CTL][PEND] = 0;
+                snc->sigs[CTL][FLAGS] = 0;
+                snc->shm[CTL][POS] = 1;
+                snc->shm[CTL][PEND] = 0;
+                snc->shm[CTL][FLAGS] = 0;
+        }
 }
 
 /* share.c */

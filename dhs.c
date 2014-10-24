@@ -69,7 +69,7 @@
 #include <share.h>
 #include <globals.h>
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define RECV_CLIENT 1
 #define RECV_SERVER 2
@@ -81,8 +81,6 @@ typedef struct
         char *path;
 } peer_info_t, *ppeer_info_t;
 
-unsigned int len = 0;
-
 /* capture handle */
 pcap_t *handle = 0;
 pntoh_tcp_session_t tcp_session = 0;
@@ -92,25 +90,29 @@ unsigned short	receive = 0;
 /* header extract and signiture storage, memory */
 uint8_t pending_more_hdr_data = 0;
 unsigned char * hdr_data = 0;
+uint32_t hdr_size = 850;
 /* low end of average HTTP header size is 200
  * high end can be over 2kb, hdr_data size will auto adjust as the program runs
  * 850 given as sufficient for most headers to minimize resize operations
  * thanks to stackoverflow forum, typo.pl
  */
-uint32_t hdr_size = 850;
 uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
 uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
-int * shmid = 0;
-int * t5shmid = 0;
-volatile sig_atomic_t ** shm = 0;
-int ** sigs = 0;
-char ** t5s = 0;
-char ** t5shm = 0;
+/*
+   int * shmid = 0;
+   int * t5shmid = 0;
+   volatile sig_atomic_t ** shm = 0;
+   int ** sigs = 0;
+   char ** t5s = 0;
+   char ** t5shm = 0;
+   */
+snc_t snc;
 
 char * tmp = 0;
+sig_atomic_t * t5Convert;
 
 /* a double ptr by reference */
-inline static void inCtr(int *** s)
+inline static void inCtr(sig_atomic_t *** s)
 {
         ((*s)[0][0])++;
         ((*s)[0][0]) = ((((*s)[0][0]) % SIGQTY) != 0 ? (((*s)[0][0]) % SIGQTY) : SIGQTY); // 1 - 5
@@ -125,10 +127,15 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        unsigned int i = 0;
+        if (t5Convert)
+        {
+                free(t5Convert);
+        }
+
+        unsigned int i = 0, len = 0;
         if (DEBUG)
         {
-                if (shm[CTL][FLAGS] == CDONE)
+                if (snc.shm[CTL][FLAGS] == CDONE)
                 {
                         strncpy(buf, "\r\n\t\t[i] --- Signaled to quit by consumer\r\n", 42);
                         while (i < 42)
@@ -147,9 +154,9 @@ void shandler ( int sign )
                         putc(buf[i++], stderr);
                 }
         }
-        shm[CTL][FLAGS] = PDONE;
+        snc.shm[CTL][FLAGS] = PDONE;
 
-        freeMem();
+        freeMem(&snc);
 
         pcap_close( handle );
 
@@ -348,7 +355,7 @@ void write_hdr_data ( void )
          */
 
         write (fd, "Finger Print:", 13);
-        if (sigs == 0 || sigs[(sigs[CTL][POS])] == 0)
+        if (snc.sigs == 0 || snc.sigs[(snc.sigs[CTL][POS])] == 0)
         {
                 write(fd, "\r\nNo fingerprint found\r\n\0", 25);
                 close ( fd );
@@ -415,8 +422,8 @@ void write_hdr_data ( void )
                 {
                         strncat (path, ">    -  ", 8);
                 }
-                unsigned int t = sigs[CTL][POS] - 1;
-                char * tmp = itoa(sigs[(t > 0 ? t : SIGQTY)][i]);
+                unsigned int t = snc.sigs[CTL][POS] - 1;
+                char * tmp = itoa(snc.sigs[(t > 0 ? t : SIGQTY)][i]);
                 strncat (path, tmp, strlen(tmp));
                 strncat (path, "\r\n", 2);
                 write ( fd , path , strlen(path) );
@@ -479,7 +486,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         int cmdSet = 0;
         int proto = 8;
         int protoSet = 0;
-        len = dataLen;   //calculated during parsing
+        unsigned int len = dataLen;   //calculated during parsing
         int var = 0;
         int pcnt = 0;
         int apos = 0;
@@ -813,21 +820,23 @@ inline uint8_t dumpToShm(void)
 {
         if (DEBUG)
         {
-                fprintf(stderr, "in dumpToShm, shm[CTL][POS] = %d\r\n", shm[CTL][POS]);
+                fprintf(stderr, "\r\nin dumpToShm, shm[CTL][POS] = %d\r\n", snc.shm[CTL][POS]);
+                fprintf(stderr, "\r\nsnc.t5s[above-1] = %p\r\n", snc.t5s[(snc.shm[CTL][POS])-1]);
+                fprintf(stderr, "\r\nsnc.t5shm[above-1] = %p\r\n", snc.t5shm[(snc.shm[CTL][POS])-1]);
                 fflush(stderr);
         }
         /* try-lock shared memory */
-        if (shm[CTL][FLAGS] == CREAD || shm[CTL][FLAGS] == 0)
+        if (snc.shm[CTL][FLAGS] == CREAD || snc.shm[CTL][FLAGS] == 0)
         {
 
-                shm[CTL][FLAGS] = PWING;
+                snc.shm[CTL][FLAGS] = PWING;
                 /* do the dump to shm routine */
-                while (shm[CTL][POS] != sigs[CTL][POS])
+                while (snc.shm[CTL][POS] != snc.sigs[CTL][POS])
                 {
-                        memcpy((sig_atomic_t *)shm[(int)((shm[CTL][POS]))], (sig_atomic_t *)sigs[(int)(shm[CTL][POS])], (sizeof(sig_atomic_t) * fngPntLen));
-                        memcpy(t5shm[((shm[CTL][POS] - 1))], t5s[(shm[CTL][POS]) - 1], (sizeof(char) * t5TplLen));
+                        memcpy((sig_atomic_t *)snc.shm[snc.shm[CTL][POS]], (sig_atomic_t *)snc.sigs[snc.shm[CTL][POS]], (sizeof(sig_atomic_t) * fngPntLen));
+                        memcpy((sig_atomic_t *)snc.t5shm[((snc.shm[CTL][POS] - 1))], (sig_atomic_t *)snc.t5s[(snc.shm[CTL][POS]) - 1], (sizeof(sig_atomic_t) * t5TplLen));
                         /* unlock shared memory */
-                        if ((shm[CTL][PEND]) == 5)
+                        if ((snc.shm[CTL][PEND]) == 5)
                         {
                                 if (DEBUG)
                                 {
@@ -836,11 +845,11 @@ inline uint8_t dumpToShm(void)
                         }
                         else
                         {
-                                shm[CTL][PEND] += 1; // pending
+                                snc.shm[CTL][PEND] += 1; // pending
                         }
-                        inCtr((int ***)(&shm)); // pos
+                        inCtr((sig_atomic_t ***)(&snc.shm)); // pos
                 }
-                shm[CTL][FLAGS] = PWTEN;
+                snc.shm[CTL][FLAGS] = PWTEN;
                 /* reset vars */
                 pending_more_hdr_data = 0;
                 return (0);
@@ -849,23 +858,24 @@ inline uint8_t dumpToShm(void)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[i] --- Blocked with flag %d\r\n", shm[CTL][FLAGS]);
+                        fprintf(stderr, "\r\n\t[i] --- Blocked with flag %d\r\n", snc.shm[CTL][FLAGS]);
                         fflush(stderr);
                 }
-                return ((uint8_t)(shm[CTL][FLAGS]));
+                return ((uint8_t)(snc.shm[CTL][FLAGS]));
         }
 }
 
 inline static void extractSig(void)
 {
-        sigs[(sigs[CTL][POS])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
-        inCtr(&sigs);
+        snc.sigs[(snc.sigs[CTL][POS])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
+        memset(hdr_data, '\0', hdr_size);
+        inCtr(&snc.sigs);
 }
 
 inline uint32_t getSrcPrt(const char * path)
 {
-        unsigned int i = 0;
-        len = strlen(path);
+        uint32_t i = 0;
+        uint32_t len = strlen(path);
         while (path[i] != ':' && i < len)
         {
                 i++;
@@ -880,8 +890,8 @@ inline uint32_t getSrcPrt(const char * path)
 
 inline uint32_t getDstPrt(const char * path)
 {
-        unsigned int i = 0;
-        len = strlen(path);
+        uint32_t i = 0;
+        uint32_t len = strlen(path);
         while (path[i] != ':' && i < len)
         {
                 i++;
@@ -967,7 +977,18 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                         {
                                 /* HERE */
                                 /* try lock memory */
-                                memcpy(t5s[(shm[CTL][POS]) - 1], (const char *)(pinfo->path), strlen((const char *)(pinfo->path)));
+                                size_t l = (strlen((const char *)(pinfo->path)));
+                                uint32_t i = 0;
+                                while (i < l)
+                                {
+                                        if (DEBUG)
+                                        {
+                                                fprintf(stderr, "(pinfo->path[%d]): %c\r\n(sig_atomic_t)(pinfo->path[%d]) *(simulated with cast to int): %d\r\n", i, (pinfo->path[i]), i, (int)(pinfo->path[i]));
+                                                fflush(stderr);
+                                        }
+                                        snc.t5s[(snc.shm[CTL][POS]) - 1][i] = (sig_atomic_t)(pinfo->path[i]);
+                                        i++;
+                                }
                                 /* unlock memory */
                                 if (DEBUG)
                                 {
@@ -1176,7 +1197,7 @@ int main ( int argc , char *argv[] )
 
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
-        //        signal( SIGSEGV, &shandler );
+        signal( SIGSEGV, &shandler );
 
         fprintf( stderr, "\r\n\t\t######################################" );
         fprintf( stderr, "\r\n\t\t#           Dump HTTP Sigs           #" );
@@ -1346,15 +1367,8 @@ int main ( int argc , char *argv[] )
         /** libntoh initialization process starts **/
         /*******************************************/
 
-        initMem();
-
-        /* initialize some values */
-        sigs[CTL][POS] = 1;
-        sigs[CTL][PEND] = 0;
-        sigs[CTL][FLAGS] = 0;
-        shm[CTL][POS] = 1;
-        shm[CTL][PEND] = 0;
-        shm[CTL][FLAGS] = 0;
+        initMem(&snc);
+        t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
 
         ntoh_init ();
 
@@ -1391,7 +1405,7 @@ int main ( int argc , char *argv[] )
 
         /* capture starts */
         /* accept signal from consumer to quit */
-        while ( ( packet = pcap_next( handle, &header ) ) != 0 && shm[CTL][FLAGS] != CDONE)
+        while ( ( packet = pcap_next( handle, &header ) ) != 0 && snc.shm[CTL][FLAGS] != CDONE)
         {
                 /* get packet headers */
                 ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
@@ -1411,7 +1425,7 @@ int main ( int argc , char *argv[] )
                         send_tcp_segment ( ip , &tcp_callback );
                 }
         }
-        if (shm[CTL][FLAGS] == CDONE)
+        if (snc.shm[CTL][FLAGS] == CDONE)
         {
                 shandler( 0 );
         }

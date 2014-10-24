@@ -4,7 +4,7 @@
 
 using namespace std;
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define SIGBUF 50
 
@@ -18,8 +18,17 @@ int * t5shmid = NULL;
 volatile sig_atomic_t ** shm = NULL;
 char ** t5shm = NULL;
 
-int ** retrieved_sigs = NULL;
-char ** retrieved_t5s = NULL;
+volatile sig_atomic_t ** retrieved_sigs = NULL;
+volatile sig_atomic_t ** retrieved_t5s = NULL;
+
+sig_atomic_t ct = 0;
+sig_atomic_t local_pos = 1;
+
+inline static void inPos(void)
+{
+        ((local_pos))++;
+        ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
+}
 
 char * itoa (int i)
 {
@@ -54,31 +63,35 @@ char * itoa (int i)
         return (p);
 }
 
-inline static void inCtr(int ** s)
-{
-        (*s[0])++;
-        (*s[0]) = (((*s[0]) % SIGQTY) > 0 ? ((*s[0]) % SIGQTY) : SIGQTY); // 1 - 5
-}
-
 unsigned int i = 0;
 
 inline void fData(void)
 {
         i = 0;
-        if (retrieved_sigs)
+        if (retrieved_sigs && retrieved_t5s)
         {
-                while (i < SIGQTY)
+                while (i < SIGBUF)
                 {
-                        free(retrieved_sigs[i++]);
+                        free((sig_atomic_t *)retrieved_sigs[i]);
+                        free((sig_atomic_t *)retrieved_t5s[i]);
+                        i++;
+                }
+                free(retrieved_t5s);
+                free(retrieved_sigs);
+        }
+        else if (retrieved_sigs)
+        {
+                while (i < SIGBUF)
+                {
+                        free((sig_atomic_t *)retrieved_sigs[i++]);
                 }
                 free(retrieved_sigs);
         }
-        i = 0;
-        if (retrieved_t5s)
+        else if (retrieved_t5s)
         {
-                while (i < SIGQTY)
+                while (i < SIGBUF)
                 {
-                        free(retrieved_t5s[i++]);
+                        free((sig_atomic_t *)retrieved_t5s[i++]);
                 }
                 free(retrieved_t5s);
         }
@@ -100,8 +113,8 @@ inline void dShmids(void)
 
 inline void iData(void)
 {
-        retrieved_t5s = (char **)malloc(sizeof(char *) * SIGQTY);
-        retrieved_sigs = (int **)malloc(sizeof(int *) * (SIGQTY));
+        retrieved_t5s = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
+        retrieved_sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGBUF));
         if (retrieved_t5s == NULL || retrieved_sigs == NULL)
         {
                 if (DEBUG)
@@ -116,10 +129,10 @@ inline void iData(void)
                 _exit(-1);
         }
         i = 0;
-        while (i < SIGQTY)
+        while (i < SIGBUF)
         {
-                retrieved_t5s[i] = (char *)malloc(sizeof(char) * t5TplLen);
-                retrieved_sigs[i] = (int *)malloc(sizeof(int) * fngPntLen);
+                retrieved_t5s[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                retrieved_sigs[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
                 if (retrieved_t5s[i] == NULL || retrieved_sigs[i] == NULL)
                 {
                         if (DEBUG)
@@ -313,40 +326,51 @@ int main (void)
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE)
         {
-                if (shm[CTL][FLAGS] == PWTEN)
+                /* only copy when dhs isn't writing and while there are pending headers to get 
+                 */
+                while (shm[CTL][PEND] > 0)
                 {
+                        if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
+                        {
+                                if (DEBUG)
+                                {
+                                        // Retrieve
+                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                                }
+                                shm[CTL][FLAGS] = CRING;
+                                if (DEBUG)
+                                {
+                                        write(2, "data written, retrieving...\r\n", 26);
+                                        write(2, "SIMULATED retrieved, releasing\r\n", 22);
+                                        fflush(stderr);
+                                }
+                                memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
+                                if (DEBUG)
+                                {
+                                        fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
+                                        i = 0;
+                                        fprintf(stderr, "\r\nsig:\r\n");
+                                        while (i < fngPntLen)
+                                        {
+                                                fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
+                                                fprintf(stderr, "\r\n");
+                                                i++;
+                                        }
+                                        fflush(stderr);
+                                }
+                                ct = (ct+1)%SIGBUF;
+                                inPos();
 
-                        if (DEBUG)
-                        {
-                                // Retrieve
-                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                                /* decrement pending counter
+                                 * should never go below 0,
+                                 * so this test is probably unnecessary
+                                 */
+                                if (shm[CTL][PEND] > 0)
+                                {
+                                        shm[CTL][PEND]--;
+                                }
+                                shm[CTL][FLAGS] = CREAD;
                         }
-                        shm[CTL][FLAGS] = CRING;
-                        if (DEBUG)
-                        {
-                                write(2, "data written, retrieving...\r\n", 26);
-                                write(2, "SIMULATED retrieved, releasing\r\n", 22);
-                                fflush(stderr);
-                        }
-                        i = 0;
-                        fprintf(stderr, "\r\nsig:\r\n");
-                        while (i < fngPntLen)
-                        {
-                                fprintf(stderr, "\t%d - %d", i, shm[(shm[CTL][POS])][i]);
-                                fprintf(stderr, "\r\n");
-                                i++;
-                        }
-                                fprintf(stderr, "\r\n");
-
-                        /* decrement pending counter
-                         * should never go below 0,
-                         * so this test is probably unnecessary
-                         */
-                        if (shm[CTL][PEND] > 0)
-                        {
-                                shm[CTL][PEND]--;
-                        }
-                        shm[CTL][FLAGS] = CREAD;
                 }
         }
 

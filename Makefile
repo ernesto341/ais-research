@@ -38,7 +38,6 @@ share:
 dhs: /usr/local/lib/libpcap.a
 	$(CC) -o dhs dhs.c $(LIB)/*.o /usr/local/lib/libpcap.a
 
-
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak

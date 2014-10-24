@@ -13,7 +13,7 @@ CTL	inc/globals.h	/^static const uint8_t CTL = 0;$/;"	v
 Contains	inc/contains.h	/^char * Contains (char * str, char * pattern)$/;"	f
 DEBUG	dhs.c	72;"	d	file:
 DEBUG	inc/contains.h	18;"	d
-DEBUG	inc/share.c	22;"	d	file:
+DEBUG	inc/share.c	10;"	d	file:
 DEBUG	retrieve.cpp	7;"	d	file:
 DEFAULT_IPV4_FRAGMENT_TIMEOUT	inc/ipv4defrag.h	123;"	d
 DEFAULT_IPV4_MAX_FLOWS	inc/ipv4defrag.h	128;"	d
@@ -124,8 +124,8 @@ PWING	inc/globals.h	/^static const uint8_t PWING = 1;$/;"	v
 PWTEN	inc/globals.h	/^static const uint8_t PWTEN = 2;$/;"	v
 RECV_CLIENT	dhs.c	74;"	d	file:
 RECV_SERVER	dhs.c	75;"	d	file:
+SIGBUF	retrieve.cpp	9;"	d	file:
 SIGQTY	inc/globals.h	/^static const uint32_t SIGQTY = 5;$/;"	v
-SIGQTY	inc/share.c	10;"	d	file:
 SYM	Makefile	/^SYM             =  -DPWING=1 -DPWTEN=2 -DCRING=3 -DCREAD=4 -DPDONE=5 -DCDONE=6 -DFLAGS=2$/;"	m
 VERSION	inc/libntoh.c	39;"	d	file:
 _CONTAINS_H_	inc/contains.h	15;"	d
@@ -158,12 +158,11 @@ _ntoh_tcp_status_	inc/tcpreassembly.h	/^enum _ntoh_tcp_status_$/;"	g
 _tcp_segment_	inc/tcpreassembly.h	/^typedef struct _tcp_segment_$/;"	s
 _tcp_session_	inc/tcpreassembly.h	/^typedef struct _tcp_session_$/;"	s
 _tcp_stream_	inc/tcpreassembly.h	/^typedef struct _tcp_stream_$/;"	s
-aShmids	inc/share.c	/^inline void aShmids(void)$/;"	f
+aShmids	inc/share.c	/^inline void aShmids(psnc_t snc)$/;"	f
 aShmids	retrieve.cpp	/^inline void aShmids(void)$/;"	f
 ack	inc/tcpreassembly.h	/^	unsigned long 			ack;$/;"	m	struct:_tcp_segment_
-addr	inc/tcpreassembly.h	/^	unsigned int 		addr;$/;"	m	struct:__anon12
+addr	inc/tcpreassembly.h	/^	unsigned int 		addr;$/;"	m	struct:__anon13
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
-buf	dhs.c	/^char buf[102] = {0};$/;"	v
 buf	inc/share.h	/^char buf[1024];$/;"	v
 buf	retrieve.cpp	/^char buf[102];$/;"	v
 build_datagram	inc/ipv4defrag.c	/^inline static unsigned char *build_datagram ( pntoh_ipv4_session_t session , pntoh_ipv4_flow_t flow )$/;"	f	file:
@@ -172,7 +171,8 @@ check_timeout	inc/tcpreassembly.h	/^enum check_timeout$/;"	g
 cksum	inc/ipv4defrag.c	/^inline static unsigned short cksum(unsigned short *buf, int nwords)$/;"	f	file:
 client	inc/tcpreassembly.h	/^	ntoh_tcp_peer_t 	client;$/;"	m	struct:_tcp_stream_
 closedby	inc/tcpreassembly.h	/^	unsigned short 		closedby;$/;"	m	struct:_tcp_stream_
-dShmids	inc/share.c	/^inline void dShmids(void)$/;"	f
+ct	retrieve.cpp	/^sig_atomic_t ct = 0;$/;"	v
+dShmids	inc/share.c	/^inline void dShmids(psnc_t snc)$/;"	f
 dShmids	retrieve.cpp	/^inline void dShmids(void)$/;"	f
 data	dhs.c	/^        unsigned char *data;$/;"	m	struct:__anon1	file:
 data	inc/ipv4defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv4_fragment_
@@ -181,31 +181,30 @@ data_len	dhs.c	/^        size_t data_len;$/;"	m	struct:__anon1	file:
 delete_stream	inc/tcpreassembly.c	/^inline static void delete_stream ( pntoh_tcp_session_t session , pntoh_tcp_stream_t *stream , int reason , int extra )$/;"	f	file:
 destination	inc/ipv4defrag.h	/^	unsigned int destination;$/;"	m	struct:__anon2
 destination	inc/ipv6defrag.h	/^	uint8_t destination[16];$/;"	m	struct:__anon5
-destination	inc/tcpreassembly.h	/^	unsigned int 	destination;$/;"	m	struct:__anon11
-dport	inc/tcpreassembly.h	/^	unsigned short 	dport;$/;"	m	struct:__anon11
+destination	inc/tcpreassembly.h	/^	unsigned int 	destination;$/;"	m	struct:__anon12
+dport	inc/tcpreassembly.h	/^	unsigned short 	dport;$/;"	m	struct:__anon12
 dumpToShm	dhs.c	/^inline uint8_t dumpToShm(void)$/;"	f
 enable_check_nowindow	inc/tcpreassembly.h	/^    unsigned short 		enable_check_nowindow;	\/\/ @contrib: di3online - https:\/\/github.com\/di3online$/;"	m	struct:_tcp_stream_
 enable_check_timeout	inc/tcpreassembly.h	/^    unsigned short 		enable_check_timeout;	\/\/ @contrib: di3online - https:\/\/github.com\/di3online$/;"	m	struct:_tcp_stream_
 extractHttpHdr	dhs.c	/^uint8_t extractHttpHdr (const char * udata)$/;"	f
 extractSig	dhs.c	/^inline static void extractSig(void)$/;"	f	file:
-fData	inc/share.c	/^inline void fData(void)$/;"	f
+fData	inc/share.c	/^inline void fData(psnc_t snc)$/;"	f
 fData	retrieve.cpp	/^inline void fData(void)$/;"	f
-fShmids	inc/share.c	/^inline void fShmids(void)$/;"	f
+fShmids	inc/share.c	/^inline void fShmids(psnc_t snc)$/;"	f
 fShmids	retrieve.cpp	/^inline void fShmids(void)$/;"	f
-fShms	inc/share.c	/^inline void fShms(void)$/;"	f
+fShms	inc/share.c	/^inline void fShms(psnc_t snc)$/;"	f
 fShms	retrieve.cpp	/^inline void fShms(void)$/;"	f
 final_iphdr	inc/ipv4defrag.h	/^	struct ip 				*final_iphdr;$/;"	m	struct:__anon3	typeref:struct:__anon3::ip
 final_iphdr	inc/ipv6defrag.h	/^	struct ip6_hdr			*final_iphdr;$/;"	m	struct:__anon6	typeref:struct:__anon6::ip6_hdr
-final_seq	inc/tcpreassembly.h	/^	unsigned long 		final_seq;$/;"	m	struct:__anon12
+final_seq	inc/tcpreassembly.h	/^	unsigned long 		final_seq;$/;"	m	struct:__anon13
 flags	inc/tcpreassembly.h	/^	unsigned char 			flags;$/;"	m	struct:_tcp_segment_
 flows	inc/ipv4defrag.h	/^	pipv4_flows_table_t 	flows;$/;"	m	struct:_ipv4_session_
 flows	inc/ipv6defrag.h	/^	pipv6_flows_table_t 	flows;$/;"	m	struct:_ipv6_session_
 flush_peer_queues	inc/tcpreassembly.c	/^inline static void flush_peer_queues ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , unsigned short extra )$/;"	f	file:
 fngPntLen	inc/globals.h	/^static const uint32_t fngPntLen = 14;$/;"	v
-fngPntLen	inc/share.c	18;"	d	file:
 fragments	inc/ipv4defrag.h	/^	pntoh_ipv4_fragment_t 	fragments;$/;"	m	struct:__anon3
 fragments	inc/ipv6defrag.h	/^	pntoh_ipv6_fragment_t 	fragments;$/;"	m	struct:__anon6
-freeMem	inc/share.c	/^void freeMem (void)$/;"	f
+freeMem	inc/share.c	/^void freeMem (psnc_t snc)$/;"	f
 free_lockaccess	inc/common.c	/^_HIDDEN void free_lockaccess ( pntoh_lock_t lock )$/;"	f
 free_peer_info	dhs.c	/^void free_peer_info ( ppeer_info_t pinfo )$/;"	f
 function	inc/ipv4defrag.h	/^	void 					*function;$/;"	m	struct:__anon3
@@ -234,26 +233,25 @@ htable_map	inc/common.c	/^_HIDDEN phtable_t htable_map ( size_t size )$/;"	f
 htable_remove	inc/common.c	/^_HIDDEN void *htable_remove ( phtable_t ht , unsigned int key, void* ip_tuple4 )$/;"	f
 htable_t	inc/common.h	/^} htable_t , *phtable_t;$/;"	t	typeref:struct:__anon7
 htnode_t	inc/common.h	/^} htnode_t , *phtnode_t;$/;"	t	typeref:struct:_hash_node_
-i	dhs.c	/^unsigned int i = 0, len = 0;$/;"	v
 i	inc/share.c	/^unsigned int i = 0;$/;"	v
 i	retrieve.cpp	/^unsigned int i = 0;$/;"	v
-iData	inc/share.c	/^inline void iData(void)$/;"	f
+iData	inc/share.c	/^inline void iData(psnc_t snc)$/;"	f
 iData	retrieve.cpp	/^inline void iData(void)$/;"	f
-iShmids	inc/share.c	/^inline void iShmids(void)$/;"	f
+iShmids	inc/share.c	/^inline void iShmids(psnc_t snc)$/;"	f
 iShmids	retrieve.cpp	/^inline void iShmids(void)$/;"	f
-iShms	inc/share.c	/^inline void iShms(void)$/;"	f
+iShms	inc/share.c	/^inline void iShms(psnc_t snc)$/;"	f
 iShms	retrieve.cpp	/^inline void iShms(void)$/;"	f
-ian	inc/tcpreassembly.h	/^	unsigned long 		ian;$/;"	m	struct:__anon12
+ian	inc/tcpreassembly.h	/^	unsigned long 		ian;$/;"	m	struct:__anon13
 id	inc/ipv4defrag.h	/^	unsigned short id;$/;"	m	struct:__anon2
 id	inc/ipv6defrag.h	/^	unsigned int id;$/;"	m	struct:__anon5
 ident	inc/ipv4defrag.h	/^	ntoh_ipv4_tuple4_t 		ident;$/;"	m	struct:__anon3
 ident	inc/ipv6defrag.h	/^	ntoh_ipv6_tuple4_t 		ident;$/;"	m	struct:__anon6
-inCtr	dhs.c	/^inline static void inCtr(int *** s)$/;"	f	file:
-inCtr	retrieve.cpp	/^inline static void inCtr(int ** s)$/;"	f	file:
+inCtr	dhs.c	/^inline static void inCtr(sig_atomic_t *** s)$/;"	f	file:
+inPos	retrieve.cpp	/^inline static void inPos(void)$/;"	f	file:
 init	inc/ipv4defrag.c	/^		unsigned short		init;$/;"	m	struct:__anon4	file:
-init	inc/ipv6defrag.c	/^		unsigned short	        init;$/;"	m	struct:__anon9	file:
-init	inc/tcpreassembly.c	/^        unsigned short		init;$/;"	m	struct:__anon8	file:
-initMem	inc/share.c	/^void initMem(void)$/;"	f
+init	inc/ipv6defrag.c	/^		unsigned short	        init;$/;"	m	struct:__anon10	file:
+init	inc/tcpreassembly.c	/^        unsigned short		init;$/;"	m	struct:__anon9	file:
+initMem	inc/share.c	/^void initMem(psnc_t snc)$/;"	f
 insert_fragment	inc/ipv4defrag.c	/^inline static pntoh_ipv4_fragment_t insert_fragment ( pntoh_ipv4_fragment_t list , pntoh_ipv4_fragment_t frag )$/;"	f	file:
 insert_fragment	inc/ipv6defrag.c	/^inline static pntoh_ipv6_fragment_t insert_fragment ( pntoh_ipv6_fragment_t list , pntoh_ipv6_fragment_t frag )$/;"	f	file:
 ip_check_timeouts	inc/ipv4defrag.c	/^inline static void ip_check_timeouts ( pntoh_ipv4_session_t session )$/;"	f	file:
@@ -265,7 +263,7 @@ ipv4_callback	dhs.c	/^void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_t
 ipv4_flows_table_t	inc/ipv4defrag.h	/^typedef htable_t ipv4_flows_table_t;$/;"	t
 ipv4_session	dhs.c	/^pntoh_ipv4_session_t ipv4_session = 0;$/;"	v
 ipv6_flows_table_t	inc/ipv6defrag.h	/^typedef htable_t ipv6_flows_table_t;$/;"	t
-isn	inc/tcpreassembly.h	/^	unsigned long 		isn;$/;"	m	struct:__anon12
+isn	inc/tcpreassembly.h	/^	unsigned long 		isn;$/;"	m	struct:__anon13
 itoa	inc/itoa.c	/^char * itoa (int i)$/;"	f
 itoa	retrieve.cpp	/^char * itoa (int i)$/;"	f
 key	inc/common.h	/^	unsigned int		key;$/;"	m	struct:_hash_node_
@@ -275,17 +273,17 @@ key	inc/tcpreassembly.h	/^	ntoh_tcp_key_t 		key;$/;"	m	struct:_tcp_stream_
 last_activ	inc/ipv4defrag.h	/^	struct timeval 			last_activ;$/;"	m	struct:__anon3	typeref:struct:__anon3::timeval
 last_activ	inc/ipv6defrag.h	/^	struct timeval 			last_activ;$/;"	m	struct:__anon6	typeref:struct:__anon6::timeval
 last_activ	inc/tcpreassembly.h	/^	struct timeval 		last_activ;$/;"	m	struct:_tcp_stream_	typeref:struct:_tcp_stream_::timeval
-lastts	inc/tcpreassembly.h	/^	unsigned int 		lastts;$/;"	m	struct:__anon12
-len	dhs.c	/^unsigned int i = 0, len = 0;$/;"	v
+lastts	inc/tcpreassembly.h	/^	unsigned int 		lastts;$/;"	m	struct:__anon13
 len	inc/ipv4defrag.h	/^	unsigned int 			len;$/;"	m	struct:_ipv4_fragment_
 len	inc/ipv6defrag.h	/^	unsigned int 			len;$/;"	m	struct:_ipv6_fragment_
+local_pos	retrieve.cpp	/^sig_atomic_t local_pos = 1;$/;"	v
 lock	inc/ipv4defrag.c	/^		ntoh_lock_t			lock;$/;"	m	struct:__anon4	file:
 lock	inc/ipv4defrag.h	/^	ntoh_lock_t 			lock;$/;"	m	struct:__anon3
 lock	inc/ipv4defrag.h	/^	ntoh_lock_t 			lock;$/;"	m	struct:_ipv4_session_
-lock	inc/ipv6defrag.c	/^		ntoh_lock_t			    lock;$/;"	m	struct:__anon9	file:
+lock	inc/ipv6defrag.c	/^		ntoh_lock_t			    lock;$/;"	m	struct:__anon10	file:
 lock	inc/ipv6defrag.h	/^	ntoh_lock_t 			lock;$/;"	m	struct:__anon6
 lock	inc/ipv6defrag.h	/^	ntoh_lock_t 			lock;$/;"	m	struct:_ipv6_session_
-lock	inc/tcpreassembly.c	/^        ntoh_lock_t			lock;$/;"	m	struct:__anon8	file:
+lock	inc/tcpreassembly.c	/^        ntoh_lock_t			lock;$/;"	m	struct:__anon9	file:
 lock	inc/tcpreassembly.h	/^	ntoh_lock_t			lock;$/;"	m	struct:_tcp_stream_
 lock	inc/tcpreassembly.h	/^    ntoh_lock_t				lock;$/;"	m	struct:_tcp_session_
 lock_access	inc/common.c	/^_HIDDEN void lock_access ( pntoh_lock_t lock )$/;"	f
@@ -299,8 +297,8 @@ max_streams	inc/tcpreassembly.h	/^    sem_t 					max_streams;$/;"	m	struct:_tcp_
 max_timewait	inc/tcpreassembly.h	/^    sem_t 					max_timewait;$/;"	m	struct:_tcp_session_
 meat	inc/ipv4defrag.h	/^	size_t 					meat;$/;"	m	struct:__anon3
 meat	inc/ipv6defrag.h	/^	size_t 					meat;$/;"	m	struct:__anon6
-mss	inc/tcpreassembly.h	/^	unsigned int 		mss;$/;"	m	struct:__anon12
-mutex	inc/libntoh.h	/^	pthread_mutex_t	mutex;$/;"	m	struct:__anon10
+mss	inc/tcpreassembly.h	/^	unsigned int 		mss;$/;"	m	struct:__anon13
+mutex	inc/libntoh.h	/^	pthread_mutex_t	mutex;$/;"	m	struct:__anon11
 new_segment	inc/tcpreassembly.c	/^inline static pntoh_tcp_segment_t new_segment ( unsigned long seq , unsigned long ack , unsigned long payload_len , unsigned char flags , void *udata )$/;"	f	file:
 next	inc/common.h	/^	struct _hash_node_	*next;$/;"	m	struct:_hash_node_	typeref:struct:_hash_node_::_hash_node_
 next	inc/ipv4defrag.h	/^	struct _ipv4_fragment_ *next;$/;"	m	struct:_ipv4_fragment_	typeref:struct:_ipv4_fragment_::_ipv4_fragment_
@@ -310,7 +308,7 @@ next	inc/ipv6defrag.h	/^	struct _ipv6_session_ 	*next;$/;"	m	struct:_ipv6_sessio
 next	inc/tcpreassembly.h	/^	struct _tcp_segment_ 	*next;$/;"	m	struct:_tcp_segment_	typeref:struct:_tcp_segment_::_tcp_segment_
 next	inc/tcpreassembly.h	/^	struct _tcp_stream_ *next;$/;"	m	struct:_tcp_stream_	typeref:struct:_tcp_stream_::_tcp_stream_
 next	inc/tcpreassembly.h	/^    struct _tcp_session_ 	*next;$/;"	m	struct:_tcp_session_	typeref:struct:_tcp_session_::_tcp_session_
-next_seq	inc/tcpreassembly.h	/^	unsigned long 		next_seq;$/;"	m	struct:__anon12
+next_seq	inc/tcpreassembly.h	/^	unsigned long 		next_seq;$/;"	m	struct:__anon13
 ntoh_exit	inc/libntoh.c	/^void ntoh_exit ( void )$/;"	f
 ntoh_get_errdesc	inc/libntoh.c	/^const char* ntoh_get_errdesc ( unsigned int val )$/;"	f
 ntoh_get_reason	inc/libntoh.c	/^const char* ntoh_get_reason ( unsigned int val )$/;"	f
@@ -348,7 +346,7 @@ ntoh_ipv6_new_flow	inc/ipv6defrag.c	/^pntoh_ipv6_flow_t ntoh_ipv6_new_flow ( pnt
 ntoh_ipv6_new_session	inc/ipv6defrag.c	/^pntoh_ipv6_session_t ntoh_ipv6_new_session ( unsigned int max_flows , unsigned long max_mem , unsigned int *error )$/;"	f
 ntoh_ipv6_session_t	inc/ipv6defrag.h	/^}ntoh_ipv6_session_t , *pntoh_ipv6_session_t;$/;"	t	typeref:struct:_ipv6_session_
 ntoh_ipv6_tuple4_t	inc/ipv6defrag.h	/^} ntoh_ipv6_tuple4_t, *pntoh_ipv6_tuple4_t;$/;"	t	typeref:struct:__anon5
-ntoh_lock_t	inc/libntoh.h	/^} ntoh_lock_t , *pntoh_lock_t;$/;"	t	typeref:struct:__anon10
+ntoh_lock_t	inc/libntoh.h	/^} ntoh_lock_t , *pntoh_lock_t;$/;"	t	typeref:struct:__anon11
 ntoh_tcp_add_segment	inc/tcpreassembly.c	/^int ntoh_tcp_add_segment ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , struct ip *ip , size_t len , void *udata )$/;"	f
 ntoh_tcp_count_streams	inc/tcpreassembly.c	/^unsigned int ntoh_tcp_count_streams ( pntoh_tcp_session_t session )$/;"	f
 ntoh_tcp_exit	inc/tcpreassembly.c	/^void ntoh_tcp_exit( void )$/;"	f
@@ -362,22 +360,22 @@ ntoh_tcp_init	inc/tcpreassembly.c	/^void ntoh_tcp_init ( void )$/;"	f
 ntoh_tcp_key_t	inc/tcpreassembly.h	/^typedef unsigned int ntoh_tcp_key_t;$/;"	t
 ntoh_tcp_new_session	inc/tcpreassembly.c	/^pntoh_tcp_session_t ntoh_tcp_new_session ( unsigned int max_streams , unsigned int max_timewait , unsigned int *error )$/;"	f
 ntoh_tcp_new_stream	inc/tcpreassembly.c	/^pntoh_tcp_stream_t ntoh_tcp_new_stream ( pntoh_tcp_session_t session , pntoh_tcp_tuple5_t tuple5 , pntoh_tcp_callback_t function ,void *udata , unsigned int *error, unsigned short enable_check_timeout, unsigned short enable_check_nowindow )$/;"	f
-ntoh_tcp_peer_t	inc/tcpreassembly.h	/^} ntoh_tcp_peer_t, *pntoh_tcp_peer_t;$/;"	t	typeref:struct:__anon12
+ntoh_tcp_peer_t	inc/tcpreassembly.h	/^} ntoh_tcp_peer_t, *pntoh_tcp_peer_t;$/;"	t	typeref:struct:__anon13
 ntoh_tcp_segment_t	inc/tcpreassembly.h	/^} ntoh_tcp_segment_t, *pntoh_tcp_segment_t;$/;"	t	typeref:struct:_tcp_segment_
 ntoh_tcp_session_t	inc/tcpreassembly.h	/^} ntoh_tcp_session_t , *pntoh_tcp_session_t;$/;"	t	typeref:struct:_tcp_session_
 ntoh_tcp_stream_t	inc/tcpreassembly.h	/^} ntoh_tcp_stream_t, *pntoh_tcp_stream_t;$/;"	t	typeref:struct:_tcp_stream_
-ntoh_tcp_tuple5_t	inc/tcpreassembly.h	/^} ntoh_tcp_tuple5_t, *pntoh_tcp_tuple5_t;$/;"	t	typeref:struct:__anon11
+ntoh_tcp_tuple5_t	inc/tcpreassembly.h	/^} ntoh_tcp_tuple5_t, *pntoh_tcp_tuple5_t;$/;"	t	typeref:struct:__anon12
 ntoh_version	inc/libntoh.c	/^const char* ntoh_version ( void )$/;"	f
 offset	inc/ipv4defrag.h	/^	unsigned int 			offset;$/;"	m	struct:_ipv4_fragment_
 offset	inc/ipv6defrag.h	/^	unsigned int 			offset;$/;"	m	struct:_ipv6_fragment_
 origin	inc/tcpreassembly.h	/^	unsigned short 			origin;$/;"	m	struct:_tcp_segment_
 params	inc/ipv4defrag.c	/^}params = { 0 , 0 };$/;"	v	typeref:struct:__anon4	file:
-params	inc/ipv6defrag.c	/^}params = { 0 , 0 };$/;"	v	typeref:struct:__anon9	file:
-params	inc/tcpreassembly.c	/^}params = {0,0};$/;"	v	typeref:struct:__anon8	file:
+params	inc/ipv6defrag.c	/^}params = { 0 , 0 };$/;"	v	typeref:struct:__anon10	file:
+params	inc/tcpreassembly.c	/^}params = {0,0};$/;"	v	typeref:struct:__anon9	file:
 path	dhs.c	/^        char *path;$/;"	m	struct:__anon1	file:
 payload_len	inc/tcpreassembly.h	/^	unsigned int 			payload_len;$/;"	m	struct:_tcp_segment_
 pcktFingerPrint	dhs.c	/^int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int dataLen)$/;"	f
-pcond	inc/libntoh.h	/^	pthread_cond_t	pcond;$/;"	m	struct:__anon10
+pcond	inc/libntoh.h	/^	pthread_cond_t	pcond;$/;"	m	struct:__anon11
 peer_info_t	dhs.c	/^} peer_info_t, *ppeer_info_t;$/;"	t	typeref:struct:__anon1	file:
 pending_more_hdr_data	dhs.c	/^uint8_t pending_more_hdr_data = 0;$/;"	v
 phtable_t	inc/common.h	/^} htable_t , *phtable_t;$/;"	t	typeref:struct:__anon7
@@ -394,32 +392,33 @@ pntoh_ipv6_flow_t	inc/ipv6defrag.h	/^} ntoh_ipv6_flow_t, *pntoh_ipv6_flow_t;$/;"
 pntoh_ipv6_fragment_t	inc/ipv6defrag.h	/^} ntoh_ipv6_fragment_t , *pntoh_ipv6_fragment_t;$/;"	t	typeref:struct:_ipv6_fragment_
 pntoh_ipv6_session_t	inc/ipv6defrag.h	/^}ntoh_ipv6_session_t , *pntoh_ipv6_session_t;$/;"	t	typeref:struct:_ipv6_session_
 pntoh_ipv6_tuple4_t	inc/ipv6defrag.h	/^} ntoh_ipv6_tuple4_t, *pntoh_ipv6_tuple4_t;$/;"	t	typeref:struct:__anon5
-pntoh_lock_t	inc/libntoh.h	/^} ntoh_lock_t , *pntoh_lock_t;$/;"	t	typeref:struct:__anon10
+pntoh_lock_t	inc/libntoh.h	/^} ntoh_lock_t , *pntoh_lock_t;$/;"	t	typeref:struct:__anon11
 pntoh_tcp_callback_t	inc/tcpreassembly.h	/^typedef void(*pntoh_tcp_callback_t) ( pntoh_tcp_stream_t , pntoh_tcp_peer_t , pntoh_tcp_peer_t , pntoh_tcp_segment_t , int, int );$/;"	t
-pntoh_tcp_peer_t	inc/tcpreassembly.h	/^} ntoh_tcp_peer_t, *pntoh_tcp_peer_t;$/;"	t	typeref:struct:__anon12
+pntoh_tcp_peer_t	inc/tcpreassembly.h	/^} ntoh_tcp_peer_t, *pntoh_tcp_peer_t;$/;"	t	typeref:struct:__anon13
 pntoh_tcp_segment_t	inc/tcpreassembly.h	/^} ntoh_tcp_segment_t, *pntoh_tcp_segment_t;$/;"	t	typeref:struct:_tcp_segment_
 pntoh_tcp_session_t	inc/tcpreassembly.h	/^} ntoh_tcp_session_t , *pntoh_tcp_session_t;$/;"	t	typeref:struct:_tcp_session_
 pntoh_tcp_stream_t	inc/tcpreassembly.h	/^} ntoh_tcp_stream_t, *pntoh_tcp_stream_t;$/;"	t	typeref:struct:_tcp_stream_
-pntoh_tcp_tuple5_t	inc/tcpreassembly.h	/^} ntoh_tcp_tuple5_t, *pntoh_tcp_tuple5_t;$/;"	t	typeref:struct:__anon11
-port	inc/tcpreassembly.h	/^	unsigned short 		port;$/;"	m	struct:__anon12
+pntoh_tcp_tuple5_t	inc/tcpreassembly.h	/^} ntoh_tcp_tuple5_t, *pntoh_tcp_tuple5_t;$/;"	t	typeref:struct:__anon12
+port	inc/tcpreassembly.h	/^	unsigned short 		port;$/;"	m	struct:__anon13
 ppeer_info_t	dhs.c	/^} peer_info_t, *ppeer_info_t;$/;"	t	typeref:struct:__anon1	file:
 protocol	inc/ipv4defrag.h	/^	uint8_t protocol;$/;"	m	struct:__anon2
 protocol	inc/ipv6defrag.h	/^	uint8_t protocol;$/;"	m	struct:__anon5
-protocol	inc/tcpreassembly.h	/^	unsigned short 	protocol;$/;"	m	struct:__anon11
+protocol	inc/tcpreassembly.h	/^	unsigned short 	protocol;$/;"	m	struct:__anon12
+psnc_t	inc/share.h	/^} snc_t, *psnc_t;$/;"	t	typeref:struct:__anon8
 ptcprs_streams_table_t	inc/tcpreassembly.h	/^typedef phtable_t ptcprs_streams_table_t;$/;"	t
 queue_segment	inc/tcpreassembly.c	/^inline static void queue_segment ( pntoh_tcp_session_t session , pntoh_tcp_peer_t peer , pntoh_tcp_segment_t segment )$/;"	f	file:
 rand	inc/tcpreassembly.h	/^    int 					rand;$/;"	m	struct:_tcp_session_
 reason_descriptions	inc/libntoh.c	/^static const char reason_descriptions[][30]=$/;"	v	file:
 receive	dhs.c	/^unsigned short	receive = 0;$/;"	v
-receive	inc/tcpreassembly.h	/^	unsigned short 		receive;$/;"	m	struct:__anon12
+receive	inc/tcpreassembly.h	/^	unsigned short 		receive;$/;"	m	struct:__anon13
 resizeChar	dhs.c	/^void resizeChar(char ** in, unsigned int * len)$/;"	f
 resizeHdr	dhs.c	/^inline static void resizeHdr(void)$/;"	f	file:
 resizeInt	dhs.c	/^void resizeInt(int ** in, unsigned int * len)$/;"	f
-retrieved_sigs	retrieve.cpp	/^int ** retrieved_sigs = NULL;$/;"	v
-retrieved_t5s	retrieve.cpp	/^char ** retrieved_t5s = NULL;$/;"	v
+retrieved_sigs	retrieve.cpp	/^volatile sig_atomic_t ** retrieved_sigs = NULL;$/;"	v
+retrieved_t5s	retrieve.cpp	/^volatile sig_atomic_t ** retrieved_t5s = NULL;$/;"	v
 retval_descriptions	inc/libntoh.c	/^static const char retval_descriptions[][48] =$/;"	v	file:
-sack	inc/tcpreassembly.h	/^	unsigned int 		sack;$/;"	m	struct:__anon12
-segments	inc/tcpreassembly.h	/^	pntoh_tcp_segment_t segments;$/;"	m	struct:__anon12
+sack	inc/tcpreassembly.h	/^	unsigned int 		sack;$/;"	m	struct:__anon13
+segments	inc/tcpreassembly.h	/^	pntoh_tcp_segment_t segments;$/;"	m	struct:__anon13
 send_ipv4_fragment	dhs.c	/^void send_ipv4_fragment ( struct ip *iphdr , pipv4_dfcallback_t callback )$/;"	f
 send_peer_segments	inc/tcpreassembly.c	/^inline static unsigned int send_peer_segments ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , unsigned int ack , unsigned short first , int extra, int who )$/;"	f	file:
 send_single_segment	inc/tcpreassembly.c	/^inline static void send_single_segment ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , pntoh_tcp_segment_t segment , int reason , int extra )$/;"	f	file:
@@ -427,34 +426,36 @@ send_tcp_segment	dhs.c	/^void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_ca
 seq	inc/tcpreassembly.h	/^	unsigned long 			seq;$/;"	m	struct:_tcp_segment_
 server	inc/tcpreassembly.h	/^	ntoh_tcp_peer_t 	server;$/;"	m	struct:_tcp_stream_
 sessions_list	inc/ipv4defrag.c	/^		pntoh_ipv4_session_t sessions_list;$/;"	m	struct:__anon4	file:
-sessions_list	inc/ipv6defrag.c	/^		pntoh_ipv6_session_t    sessions_list;$/;"	m	struct:__anon9	file:
-sessions_list	inc/tcpreassembly.c	/^        pntoh_tcp_session_t	sessions_list;$/;"	m	struct:__anon8	file:
+sessions_list	inc/ipv6defrag.c	/^		pntoh_ipv6_session_t    sessions_list;$/;"	m	struct:__anon10	file:
+sessions_list	inc/tcpreassembly.c	/^        pntoh_tcp_session_t	sessions_list;$/;"	m	struct:__anon9	file:
 sfhash	inc/sfhash.c	/^_HIDDEN unsigned int sfhash(const void * key, unsigned int len, unsigned int initval)$/;"	f
 sfhash_3words	inc/sfhash.c	/^_HIDDEN unsigned int sfhash_3words(unsigned int a, unsigned int b, unsigned int c, unsigned int initval)$/;"	f
 shandler	dhs.c	/^void shandler ( int sign )$/;"	f
 shandler	retrieve.cpp	/^void shandler ( int sign )$/;"	f
-shm	dhs.c	/^int ** shm = 0;$/;"	v
-shm	retrieve.cpp	/^int ** shm = NULL;$/;"	v
-shmid	dhs.c	/^int * shmid = 0;$/;"	v
+shm	inc/share.h	/^        volatile sig_atomic_t ** shm;$/;"	m	struct:__anon8
+shm	retrieve.cpp	/^volatile sig_atomic_t ** shm = NULL;$/;"	v
+shmid	inc/share.h	/^        int32_t * shmid;$/;"	m	struct:__anon8
 shmid	retrieve.cpp	/^int * shmid = NULL;$/;"	v
 shmkey	dhs.c	/^uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};$/;"	v
 shmkey	retrieve.cpp	/^uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};$/;"	v
-sigs	dhs.c	/^int ** sigs = 0;$/;"	v
+sigs	inc/share.h	/^        sig_atomic_t ** sigs;$/;"	m	struct:__anon8
+snc	dhs.c	/^snc_t snc;$/;"	v
+snc_t	inc/share.h	/^} snc_t, *psnc_t;$/;"	t	typeref:struct:__anon8
 source	inc/ipv4defrag.h	/^	unsigned int source;$/;"	m	struct:__anon2
 source	inc/ipv6defrag.h	/^	uint8_t source[16];$/;"	m	struct:__anon5
-source	inc/tcpreassembly.h	/^	unsigned int 	source;$/;"	m	struct:__anon11
-sport	inc/tcpreassembly.h	/^	unsigned short 	sport;$/;"	m	struct:__anon11
-status	inc/tcpreassembly.h	/^	unsigned int 		status;$/;"	m	struct:__anon12
+source	inc/tcpreassembly.h	/^	unsigned int 	source;$/;"	m	struct:__anon12
+sport	inc/tcpreassembly.h	/^	unsigned short 	sport;$/;"	m	struct:__anon12
+status	inc/tcpreassembly.h	/^	unsigned int 		status;$/;"	m	struct:__anon13
 status	inc/tcpreassembly.h	/^	unsigned int 		status;$/;"	m	struct:_tcp_stream_
 streams	inc/tcpreassembly.h	/^    ptcprs_streams_table_t 	streams;$/;"	m	struct:_tcp_session_
 syn_retries	inc/tcpreassembly.h	/^	unsigned int 		syn_retries;$/;"	m	struct:_tcp_stream_
 synack_retries	inc/tcpreassembly.h	/^	unsigned int 		synack_retries;$/;"	m	struct:_tcp_stream_
+t5Convert	dhs.c	/^sig_atomic_t * t5Convert;$/;"	v
 t5TplLen	inc/globals.h	/^static const uint32_t t5TplLen = 44;$/;"	v
-t5TplLen	inc/share.c	14;"	d	file:
-t5s	dhs.c	/^char ** t5s = 0;$/;"	v
-t5shm	dhs.c	/^char ** t5shm = 0;$/;"	v
+t5s	inc/share.h	/^        sig_atomic_t ** t5s;$/;"	m	struct:__anon8
+t5shm	inc/share.h	/^        volatile sig_atomic_t ** t5shm;$/;"	m	struct:__anon8
 t5shm	retrieve.cpp	/^char ** t5shm = NULL;$/;"	v
-t5shmid	dhs.c	/^int * t5shmid = 0;$/;"	v
+t5shmid	inc/share.h	/^        int32_t * t5shmid;$/;"	m	struct:__anon8
 t5shmid	retrieve.cpp	/^int * t5shmid = NULL;$/;"	v
 t5shmkey	dhs.c	/^uint32_t t5shmkey[] = {959, 653, 987, 627, 905};$/;"	v
 t5shmkey	retrieve.cpp	/^uint32_t t5shmkey[] = {959, 653, 987, 627, 905};$/;"	v
@@ -478,17 +479,17 @@ timewait	inc/tcpreassembly.h	/^    ptcprs_streams_table_t 	timewait;$/;"	m	struc
 tmp	dhs.c	/^char * tmp = 0;$/;"	v
 total	inc/ipv4defrag.h	/^	size_t 					total;$/;"	m	struct:__anon3
 total	inc/ipv6defrag.h	/^	size_t 					total;$/;"	m	struct:__anon6
-totalwin	inc/tcpreassembly.h	/^	unsigned long 		totalwin;$/;"	m	struct:__anon12
+totalwin	inc/tcpreassembly.h	/^	unsigned long 		totalwin;$/;"	m	struct:__anon13
 tuple	inc/tcpreassembly.h	/^	ntoh_tcp_tuple5_t 	tuple;$/;"	m	struct:_tcp_stream_
 tv	inc/tcpreassembly.h	/^	struct timeval 			tv;$/;"	m	struct:_tcp_segment_	typeref:struct:_tcp_segment_::timeval
 udata	inc/ipv4defrag.h	/^	void 					*udata;$/;"	m	struct:__anon3
 udata	inc/ipv6defrag.h	/^	void 					*udata;$/;"	m	struct:__anon6
 udata	inc/tcpreassembly.h	/^	void 				*udata;$/;"	m	struct:_tcp_stream_
 unlock_access	inc/common.c	/^_HIDDEN void unlock_access ( pntoh_lock_t lock )$/;"	f
-use	inc/libntoh.h	/^	int				use;$/;"	m	struct:__anon10
+use	inc/libntoh.h	/^	int				use;$/;"	m	struct:__anon11
 user_data	inc/tcpreassembly.h	/^	void 					*user_data;$/;"	m	struct:_tcp_segment_
 val	inc/common.h	/^	void				*val;$/;"	m	struct:_hash_node_
 write_data	dhs.c	/^void write_data ( ppeer_info_t info )$/;"	f
 write_hdr_data	dhs.c	/^void write_hdr_data ( void )$/;"	f
-wscale	inc/tcpreassembly.h	/^	unsigned int 		wscale;$/;"	m	struct:__anon12
-wsize	inc/tcpreassembly.h	/^	unsigned int 		wsize;$/;"	m	struct:__anon12
+wscale	inc/tcpreassembly.h	/^	unsigned int 		wscale;$/;"	m	struct:__anon13
+wsize	inc/tcpreassembly.h	/^	unsigned int 		wsize;$/;"	m	struct:__anon13
