@@ -338,24 +338,29 @@ int main (void)
                                         fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
                                 }
                                 shm[CTL][FLAGS] = CRING;
-                                if (DEBUG)
-                                {
-                                        write(2, "data written, retrieving...\r\n", 26);
-                                        write(2, "SIMULATED retrieved, releasing\r\n", 22);
-                                        fflush(stderr);
-                                }
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
+                                //memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * t5TplLen);
                                 if (DEBUG)
                                 {
                                         fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
-                                        i = 0;
                                         fprintf(stderr, "\r\nsig:\r\n");
+                                        i = 0;
                                         while (i < fngPntLen)
                                         {
                                                 fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
                                                 fprintf(stderr, "\r\n");
                                                 i++;
                                         }
+                                        /*
+                                        fprintf(stderr, "\t");
+                                        i = 0;
+                                        while (i < t5TplLen)
+                                        {
+                                                fprintf(stderr, "%c", retrieved_t5s[ct][i]);
+                                                i++;
+                                        }
+                                        */
+                                        fprintf(stderr, "\r\n");
                                         fflush(stderr);
                                 }
                                 ct = (ct+1)%SIGBUF;
