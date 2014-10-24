@@ -454,7 +454,7 @@ t5Convert	dhs.c	/^sig_atomic_t * t5Convert;$/;"	v
 t5TplLen	inc/globals.h	/^static const uint32_t t5TplLen = 44;$/;"	v
 t5s	inc/share.h	/^        sig_atomic_t ** t5s;$/;"	m	struct:__anon8
 t5shm	inc/share.h	/^        volatile sig_atomic_t ** t5shm;$/;"	m	struct:__anon8
-t5shm	retrieve.cpp	/^char ** t5shm = NULL;$/;"	v
+t5shm	retrieve.cpp	/^volatile sig_atomic_t ** t5shm = NULL;$/;"	v
 t5shmid	inc/share.h	/^        int32_t * t5shmid;$/;"	m	struct:__anon8
 t5shmid	retrieve.cpp	/^int * t5shmid = NULL;$/;"	v
 t5shmkey	dhs.c	/^uint32_t t5shmkey[] = {959, 653, 987, 627, 905};$/;"	v

@@ -16,7 +16,7 @@ uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
 int * shmid = NULL;
 int * t5shmid = NULL;
 volatile sig_atomic_t ** shm = NULL;
-char ** t5shm = NULL;
+volatile sig_atomic_t ** t5shm = NULL;
 
 volatile sig_atomic_t ** retrieved_sigs = NULL;
 volatile sig_atomic_t ** retrieved_t5s = NULL;
@@ -104,7 +104,7 @@ inline void dShmids(void)
         {
                 if (i < SIGQTY)
                 {
-                        shmdt(t5shm[i]);
+                        shmdt((void *)t5shm[i]);
                 }
                 shmdt((void *)shm[i]);
                 i++;
@@ -131,8 +131,8 @@ inline void iData(void)
         i = 0;
         while (i < SIGBUF)
         {
-                retrieved_t5s[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
-                retrieved_sigs[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
+                retrieved_t5s[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                retrieved_sigs[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
                 if (retrieved_t5s[i] == NULL || retrieved_sigs[i] == NULL)
                 {
                         if (DEBUG)
@@ -177,7 +177,7 @@ inline void fShmids(void)
 inline void iShms(void)
 {
         shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
-        t5shm = (char **)malloc(sizeof(char *) * (SIGQTY));
+        t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
         {
                 strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
@@ -217,7 +217,7 @@ inline void iShmids(void)
                 }
                 if (i < SIGQTY)
                 {
-                        t5shmid[i] = shmget(t5shmkey[i], sizeof(char) * t5TplLen, 0666);
+                        t5shmid[i] = shmget(t5shmkey[i], sizeof(sig_atomic_t) * t5TplLen, 0666);
                         if (t5shmid[i] < 0)
                         {
                                 if (DEBUG)
@@ -239,7 +239,7 @@ inline void aShmids(void)
         i = 0;
         while (i < (SIGQTY + 1))
         {
-                shm[i] = (int *)shmat(shmid[i], (void *) 0, 0);
+                shm[i] = (volatile sig_atomic_t *)shmat(shmid[i], (void *) 0, 0);
                 if ((void *)shm[i] == (void *)-1)
                 {
                         strncpy(buf, "unable to attach shm", 14);
@@ -249,7 +249,7 @@ inline void aShmids(void)
                 }
                 if (i < SIGQTY)
                 {
-                        t5shm[i] = (char *)shmat(t5shmid[i], (void *) 0, 0);
+                        t5shm[i] = (volatile sig_atomic_t *)shmat(t5shmid[i], (void *) 0, 0);
                         if ((void *)t5shm[i] == (void *)-1)
                         {
                                 strncpy(buf, "unable to attach t5shm", 16);
@@ -339,7 +339,7 @@ int main (void)
                                 }
                                 shm[CTL][FLAGS] = CRING;
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
-                                //memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * t5TplLen);
+                                memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
                                 if (DEBUG)
                                 {
                                         fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
@@ -351,7 +351,6 @@ int main (void)
                                                 fprintf(stderr, "\r\n");
                                                 i++;
                                         }
-                                        /*
                                         fprintf(stderr, "\t");
                                         i = 0;
                                         while (i < t5TplLen)
@@ -359,7 +358,6 @@ int main (void)
                                                 fprintf(stderr, "%c", retrieved_t5s[ct][i]);
                                                 i++;
                                         }
-                                        */
                                         fprintf(stderr, "\r\n");
                                         fflush(stderr);
                                 }

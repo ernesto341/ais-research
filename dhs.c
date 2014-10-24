@@ -989,6 +989,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                                         snc.t5s[(snc.shm[CTL][POS]) - 1][i] = (sig_atomic_t)(pinfo->path[i]);
                                         i++;
                                 }
+                                snc.t5s[(snc.shm[CTL][POS]) - 1][i] = (sig_atomic_t)((const char)'\0');
                                 /* unlock memory */
                                 if (DEBUG)
                                 {
