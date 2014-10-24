@@ -482,6 +482,23 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         }
 
         unsigned int i = 0;
+
+        if (DEBUG)
+        {
+                strcpy (buf, "\r\n\t-----\tHEADER BEGIN\t-----\r\n");
+                write (2, buf, strlen(buf));
+                while (i < dataLen)
+                {
+                        write(2, (const char *)(&(curPcktData[i++])), 1);
+                        fflush(stderr);
+                }
+                strcpy (buf, "\r\n\t------\tHEADER END\t------\r\n");
+                write (2, buf, strlen(buf));
+                fflush(stderr);
+        }
+
+        i = 0;
+
         int cmd = 8;
         int cmdSet = 0;
         int proto = 8;
@@ -499,7 +516,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         int lt = 0;
         int gt = 0;
         int qstnmrk = 0;
-        unsigned char *target = (unsigned char *)curPcktData;
+        unsigned char *target = 0;
         int *fngPnt = malloc(sizeof(int) * fngPntLen);
         if (fngPnt == 0)
         {
@@ -510,6 +527,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
                 shandler(0);
         }
 
+        target = (unsigned char *)curPcktData;
         for(;(*target != '\n' && *target != '\r') && i < len; i++)
         {
                 if(protoSet == 0 && (*target == 48 || *target == 49))             //proto
@@ -544,7 +562,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
                         {
                                 target--;
                         }
-                }  
+                }
 
                 if(cmdSet == 0 && *target == 71)                  //cmd get
                 {
