@@ -6,4 +6,5 @@ dhs_err
 ret_err
 sigs
 retrieve
+inc/*.gch
 
