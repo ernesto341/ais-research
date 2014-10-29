@@ -96,8 +96,11 @@ uint32_t hdr_size = 850;
  * 850 given as sufficient for most headers to minimize resize operations
  * thanks to stackoverflow forum, typo.pl
  */
+#ifndef _keys
+#define _keys
 uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
 uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
+#endif
 snc_t snc;
 
 char * tmp = 0;

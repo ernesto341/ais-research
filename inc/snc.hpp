@@ -16,10 +16,18 @@
 #pragma once
 
 #include <globals.h>
+#include <time.h>
+#include <queue.h>
 
 #ifndef _buf
 #define _buf
 char buf[1024];
+#endif
+
+#ifndef _keys
+#define _keys
+uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
+uint32_t t5shmkey[] = {959, 653, 987, 627, 905};
 #endif
 
 #define NO_MEM 7
@@ -29,11 +37,32 @@ char buf[1024];
 
 using namespace std;
 
+typedef struct
+{
+        int32_t * shmid;
+        int32_t * t5shmid;
+
+        volatile sig_atomic_t ** shm;
+        volatile sig_atomic_t ** t5shm;
+} smem_t, *psmem_t;
+
+typedef struct
+{
+        volatile sig_atomic_t ** sigs;
+        volatile sig_atomic_t ** t5s;
+} mem_t, *pmem_t;
+
+typedef struct
+{
+        sig_atomic_t * sigs;
+        sig_atomic_t * t5s;
+} data_t, *pdata_t;
+
 /* storage and control */
 class snc
 {
         private:
-                unsigned int i = 0;
+                uint32_t i;
 
                 /* if using an expanding buffer to *permanently store signatures and tuples, this is the last signature/tuple pair returned */
                 sig_atomic_t top;
@@ -50,51 +79,32 @@ class snc
                 /* current position within SIGQTY buffer ring */
                 sig_atomic_t pos;
 
+                smem_t smem;
+                /* instead of creating and manging a mem type by myself, let smarter people take care of that crap
+                 * leaving 'mem' in place for now in order to test use of queue and allow existing memory
+                 * allocation/deallocation functions to continue working  */
+                mem_t mem;
+                queue<data_t> data;
                 /* shmids for transfer between applications */
-                int32_t * shmid;
-                int32_t * t5shmid;
+                /*
+                   int32_t * shmid;
+                   int32_t * t5shmid;
+                   */
 
                 /* shared memory segments */
-                volatile sig_atomic_t ** shm;
-                volatile sig_atomic_t ** t5shm;
+                /*
+                   volatile sig_atomic_t ** shm;
+                   volatile sig_atomic_t ** t5shm;
+                   */
 
                 /* actual retrieved sigs and identifying tuples */
-                sig_atomic_t ** sigs;
-                sig_atomic_t ** t5s;
+                /*
+                   volatile sig_atomic_t ** sigs;
+                   volatile sig_atomic_t ** t5s;
+                   */
 
                 /* logfile file descriptor */
                 int32_t logfd;
-
-                /* signal handler - basically an exit function*/
-                void shandler ( int sign )
-                {
-                        signal( SIGINT, &shandler );
-                        signal( SIGTERM, &shandler );
-                        signal( SIGSEGV, &shandler );
-
-                        if (DEBUG)
-                        {
-                                if (snc.shm[CTL][FLAGS] == PDONE)
-                                {
-                                        Log("\n\t\t[i] --- Signaled to quit by producer\n");
-                                }
-                                strncpy(buf, "\n\t\t[i] --- Signal: ", 19);
-                                tmp = itoa(sign);
-                                strncat(buf, tmp, strlen(tmp));
-                                strncat(buf, "\n", 1);
-                                Log(buf);
-                        }
-                        snc.shm[CTL][FLAGS] = CDONE;
-
-                        Free();
-
-                        pcap_close( handle );
-
-                        ntoh_exit();
-
-                        Log("\n\t\tX      -----   Inactive   -----      X\n\n");
-                        _exit( sign );
-                }
 
                 /* routines for logging */
                 int32_t openLog(const char * n = NULL, int32_t * fd = NULL);
@@ -105,32 +115,32 @@ class snc
                 inline void fData(void)
                 {
                         i = 0;
-                        if (sigs && t5s)
+                        if (mem.sigs && mem.t5s)
                         {
                                 while (i < SIGBUF)
                                 {
-                                        free((sig_atomic_t *)sigs[i]);
-                                        free((sig_atomic_t *)t5s[i]);
+                                        free((sig_atomic_t *)mem.sigs[i]);
+                                        free((sig_atomic_t *)mem.t5s[i]);
                                         i++;
                                 }
-                                free(t5s);
-                                free(sigs);
+                                free(mem.t5s);
+                                free(mem.sigs);
                         }
-                        else if (sigs)
+                        else if (mem.sigs)
                         {
                                 while (i < SIGBUF)
                                 {
-                                        free((sig_atomic_t *)sigs[i++]);
+                                        free((sig_atomic_t *)mem.sigs[i++]);
                                 }
-                                free(sigs);
+                                free(mem.sigs);
                         }
-                        else if (t5s)
+                        else if (mem.t5s)
                         {
                                 while (i < SIGBUF)
                                 {
-                                        free((sig_atomic_t *)t5s[i++]);
+                                        free((sig_atomic_t *)mem.t5s[i++]);
                                 }
-                                free(t5s);
+                                free(mem.t5s);
                         }
                 }
 
@@ -141,31 +151,31 @@ class snc
                         {
                                 if (i < SIGQTY)
                                 {
-                                        shmdt((void *)t5shm[i]);
+                                        shmdt((void *)smem.t5shm[i]);
                                 }
-                                shmdt((void *)shm[i]);
+                                shmdt((void *)smem.shm[i]);
                                 i++;
                         }
                 }
 
                 inline void iData(void)
                 {
-                        t5s = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
-                        sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGBUF));
-                        if (t5s == NULL || sigs == NULL)
+                        mem.t5s = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
+                        mem.sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGBUF));
+                        if (mem.t5s == NULL || mem.sigs == NULL)
                         {
                                 Log("Unable to allocate sufficient memory\n");
-                                shandler(NO_MEM);
+                                _exit(NO_MEM);
                         }
                         i = 0;
                         while (i < SIGBUF)
                         {
-                                t5s[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
-                                sigs[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
-                                if (t5s[i] == NULL || sigs[i] == NULL)
+                                mem.t5s[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                                mem.sigs[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
+                                if (mem.t5s[i] == NULL || mem.sigs[i] == NULL)
                                 {
                                         Log("Unable to allocate sufficient memory\n");
-                                        shandler(NO_MEM);
+                                        _exit(NO_MEM);
                                 }
                                 i++;
                         }
@@ -173,36 +183,36 @@ class snc
 
                 inline void fShms(void)
                 {
-                        if (t5shm)
+                        if (smem.t5shm)
                         {
-                                free(t5shm);
+                                free(smem.t5shm);
                         }
-                        if (shm)
+                        if (smem.shm)
                         {
-                                free(shm);
+                                free(smem.shm);
                         }
                 }
 
                 inline void fShmids(void)
                 {
-                        if (t5shmid)
+                        if (smem.t5shmid)
                         {
-                                free(t5shmid);
+                                free(smem.t5shmid);
                         }
-                        if (shmid)
+                        if (smem.shmid)
                         {
-                                free(shmid);
+                                free(smem.shmid);
                         }
                 }
 
                 inline void iShms(void)
                 {
-                        shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
-                        t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
-                        if (shm == NULL || t5shm == NULL)
+                        smem.shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
+                        smem.t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
+                        if (smem.shm == NULL || smem.t5shm == NULL)
                         {
                                 Log("Unable to allocate sufficient memory\n");
-                                shandler(NO_MEM);
+                                _exit(NO_MEM);
                         }
                 }
 
@@ -210,28 +220,28 @@ class snc
                 {
                         i = 0;
                         srand(time(NULL));
-                        shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
-                        t5shmid = (int *)malloc(sizeof(int) * (SIGQTY));
-                        if (shmid == NULL || t5shmid == NULL)
+                        smem.shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
+                        smem.t5shmid = (int *)malloc(sizeof(int) * (SIGQTY));
+                        if (smem.shmid == NULL || smem.t5shmid == NULL)
                         {
                                 Log("Unable to allocate sufficient memory\n");
-                                shandler(NO_MEM);
+                                _exit(NO_MEM);
                         }
                         while (i < (SIGQTY + 1))
                         {
-                                shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, 0666);
-                                if (shmid[i] < 0)
+                                smem.shmid[i] = shmget(shmkey[i], sizeof(sig_atomic_t) * fngPntLen, 0666);
+                                if (smem.shmid[i] < 0)
                                 {
                                         Log("unable to get shm\n");
-                                        shandler(I_SHM);
+                                        _exit(I_SHM);
                                 }
                                 if (i < SIGQTY)
                                 {
-                                        t5shmid[i] = shmget(t5shmkey[i], sizeof(sig_atomic_t) * t5TplLen, 0666);
-                                        if (t5shmid[i] < 0)
+                                        smem.t5shmid[i] = shmget(t5shmkey[i], sizeof(sig_atomic_t) * t5TplLen, 0666);
+                                        if (smem.t5shmid[i] < 0)
                                         {
                                                 Log("unable to get t5shm\n");
-                                                shandler(I_SHM);
+                                                _exit(I_SHM);
                                         }
                                 }
                                 i++;
@@ -243,19 +253,19 @@ class snc
                         i = 0;
                         while (i < (SIGQTY + 1))
                         {
-                                shm[i] = (volatile sig_atomic_t *)shmat(shmid[i], (void *) 0, 0);
-                                if ((void *)shm[i] == (void *)-1)
+                                smem.shm[i] = (volatile sig_atomic_t *)shmat(smem.shmid[i], (void *) 0, 0);
+                                if ((void *)smem.shm[i] == (void *)-1)
                                 {
                                         Log("unable to attach shm\n");
-                                        shandler(A_SHM);
+                                        _exit(A_SHM);
                                 }
                                 if (i < SIGQTY)
                                 {
-                                        t5shm[i] = (volatile sig_atomic_t *)shmat(t5shmid[i], (void *) 0, 0);
-                                        if ((void *)t5shm[i] == (void *)-1)
+                                        smem.t5shm[i] = (volatile sig_atomic_t *)shmat(smem.t5shmid[i], (void *) 0, 0);
+                                        if ((void *)smem.t5shm[i] == (void *)-1)
                                         {
                                                 Log("unable to attach shm\n");
-                                                shandler(A_SHM);
+                                                _exit(A_SHM);
                                         }
                                 }
                                 i++;
@@ -263,21 +273,21 @@ class snc
                 }
 
                 /* dummy manger for memory allocation */
-                inline static void Alloc(void)
+                inline void Alloc(void)
                 {
-                        iData();
-                        iShms();
-                        iShmids();
-                        aShmids();
+                        this->iData();
+                        this->iShms();
+                        this->iShmids();
+                        this->aShmids();
                 }
 
                 /* dummy manger for memory deallocation */
-                inline static void Free(void)
+                inline void Free(void)
                 {
-                        dShmids();
-                        fShmids();
-                        fShms();
-                        fData();
+                        this->dShmids();
+                        this->fShmids();
+                        this->fShms();
+                        this->fData();
                 }
 
         public:
@@ -296,36 +306,59 @@ class snc
                 }
 
                 /* accessors */
-                inline sig_atomic_t * getT5(const int & i) const
+
+                sig_atomic_t getFlag(void) const
                 {
-                        if (i < 0 || i > SIGBUF)
+                        if (smem.shm)
+                        {
+                                return (smem.shm[CTL][FLAGS]);
+                        }
+                        return (-1);
+                }
+
+                inline sig_atomic_t * getT5(const int & i)
+                {
+                        if (i < 0 || (unsigned int)i > SIGBUF)
                         {
                                 return (NULL);
                         }
-                        return (t5s[i]);
+                        return ((sig_atomic_t *)(mem.t5s[i]));
                 }
 
-                inline sig_atomic_t * getSig(const int & i) const
+                inline sig_atomic_t * getSig(const int & i)
                 {
-                        if (i < 0 || i > SIGBUF)
+                        if (i < 0 || (unsigned int)i > SIGBUF)
                         {
                                 return (NULL);
                         }
-                        return (sigs[i]);
+                        return ((sig_atomic_t *)(mem.sigs[i]));
                 }
 
-                /* HERE - this entire program should be incorporated into the ais, so in the ais you should call and handle independently getSig(top) and getT5(top) */
-                inline sig_atomic_t * getPair(void) const
+                inline pdata_t Dequeue(void)
                 {
-                        sig_atomic_t * t = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen + sizeof(sig_atomic_t) * t5TplLen);
-                        memset(t, -1, fngPntLen + t5TplLen);
-                        t = sigs[top];
-                        t+fngPntLen = t5s[top];
-                        top++;
+                        pdata_t t = (pdata_t)malloc(sizeof(data_t));
+                        if (!t)
+                        {
+                                return (0);
+                        }
+                        t = &(data.top());
+                        data.pop();
+                        return (t);
+                }
+
+                inline pdata_t getPair(const int & i)
+                {
+                        pdata_t t = (pdata_t)malloc(sizeof(data_t));
+                        if (!t)
+                        {
+                                return (0);
+                        }
+                        memcpy((void *)t->sigs, (const void *)mem.sigs[i], sizeof(sig_atomic_t));
+                        memcpy((void *)t->t5s, (const void *)mem.t5s[i], sizeof(sig_atomic_t));
                         return(t);
                 }
 
-                inline static const int32_t getLogfd(void) const
+                inline int32_t getLogfd(void)
                 {
                         return(logfd);
                 }
@@ -334,57 +367,72 @@ class snc
 #if __WORDSIZE == 64
                 inline uint64_t getCt(void)
                 {
-                        return((uint64_t)(ct1 + (ct2*2147483647));
+                        return((uint64_t)(ct1 + (ct2*2147483647)));
                 }
 #else
                 inline uint32_t getCt(void)
                 {
-                        return((uint32_t)(ct1 + (ct2*2147483647));
+                        return((uint32_t)(ct1 + (ct2*2147483647)));
                 }
 #endif
 
-                inline static const int32_t getT5shmid(const int & i) const
+                inline int32_t getT5shmid(const int & i)
                 {
-                        return(t5shmid[i]);
+                        return(smem.t5shmid[i]);
                 }
 
-                inline static const int32_t getShmid(const int & i) const
+                inline int32_t getShmid(const int & i)
                 {
-                        return(shmid[i]);
+                        return(smem.shmid[i]);
                 }
 
-                inline static const int32_t * getT5shmids(void) const
+                inline int32_t * getT5shmids(void)
                 {
-                        return(t5shmid);
+                        return(smem.t5shmid);
                 }
 
-                inline static const int32_t * getShmids(void) const
+                inline int32_t * getShmids(void)
                 {
-                        return(shmid);
+                        return(smem.shmid);
                 }
 
-                inline uint32_t getSize(void) const
+                inline uint32_t getSize(void)
                 {
                         return(SIGBUF);
                 }
 
-                inline sig_atomic_t getPos(void) const
+                inline sig_atomic_t getPos(void)
                 {
                         return(pos);
                 }
 
                 /* mutators */
-                inline static void incTop(void)
+                inline static void Enqueue(const data_t t)
+                {
+                        data.enqueue(t);
+                }
+
+                uint8_t setFlag(const void * val)
+                {
+                        if (!smem.shm || !val)
+                        {
+                                return (-1);
+                        }
+                        smem.shm[CTL][FLAGS] = (sig_atomic_t)*((sig_atomic_t *)(val));
+                        return (0);
+                }
+
+                inline void incTop(void)
                 {
                         top++;
                         top = top % SIGBUF;
                 }
-                inline static void incPos(void)
+                inline void incPos(void)
                 {
                         pos++;
                         pos = (((pos) % SIGQTY) != 0 ? ((pos) % SIGQTY) : SIGQTY); // 1 - 5
                 }
-                inline static void incCt(void)
+                inline void incCt(void)
                 {
                         ct1++;
                         /* check for and handle overflow SORT OF */
@@ -401,6 +449,16 @@ class snc
                 }
 
                 /* operators */
+                inline static void Copy(pdata_t src, pdata_t dst)
+                {
+                        memcpy(src->sigs, dst->sigs, sizeof(sig_atomic_t));
+                        memcpy(src->t5s, dst->t5s, sizeof(sig_atomic_t));
+                }
+                inline static void Copy(data_t src, data_t dst)
+                {
+                        memcpy(src.sigs, dst.sigs, sizeof(sig_atomic_t));
+                        memcpy(src.t5s, dst.t5s, sizeof(sig_atomic_t));
+                }
 
                 /* others */
 #ifndef _itoa_h_
@@ -444,85 +502,89 @@ class snc
 #endif
 
 /* main file */
-uint8_t Log(const char * c)
-{
-        if (!c)
-        {
-                return (-1);
-        }
-        if (logfd != -1)
-        {
-                while (*c != '\0')
-                {
-                        if ((putc(*c, logfd)) < 0)
-                        {
-                                putc("L", stdout);
-                                shandler(LOG);
-                        }
-                }
-                return (0);
-        }
-        else
-        {
-                while (*c != '\0')
-                {
-                        if ((putc(*c, stdout)) < 0)
-                        {
-                                putc("L", stdout);
-                                shandler(LOG);
-                        }
-                }
-                return (LOG);
-        }
-}
+/*
+   uint8_t Log(const char * c)
+   {
+   if (!c)
+   {
+   return (-1);
+   }
+   if (logfd != -1)
+   {
+   while (*c != '\0')
+   {
+   if ((putc(*c, logfd)) < 0)
+   {
+   putc("L", stdout);
+   _exit(LOG);
+   }
+   }
+   return (0);
+   }
+   else
+   {
+   while (*c != '\0')
+   {
+   if ((putc(*c, stdout)) < 0)
+   {
+   putc("L", stdout);
+   _exit(LOG);
+   }
+   }
+   return (LOG);
+   }
+   }
 
-uint32_t openLog(const char * n, uint32_t * fd)
-{
-        if (!fd)
-        {
-                if ((fd = (uint32_t *)malloc(sizeof(uint32_t) * 1)) < 0)
-                {
-                        Log("Insufficient memory\n\0");
-                        shandler(NO_MEM);
-                }
-        }
-        /* HERE */
-        char * path = getcwd();
-        if (path)
-        {
-                if (n)
-                {
-                        strncat(path, n, strlen(n));
-                }
-                else
-                {
-                        strncat(path, (const char *)"dhs_retrieve.log", 16);
-                }
-        }
-        else
-        {
-                strncpy(path, (const char *)"/tmp/dhs_retrieve.log", 21);
-        }
-        *fd = open ((const char *)path , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , 0644);
-        if (*fd < 0)
-        {
-                Log("Unable to open log file\n");
-                shandler(LOG);
-        }
-        return (*fd);
-}
+   uint32_t openLog(const char * n, uint32_t * fd)
+   {
+   if (!fd)
+   {
+   if ((fd = (uint32_t *)malloc(sizeof(uint32_t) * 1)) < 0)
+   {
+   Log("Insufficient memory\n\0");
+   _exit(NO_MEM);
+   }
+   }
+   */
+/* HERE */
+/*
+   char * path = getcwd();
+   if (path)
+   {
+   if (n)
+   {
+   strncat(path, n, strlen(n));
+   }
+   else
+   {
+   strncat(path, (const char *)"dhs_retrieve.log", 16);
+   }
+   }
+   else
+   {
+   strncpy(path, (const char *)"/tmp/dhs_retrieve.log", 21);
+   }
+ *fd = open ((const char *)path , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , 0644);
+ if (*fd < 0)
+ {
+ Log("Unable to open log file\n");
+ _exit(LOG);
+ }
+ return (*fd);
+ }
 
-int32_t closeLog(int32_t * fd)
-{
-        if (!fd || *fd < 0)
-        {
-                return(0);
-        }
-        if (close(*fd) < 0)
-        {
-                Log("Unable to close logfile");
-                return (-1);
-        }
-        return (0);
-}
+ int32_t closeLog(int32_t * fd)
+ {
+ if (!fd || *fd < 0)
+ {
+ return(0);
+ }
+ if (close(*fd) < 0)
+ {
+ Log("Unable to close logfile");
+ return (-1);
+ }
+ return (0);
+ }
 
+*/
