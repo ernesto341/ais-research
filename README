@@ -1,0 +1,8 @@
+fork and exec ais train module
+on receive first population, fork and exec dhs and retrieve
+in retrieve, create 8 unknownweb objects.
+   on receive, spawn test thread with one of the unknownweb objects and the received signature to keep the queue clear
+in test thread, accept in a struct as a void * one unknownweb object and one signature
+   run the test function against the signature and record within the unknownweb object in the default/preprogrammed manner. return the results in a struct as a void *
+in retrieve, on join, coalesce the results into a tracking/logging structure/method
+

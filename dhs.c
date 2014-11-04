@@ -45,6 +45,8 @@
  * Ensure no buffer overflows, use resize
  * replace all print statements with putc(int character, FILE io) loops for thread operation
  *
+ * prepend a 0 to signatures in order to facilitate use of current Webdata class file
+ *
  */
 
 #include <getopt.h>

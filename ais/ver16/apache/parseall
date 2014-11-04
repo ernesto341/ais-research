@@ -1,0 +1,10 @@
+#/bin/bash
+
+rm unknown temp*
+
+parseurl.pl interesting temp
+parseurl.pl access.log temp
+
+sort temp > temp2
+uniq temp2 > temp3
+./input.pl temp3 unknown
