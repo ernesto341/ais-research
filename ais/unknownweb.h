@@ -16,7 +16,8 @@ class unknownWeb : protected Webdata {
     void reset();
     void setThreshold(int);
     void test(Antibody **a, int s, int f = 0, int cl = -1);
-    void test(Antibody **a, int s, int f = 0, int cl = -1, const int * sig = NULL);
+                //unknown.test(pop[i], MAX_ANTIBODIES, 2, i);
+    void * test(void *);
 
     friend ostream &operator<<(ostream &, const unknownWeb &);
 };

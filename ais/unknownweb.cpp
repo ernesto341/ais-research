@@ -28,25 +28,43 @@ void unknownWeb::reset() {
 
 /* HERE make this a live data test function that takes an int * and tests against that, returning/logging/printing result 
  * what is 'tested'? 'results'? testing live traffic, may overflow an integer */
-void unknownWeb::test(Antibody **a, int s, int f, int cl, const int * sig) {
-        if (sig)
+void * unknownWeb::test(void * v)
+{
+        if (v)
         {
-                for(int i = 0; i < lines; i++) {
-                        for(int j = 0; j < s; j++) { // Run it against good antibodies in this class
+                test_param params;
+                params = *(test_param *)v;
+                test_result results;
+                for(int i = 0; i < lines; i++)
+                {
+                        for(int j = 0; j < s; j++)
+                        { // Run it against good antibodies in this class
                                 // fitness() with no argument computes how reliably this antibody can
                                 // distinguish normal from attack. Skip over unreliable antibodies.
-                                if(a[j]->fitness() <= 0.5) continue;
+                                if(champs[j]->fitness() <= 0.5)
+                                {
+                                        continue;
+                                }
                                 tested[i]++;
-                                int ret = a[j]->match(&sig[i]);
-                                int c = a[j]->queryClassification();
-                                if(ret == -1) continue;
-                                if(ret == 1) { // labeled as attack
+                                int ret = champs[j]->match(&sig[i]);
+                                int c = champs[j]->queryClassification();
+                                if(ret == -1)
+                                {
+                                        continue;
+                                }
+                                if(ret == 1)
+                                { // labeled as attack
                                         results[i]++;
-                                        if(c == cl) guessedCount[i][c]++; // in correct class for population
+                                        if(c == cl)
+                                        {
+                                                guessedCount[i][c]++; // in correct class for population
+                                        }
                                 }
                         }
                 }
+                return ((void *)results);
         }
+        return ((void *)0);
 }
 
 void unknownWeb::test(Antibody **a, int s, int f, int cl) {

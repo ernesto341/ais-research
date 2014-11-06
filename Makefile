@@ -1,14 +1,14 @@
 INC             =  ./inc
-INCFLAGS        =  -I $(INC) -I /usr/include -I /usr/local/include
+RET             =  ./retdir
+INCFLAGS        =  -I $(INC) -I $(RET) -I /usr/include -I /usr/local/include
 LIB             =  ./lib
-SYM             =  -DPWING=1 -DPWTEN=2 -DCRING=3 -DCREAD=4 -DPDONE=5 -DCDONE=6 -DFLAGS=2
-CFLAGS          =  -Wall -Wextra -ggdb -O2 -pthread
+CFLAGS          =  -Wall -Wextra -ggdb -O2 -lpthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
 
 all: tcpreassembly libntoh sfhash common 4d 6d itoa share dhs retrieve
 
 retrieve:
-	g++ $(INCFLAGS) $(CFLAGS) retrieve.cpp -o retrieve
+	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve
 
 itoa:
 	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c
@@ -48,7 +48,8 @@ clean:
 	rm -f ret_err
 	rm -f core
 	rm -f dhs
-	rm -f retrieve
+	rm -f ./retrieve/retrieve
+	rm -f dhs
 	rm -f $(LIB)/*.o
 	rm -f $(LIB)/*.gch
 	rm -f $(INC)/*.o

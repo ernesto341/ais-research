@@ -352,7 +352,7 @@ void write_hdr_data ( void )
          */
 
         write (fd, "Finger Print:", 13);
-        if (snc.sigs == 0 || snc.sigs[(snc.sigs[CTL][POS])] == 0)
+        if (snc.mem.sigs == 0 || snc.mem.sigs[(snc.mem.sigs[CTL][POS])] == 0)
         {
                 write(fd, "\r\nNo fingerprint found\r\n\0", 25);
                 close ( fd );
@@ -419,8 +419,8 @@ void write_hdr_data ( void )
                 {
                         strncat (path, ">    -  ", 8);
                 }
-                unsigned int t = snc.sigs[CTL][POS] - 1;
-                char * tmp = itoa(snc.sigs[(t > 0 ? t : SIGQTY)][i]);
+                unsigned int t = snc.mem.sigs[CTL][POS] - 1;
+                char * tmp = itoa(snc.mem.sigs[(t > 0 ? t : SIGQTY)][i]);
                 strncat (path, tmp, strlen(tmp));
                 strncat (path, "\r\n", 2);
                 write ( fd , path , strlen(path) );
@@ -836,7 +836,7 @@ inline uint8_t dumpToShm(void)
         if (DEBUG)
         {
                 fprintf(stderr, "\r\nin dumpToShm, shm[CTL][POS] = %d\r\n", snc.smem.shm[CTL][POS]);
-                fprintf(stderr, "\r\nsnc.t5s[above-1] = %p\r\n", snc.smem.t5s[(snc.smem.shm[CTL][POS])-1]);
+                fprintf(stderr, "\r\nsnc.t5s[above-1] = %p\r\n", snc.mem.t5s[(snc.smem.shm[CTL][POS])-1]);
                 fprintf(stderr, "\r\nsnc.t5shm[above-1] = %p\r\n", snc.smem.t5shm[(snc.smem.shm[CTL][POS])-1]);
                 fflush(stderr);
         }
@@ -849,7 +849,7 @@ inline uint8_t dumpToShm(void)
                 while (snc.smem.shm[CTL][POS] != snc.mem.sigs[CTL][POS])
                 {
                         memcpy((sig_atomic_t *)snc.smem.shm[snc.smem.shm[CTL][POS]], (sig_atomic_t *)snc.mem.sigs[snc.smem.shm[CTL][POS]], (sizeof(sig_atomic_t) * fngPntLen));
-                        memcpy((sig_atomic_t *)snc.smem.t5shm[((snc.smem.shm[CTL][POS] - 1))], (sig_atomic_t *)snc.smem.t5s[(snc.smem.shm[CTL][POS]) - 1], (sizeof(sig_atomic_t) * t5TplLen));
+                        memcpy((sig_atomic_t *)snc.smem.t5shm[((snc.smem.shm[CTL][POS] - 1))], (sig_atomic_t *)snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1], (sizeof(sig_atomic_t) * t5TplLen));
                         /* unlock shared memory */
                         if ((snc.smem.shm[CTL][PEND]) == 5)
                         {

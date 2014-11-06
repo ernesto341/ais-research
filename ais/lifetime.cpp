@@ -335,15 +335,6 @@ void train() {
         }
 }
 
-void testUnknown(int r, const int * sig) {
-        unknown.reset();
-        mystery << "Population " << r << endl;
-        for(int i = 0; i < CLASS_COUNT; i++) {
-                unknown.test(pop[i], MAX_ANTIBODIES, 2, i, sig);
-        }
-        mystery << unknown;
-}
-
 void testUnknown(int r) {
         unknown.reset();
         mystery << "Population " << r << endl;

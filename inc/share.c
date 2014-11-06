@@ -189,8 +189,8 @@ inline void aShmids(psnc_t snc)
         unsigned int j = 0;
         while (i < (SIGQTY + 1))
         {
-                snc->shm[i] = shmat(snc->shmid[i], (void *) 0, 0);
-                if ((void *)snc->shm[i] == (void *)-1)
+                snc->smem.shm[i] = shmat(snc->smem.shmid[i], (void *) 0, 0);
+                if ((void *)snc->smem.shm[i] == (void *)-1)
                 {
                         if (DEBUG)
                         {
@@ -203,12 +203,12 @@ inline void aShmids(psnc_t snc)
                 j = 0;
                 while (j < fngPntLen)
                 {
-                        snc->shm[i][j++] = -1;
+                        snc->smem.shm[i][j++] = -1;
                 }
                 if (i < SIGQTY)
                 {
-                        snc->t5shm[i] = shmat(snc->t5shmid[i], (void *) 0, 0);
-                        if ((void *)snc->t5shm[i] == (void *)-1)
+                        snc->smem.t5shm[i] = shmat(snc->smem.t5shmid[i], (void *) 0, 0);
+                        if ((void *)snc->smem.t5shm[i] == (void *)-1)
                         {
                                 if (DEBUG)
                                 {
@@ -221,7 +221,7 @@ inline void aShmids(psnc_t snc)
                         j = 0;
                         while (j < t5TplLen)
                         {
-                                snc->t5shm[i][j++] = '0';
+                                snc->smem.t5shm[i][j++] = '0';
                         }
                         i++;
                 }
@@ -241,12 +241,12 @@ void initMem(psnc_t snc)
                 aShmids(snc);
 
                 /* initialize some values */
-                snc->sigs[CTL][POS] = 1;
-                snc->sigs[CTL][PEND] = 0;
-                snc->sigs[CTL][FLAGS] = 0;
-                snc->shm[CTL][POS] = 1;
-                snc->shm[CTL][PEND] = 0;
-                snc->shm[CTL][FLAGS] = 0;
+                snc->mem.sigs[CTL][POS] = 1;
+                snc->mem.sigs[CTL][PEND] = 0;
+                snc->mem.sigs[CTL][FLAGS] = 0;
+                snc->smem.shm[CTL][POS] = 1;
+                snc->smem.shm[CTL][PEND] = 0;
+                snc->smem.shm[CTL][FLAGS] = 0;
         }
 }
 
