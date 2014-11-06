@@ -48,7 +48,7 @@ clean:
 	rm -f ret_err
 	rm -f core
 	rm -f dhs
-	rm -f ./retrieve/retrieve
+	rm -f $(RET)/retrieve
 	rm -f dhs
 	rm -f $(LIB)/*.o
 	rm -f $(LIB)/*.gch
