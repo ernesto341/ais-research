@@ -7,4 +7,6 @@ ret_err
 sigs
 retrieve
 inc/*.gch
+retdir/*.gch
+retdir/*.o
 
