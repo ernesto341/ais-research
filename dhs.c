@@ -124,27 +124,22 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        if (t5Convert)
-        {
-                free(t5Convert);
-        }
-
         unsigned int i = 0, len = 0;
         if (DEBUG)
         {
                 if (snc.smem.shm[CTL][FLAGS] == CDONE)
                 {
-                        strncpy(buf, "\r\n\t\t[i] --- Signaled to quit by consumer\r\n", 42);
+                        strncpy(buf, "\n\t\t[i] --- Signaled to quit by consumer\n", 40);
                         while (i < 42)
                         {
                                 putc(buf[i++], stderr);
                         }
                 }
-                strncpy(buf, "\r\n\t\t[i] --- Signal: \r\n", 22);
+                strncpy(buf, "\n\t\t[i] --- Signal: ", 19);
                 tmp = itoa(sign);
                 len = strlen(tmp);
                 strncat(buf, tmp, len);
-                len += 22;
+                len += 19;
                 i = 0;
                 while (i < len)
                 {
@@ -155,11 +150,16 @@ void shandler ( int sign )
 
         freeMem(&snc);
 
+        if (t5Convert)
+        {
+                free(t5Convert);
+        }
+
         pcap_close( handle );
 
         ntoh_exit();
 
-        strncpy(buf, "\r\n\t\tX      -----   Inactive   -----      X\r\n\r\n", 46);
+        strncpy(buf, "\n\t\tX      -----   Inactive   -----      X\n\n", 43);
         i = 0;
         while (i < 46)
         {
@@ -180,7 +180,7 @@ void resizeInt(int ** in, unsigned int * len)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
                         shandler(0);
                 }
         }
@@ -202,7 +202,7 @@ void resizeChar(char ** in, unsigned int * len)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
                         shandler(0);
                 }
         }
@@ -331,7 +331,7 @@ void write_hdr_data ( void )
         }
 
         write ( fd , (const char *)hdr_data , strlen((const char *)hdr_data) );
-        write ( fd , "\r\n" , 2 );
+        write ( fd , "\n" , 1 );
 
         /*FINGER PRINT EXPLANATION:
          * array of integers, each slot contains a specified number (integer) that represents the character count 
@@ -354,7 +354,7 @@ void write_hdr_data ( void )
         write (fd, "Finger Print:", 13);
         if (snc.mem.sigs == 0 || snc.mem.sigs[(snc.mem.sigs[CTL][POS])] == 0)
         {
-                write(fd, "\r\nNo fingerprint found\r\n\0", 25);
+                write(fd, "\nNo fingerprint found\n\0", 22);
                 close ( fd );
                 pending_more_hdr_data = 0;
                 return;
@@ -362,7 +362,7 @@ void write_hdr_data ( void )
         unsigned int i = 0;
         while (i < fngPntLen)
         {
-                strncpy (path, "\r\n", 2);
+                strncpy (path, "\n", 1);
                 if (i == 0)
                 {
                         strncat (path, "CMD  -  ", 8);
@@ -422,12 +422,12 @@ void write_hdr_data ( void )
                 unsigned int t = snc.mem.sigs[CTL][POS] - 1;
                 char * tmp = itoa(snc.mem.sigs[(t > 0 ? t : SIGQTY)][i]);
                 strncat (path, tmp, strlen(tmp));
-                strncat (path, "\r\n", 2);
+                strncat (path, "\n", 1);
                 write ( fd , path , strlen(path) );
                 i++;
         }
 
-        write ( fd , "\r\n" , 2 );
+        write ( fd , "\n" , 1 );
         close ( fd );
         pending_more_hdr_data = 0;
         free(hdr_data);
@@ -482,15 +482,15 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
 
         if (DEBUG)
         {
-                strcpy (buf, "\r\n\t-----\tHEADER BEGIN\t-----\r\n");
-                write (2, buf, strlen(buf));
+                strcpy (buf, "\n\t-----\tHEADER BEGIN\t-----\n");
+                write (2, buf, 27);
                 while (i < dataLen)
                 {
                         write(2, (const char *)(&(curPcktData[i++])), 1);
                         fflush(stderr);
                 }
-                strcpy (buf, "\r\n\t------\tHEADER END\t------\r\n");
-                write (2, buf, strlen(buf));
+                strcpy (buf, "\n\t------\tHEADER END\t------\n");
+                write (2, buf, 27);
                 fflush(stderr);
         }
 
@@ -519,7 +519,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory\r\n");
+                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory\n");
                 }
                 shandler(0);
         }
@@ -764,7 +764,7 @@ inline static void resizeHdr(void)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
                         shandler(0);
                 }
         }
@@ -789,7 +789,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\r\n\t[e] --- Unable to allocate sufficient memory!\r\n");
+                                fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
                                 shandler(0);
                         }
                 }
@@ -807,7 +807,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\r\n\t[i] --- Found end of header with 0d0a 0d0a\r\n");
+                                fprintf(stderr, "\n\t[i] --- Found end of header with 0d0a 0d0a\n");
                         }
                         eoh = 0;
                 }
@@ -815,7 +815,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\r\n\t[i] --- Found end of header with 0a0d 0a0d\r\n");
+                                fprintf(stderr, "\n\t[i] --- Found end of header with 0a0d 0a0d\n");
                         }
                         eoh = 0;
                 }
@@ -823,7 +823,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\r\n\t[a] --- Resizing header\r\n");
+                                fprintf(stderr, "\n\t[a] --- Resizing header\n");
                         }
                         resizeHdr();
                 }
@@ -835,9 +835,11 @@ inline uint8_t dumpToShm(void)
 {
         if (DEBUG)
         {
-                fprintf(stderr, "\r\nin dumpToShm, shm[CTL][POS] = %d\r\n", snc.smem.shm[CTL][POS]);
-                fprintf(stderr, "\r\nsnc.t5s[above-1] = %p\r\n", snc.mem.t5s[(snc.smem.shm[CTL][POS])-1]);
-                fprintf(stderr, "\r\nsnc.t5shm[above-1] = %p\r\n", snc.smem.t5shm[(snc.smem.shm[CTL][POS])-1]);
+                fprintf(stderr, "\nin dumpToShm, snc.smem.shm[CTL][POS] = %d\n", snc.smem.shm[CTL][POS]);
+                fprintf(stderr, "\nsnc.mem.sigs[above] = %p\n", snc.mem.sigs[(snc.smem.shm[CTL][POS])]);
+                fprintf(stderr, "\nsnc.mem.t5s[above-1] = %p\n", snc.mem.t5s[(snc.smem.shm[CTL][POS])-1]);
+                fprintf(stderr, "\nsnc.smem.shm[above] = %p\n", snc.smem.shm[(snc.smem.shm[CTL][POS])]);
+                fprintf(stderr, "\nsnc.smem.t5shm[above-1] = %p\n", snc.smem.t5shm[(snc.smem.shm[CTL][POS])-1]);
                 fflush(stderr);
         }
         /* try-lock shared memory */
@@ -848,8 +850,14 @@ inline uint8_t dumpToShm(void)
                 /* do the dump to shm routine */
                 while (snc.smem.shm[CTL][POS] != snc.mem.sigs[CTL][POS])
                 {
-                        memcpy((sig_atomic_t *)snc.smem.shm[snc.smem.shm[CTL][POS]], (sig_atomic_t *)snc.mem.sigs[snc.smem.shm[CTL][POS]], (sizeof(sig_atomic_t) * fngPntLen));
+                        fprintf(stderr, "start of loop, memcpy 1\n");
+                        fflush(stderr);
                         memcpy((sig_atomic_t *)snc.smem.t5shm[((snc.smem.shm[CTL][POS] - 1))], (sig_atomic_t *)snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1], (sizeof(sig_atomic_t) * t5TplLen));
+                        fprintf(stderr, "start of memcpy 2\n");
+                        fflush(stderr);
+                        memcpy((sig_atomic_t *)snc.smem.shm[snc.smem.shm[CTL][POS]], (sig_atomic_t *)snc.mem.sigs[snc.smem.shm[CTL][POS]], (sizeof(sig_atomic_t) * fngPntLen));
+                        fprintf(stderr, "done with memcpys\n");
+                        fflush(stderr);
                         /* unlock shared memory */
                         if ((snc.smem.shm[CTL][PEND]) == 5)
                         {
@@ -863,6 +871,8 @@ inline uint8_t dumpToShm(void)
                                 snc.smem.shm[CTL][PEND] += 1; // pending
                         }
                         inCtr((sig_atomic_t ***)(&snc.smem.shm)); // pos
+                        fprintf(stderr, "end of loop\n");
+                        fflush(stderr);
                 }
                 snc.smem.shm[CTL][FLAGS] = PWTEN;
                 /* reset vars */
@@ -873,7 +883,7 @@ inline uint8_t dumpToShm(void)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\r\n\t[i] --- Blocked with flag %d\r\n", snc.smem.shm[CTL][FLAGS]);
+                        fprintf(stderr, "\n\t[i] --- Blocked with flag %d\n", snc.smem.shm[CTL][FLAGS]);
                         fflush(stderr);
                 }
                 return ((uint8_t)(snc.smem.shm[CTL][FLAGS]));
@@ -990,17 +1000,18 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                         /* got entire header, dump to shm */
                         if (pending_more_hdr_data == 0)
                         {
-                                /* HERE */
                                 /* try lock memory */
                                 size_t l = (strlen((const char *)(pinfo->path)));
                                 uint32_t i = 0;
                                 while (i < l)
                                 {
+                                        /*
                                         if (DEBUG)
                                         {
-                                                fprintf(stderr, "(pinfo->path[%d]): %c\r\n(sig_atomic_t)(pinfo->path[%d]) *(simulated with cast to int): %d\r\n", i, (pinfo->path[i]), i, (int)(pinfo->path[i]));
+                                                fprintf(stderr, "(pinfo->path[%d]): %c\n(sig_atomic_t)(pinfo->path[%d]) *(simulated with cast to int): %d\n", i, (pinfo->path[i]), i, (int)(pinfo->path[i]));
                                                 fflush(stderr);
                                         }
+                                        */
                                         snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1][i] = (sig_atomic_t)(pinfo->path[i]);
                                         i++;
                                 }
@@ -1008,7 +1019,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                                 /* unlock memory */
                                 if (DEBUG)
                                 {
-                                        write(2, "\r\n\t[i] --- tcp tuple 5 --- ", 27);
+                                        write(2, "\n\t[i] --- tcp tuple 5 --- ", 27);
                                         write(2, (const char *)(pinfo->path), strlen((const char *)(pinfo->path)));
                                         fflush(stderr);
                                 }
@@ -1215,15 +1226,15 @@ int main ( int argc , char *argv[] )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        fprintf( stderr, "\r\n\t\t######################################" );
-        fprintf( stderr, "\r\n\t\t#           Dump HTTP Sigs           #" );
-        fprintf( stderr, "\r\n\t\t# ---------------------------------- #" );
-        fprintf( stderr, "\r\n\t\t#     Written by Ernest Richards     #" );
-        fprintf( stderr, "\r\n\t\t#  Based on code from Chema Garcia   #" );
-        fprintf( stderr, "\r\n\t\t# ---------------------------------- #" );
-        fprintf( stderr, "\r\n\t\t# Github.com/ernesto341/ais-research #" );
-        fprintf( stderr, "\r\n\t\t######################################\r\n" );
-        fprintf( stderr, "\r\n\t\tX      -----    Active    -----      X\r\n\r\n" );
+        fprintf( stderr, "\n\t\t######################################" );
+        fprintf( stderr, "\n\t\t#           Dump HTTP Sigs           #" );
+        fprintf( stderr, "\n\t\t# ---------------------------------- #" );
+        fprintf( stderr, "\n\t\t#     Written by Ernest Richards     #" );
+        fprintf( stderr, "\n\t\t#  Based on code from Chema Garcia   #" );
+        fprintf( stderr, "\n\t\t# ---------------------------------- #" );
+        fprintf( stderr, "\n\t\t# Github.com/ernesto341/ais-research #" );
+        fprintf( stderr, "\n\t\t######################################\n" );
+        fprintf( stderr, "\n\t\tX      -----    Active    -----      X\n\n" );
 
         if (DEBUG)
         {
@@ -1384,7 +1395,13 @@ int main ( int argc , char *argv[] )
         /*******************************************/
 
         initMem(&snc);
-        t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+
+        if ((t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen)) < (sig_atomic_t *)0)
+        {
+                fprintf(stderr, "Memory\n");
+                fflush(stderr);
+                _exit(-1);
+        }
 
         ntoh_init ();
 

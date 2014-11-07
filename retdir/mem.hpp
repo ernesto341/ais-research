@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <time.h>
 
-#include "tools.hpp"
+#include <tools.hpp>
 
 using namespace std;
 
@@ -14,8 +14,6 @@ using namespace std;
 #ifndef SIGBUF
 #define SIGBUF 50
 #endif
-
-char buf[102];
 
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];
@@ -31,11 +29,12 @@ extern volatile sig_atomic_t ** retrieved_t5s;
 extern sig_atomic_t ct;
 extern sig_atomic_t local_pos;
 
-unsigned int i = 0;
+extern char buf[];
+extern unsigned int i;
 
 inline void fData(void)
 {
-        i = 0;
+        unsigned int i = 0;
         if (retrieved_sigs && retrieved_t5s)
         {
                 while (i < SIGBUF)
@@ -67,7 +66,7 @@ inline void fData(void)
 
 inline void dShmids(void)
 {
-        i = 0;
+        unsigned int i = 0;
         while (i < (SIGQTY + 1))
         {
                 if (i < SIGQTY)
@@ -81,6 +80,8 @@ inline void dShmids(void)
 
 inline void iData(void)
 {
+        unsigned int i = 0;
+        char buf [102];
         retrieved_t5s = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
         retrieved_sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGBUF));
         if (retrieved_t5s == NULL || retrieved_sigs == NULL)
@@ -144,6 +145,7 @@ inline void fShmids(void)
 
 inline void iShms(void)
 {
+        char buf [102];
         shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
         t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
         if (shm == NULL || t5shm == NULL)
@@ -156,7 +158,8 @@ inline void iShms(void)
 
 inline void iShmids(void)
 {
-        i = 0;
+        unsigned int i = 0;
+        char buf [102];
         srand(time(NULL));
         shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
         t5shmid = (int *)malloc(sizeof(int) * (SIGQTY));
@@ -200,7 +203,8 @@ inline void iShmids(void)
 
 inline void aShmids(void)
 {
-        i = 0;
+        unsigned int i = 0;
+        char buf [102];
         while (i < (SIGQTY + 1))
         {
                 shm[i] = (volatile sig_atomic_t *)shmat(shmid[i], (void *) 0, 0);

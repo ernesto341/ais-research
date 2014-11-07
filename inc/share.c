@@ -7,7 +7,7 @@
 #include <share.h>
 
 #ifndef DEBUG
-#define DEBUG 0
+#define DEBUG 1
 #endif
 
 unsigned int i = 0;
@@ -15,17 +15,15 @@ unsigned int i = 0;
 inline void dShmids(psnc_t snc)
 {
         i = 0;
-        while (i < (SIGQTY))
-        {
-                shmdt((sig_atomic_t *)snc->smem.t5shm[i]);
-                shmctl(snc->smem.t5shmid[i], IPC_RMID, 0);
-                i++;
-        }
-        i = 0;
         while (i < (SIGQTY + 1))
         {
                 shmdt((sig_atomic_t *)snc->smem.shm[i]);
                 shmctl(snc->smem.shmid[i], IPC_RMID, 0);
+                if (i < (SIGQTY))
+                {
+                        shmdt((sig_atomic_t *)snc->smem.t5shm[i]);
+                        shmctl(snc->smem.t5shmid[i], IPC_RMID, 0);
+                }
                 i++;
         }
 }
@@ -36,8 +34,21 @@ inline void fData(psnc_t snc)
         {
                 free(hdr_data);
         }
-        unsigned int i = 0;
-        if (snc->mem.sigs)
+        i = 0;
+        if (snc->mem.sigs && snc->mem.t5s)
+        {
+                while (i < (SIGQTY + 1))
+                {
+                        if (i < (SIGQTY))
+                        {
+                                free(snc->mem.t5s[i]);
+                        }
+                        free(snc->mem.sigs[i]);
+                        i++;
+                }
+                free(snc->mem.sigs);
+        }
+        else if (snc->mem.sigs)
         {
                 while (i < (SIGQTY + 1))
                 {
@@ -45,8 +56,7 @@ inline void fData(psnc_t snc)
                 }
                 free(snc->mem.sigs);
         }
-        i = 0;
-        if (snc->mem.t5s)
+        else if (snc->mem.t5s)
         {
                 while (i < SIGQTY)
                 {
@@ -54,7 +64,6 @@ inline void fData(psnc_t snc)
                 }
                 free(snc->mem.t5s);
         }
-        i = 0;
 }
 
 inline void fShms(psnc_t snc)
@@ -103,19 +112,38 @@ inline void iData(psnc_t snc)
         {
                 if (DEBUG)
                 {
-                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                        write(2, buf, 38);
+                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                        write(2, buf, 37);
                 }
                 _exit(-1);
         }
         i = 0;
         while (i < (SIGQTY + 1))
         {
-                snc->mem.sigs[i++] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
+                snc->mem.sigs[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
+                if (snc->mem.sigs[i] == 0)
+                {
+                        if (DEBUG)
+                        {
+                                strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                                write(2, buf, 37);
+                        }
+                        _exit(-1);
+                }
                 if (i < SIGQTY)
                 {
-                        snc->mem.t5s[i++] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                        snc->mem.t5s[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                        if (snc->mem.t5s[i] == 0)
+                        {
+                                if (DEBUG)
+                                {
+                                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                                        write(2, buf, 37);
+                                }
+                                _exit(-1);
+                        }
                 }
+                i++;
         }
 }
 
@@ -127,8 +155,8 @@ inline void iShms(psnc_t snc)
         {
                 if (DEBUG)
                 {
-                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                        write(2, buf, 38);
+                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                        write(2, buf, 37);
                 }
                 _exit(-1);
         }
@@ -144,8 +172,8 @@ inline void iShmids(psnc_t snc)
         {
                 if (DEBUG)
                 {
-                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                        write(2, buf, 38);
+                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                        write(2, buf, 37);
                 }
                 _exit(-1);
         }
@@ -180,13 +208,11 @@ inline void iShmids(psnc_t snc)
                 }
                 i++;
         }
-        i = 0;
 }
 
 inline void aShmids(psnc_t snc)
 {
         i = 0;
-        unsigned int j = 0;
         while (i < (SIGQTY + 1))
         {
                 snc->smem.shm[i] = shmat(snc->smem.shmid[i], (void *) 0, 0);
@@ -194,16 +220,10 @@ inline void aShmids(psnc_t snc)
                 {
                         if (DEBUG)
                         {
-                                strncpy(buf, "unable to attach shm", 14);
-                                strncat(buf, "\r\n", 2);
-                                write(2, buf, 16);
+                                strncpy(buf, "unable to attach shm\n", 15);
+                                write(2, buf, 15);
                         }
                         _exit(-1);
-                }
-                j = 0;
-                while (j < fngPntLen)
-                {
-                        snc->smem.shm[i][j++] = -1;
                 }
                 if (i < SIGQTY)
                 {
@@ -212,22 +232,14 @@ inline void aShmids(psnc_t snc)
                         {
                                 if (DEBUG)
                                 {
-                                        strncpy(buf, "unable to attach t5shm", 16);
-                                        strncat(buf, "\r\n", 2);
-                                        write(2, buf, 18);
+                                        strncpy(buf, "unable to attach t5shm\n", 17);
+                                        write(2, buf, 17);
                                 }
                                 _exit(-1);
                         }
-                        j = 0;
-                        while (j < t5TplLen)
-                        {
-                                snc->smem.t5shm[i][j++] = '0';
-                        }
-                        i++;
                 }
                 i++;
         }
-        i = 0;
 }
 
 void initMem(psnc_t snc)
@@ -241,6 +253,27 @@ void initMem(psnc_t snc)
                 aShmids(snc);
 
                 /* initialize some values */
+                i = 0;
+                unsigned int j = 0;
+                while (i < SIGQTY + 1)
+                {
+                        j = 0;
+                        while (j < fngPntLen)
+                        {
+                                snc->smem.shm[i][j] = -1;
+                                j++;
+                        }
+                        if (i < SIGQTY)
+                        {
+                                j = 0;
+                                while (j < t5TplLen)
+                                {
+                                        snc->smem.t5shm[i][j] = -1;
+                                        j++;
+                                }
+                        }
+                        i++;
+                }
                 snc->mem.sigs[CTL][POS] = 1;
                 snc->mem.sigs[CTL][PEND] = 0;
                 snc->mem.sigs[CTL][FLAGS] = 0;

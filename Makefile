@@ -7,8 +7,11 @@ CC              =  gcc $(CFLAGS) $(INCFLAGS)
 
 all: tcpreassembly libntoh sfhash common 4d 6d itoa share dhs retrieve
 
-retrieve:
-	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve
+pull:
+	g++ $(INCFLAGS) $(CFLAGS) -c -o $(RET)/pull.o $(RET)/pull.cpp
+
+retrieve: pull
+	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve $(RET)/*.o
 
 itoa:
 	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c
@@ -49,6 +52,8 @@ clean:
 	rm -f core
 	rm -f dhs
 	rm -f $(RET)/retrieve
+	rm -f $(RET)/*.gch
+	rm -f $(RET)/*.o
 	rm -f dhs
 	rm -f $(LIB)/*.o
 	rm -f $(LIB)/*.gch
