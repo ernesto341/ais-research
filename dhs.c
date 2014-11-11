@@ -90,9 +90,11 @@ pntoh_ipv4_session_t ipv4_session = 0;
 unsigned short	receive = 0;
 
 /* header extract and signiture storage, memory */
+/*
 uint8_t pending_more_hdr_data = 0;
 unsigned char * hdr_data = 0;
 uint32_t hdr_size = 850;
+*/
 /* low end of average HTTP header size is 200
  * high end can be over 2kb, hdr_data size will auto adjust as the program runs
  * 850 given as sufficient for most headers to minimize resize operations

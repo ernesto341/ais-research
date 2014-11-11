@@ -21,8 +21,8 @@
 #include <itoa.h>
 #include <globals.h>
 
-extern unsigned char * hdr_data;
-extern uint32_t hdr_size;
+//extern unsigned char * hdr_data;
+//extern uint32_t hdr_size;
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];
 

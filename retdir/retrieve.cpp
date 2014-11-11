@@ -1,7 +1,7 @@
 #include <iostream>
 #include <queue>
 
-#include <globals.h>
+#include <retglobals.h>
 
 #include <tools.hpp>
 #include <mem.hpp>

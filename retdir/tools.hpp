@@ -1,7 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include <stdio.h>
-#include <globals.h>
+#include <retglobals.h>
 #include <signal.h>
 
 #include <mem.hpp>

@@ -301,7 +301,10 @@ void ntoh_ipv6_free_flow ( pntoh_ipv6_session_t session , pntoh_ipv6_flow_t *flo
 int ntoh_ipv6_add_fragment ( pntoh_ipv6_session_t session , pntoh_ipv6_flow_t flow , struct ip6_hdr *iphdr , size_t len )
 {
 	size_t                  iphdr_len = 0;
+   /* HERE - replacing short with long to eliminate a warning
 	unsigned short          offset = 0;
+   */
+	unsigned long            offset = 0;
 	unsigned int            data_len = 0;
 	unsigned char           *data = 0;
 	int				        ret = NTOH_OK;

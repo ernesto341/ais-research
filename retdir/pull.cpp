@@ -2,64 +2,48 @@
 
 using namespace std;
 
-/*
+int32_t child_pid = -1;
+int32_t snum = 0;
 
-   Antibody ** champs;
+Antibody ** champs;
 
-*/
+int32_t logfd = -1;
+
+volatile sig_atomic_t testing = 0;
+
 typedef struct _test_param
 {
-        //unknownweb * uw_obj; // pass one of the precreated/initialized objects by reference
+        uint8_t tnum;
         uint32_t sig[fngPntLen]; // signature to be tested
-        char t5tuple[t5TplLen]; // t5 tuple
-        volatile sig_atomic_t go; // signal to thread to start testing
+        char tuple[t5TplLen]; // t5 tuple
+        volatile sig_atomic_t flag; // signal to thread to start testing
+        int8_t attack; // whether or not the tested signature was determined to be an attack
 } test_param, *ptest_param;
 
-typedef struct _test_result
-{
-        uint32_t sig[fngPntLen]; // tested signature
-        int8_t attack; // whether or not the tested signature was determined to be an attack
-        char **resultv; // all results will be stored locally in each uw_obj, but this struct is a set of *new results that can be logged if necessary
-        uint32_t resultc; // count of results
-        char t5tuple[t5TplLen]; // t5 tuple
-} test_result, *ptest_result;
-
-/*
-uint32_t count(const char ** r)
-{
-        uint32_t ct = 0;
-        while (*r != "\0")
-        {
-                (&r)++;
-                ct++;
-        }
-        return (ct);
-}
-*/
+queue<test_param> log_queue;
 
 void * testThread(void * v)
 {
-        test_param p = *(ptest_param)v;
-        //p.uw_obj->test(&champs, p.sig);
-        ptest_result r = new test_result;
-        memcpy(r->sig, p.sig, sizeof(uint32_t) * fngPntLen);
-        memcpy(r->t5tuple, p.t5tuple, sizeof(char) * t5TplLen);
-        //r->attack = (uint8_t)p.uw_obj.queryTests(); // HERE - use this? to determine if this was an attack
-        //r->resultv = ;
-        //r->resultc = count(resultv);
-
-        if(r->attack - LOGLEVEL >= 0)
+        if (v)
         {
-                // HERE - need to enforce mutual exclusion?
-                //log_queue.enqueue(*r);
+                for (unsigned int i = 0; i < fngPntLen; i++)
+                {
+                        if (champs[i]->fitness() > MIN_FITNESS)
+                        {
+                                ((ptest_param)v)->attack = (uint8_t)champs[i]->match((int *)(((ptest_param)v)->sig));
+                        }
+                }
+
+                if(LOG_LEVEL - (((ptest_param)v)->attack) <= 0)
+                {
+                        // HERE - need to enforce mutual exclusion?
+                        //log_queue.enqueue(*v);
+                }
+                ((ptest_param)v)->flag = DONE;
         }
 
-        return ((void *)r);
+        return ((void *)0);
 }
-
-
-queue<test_result> log_queue;
-uint32_t logfd;
 
 /* HERE */
 /* child function that watches the queue for entries that need to be logged and logs new entries */
@@ -71,9 +55,10 @@ void Stats (void)
         /* log new item to queue */
         /* dump overall statistics to log file */
         /* close log file */
+        return;
 }
 
-inline static void Convert (char dst[t5TplLen], sig_atomic_t src[t5TplLen])
+inline static void Convert (char dst[t5TplLen], volatile sig_atomic_t src[t5TplLen])
 {
         unsigned int i = 0;
         while (i < t5TplLen)
@@ -83,107 +68,175 @@ inline static void Convert (char dst[t5TplLen], sig_atomic_t src[t5TplLen])
         }
 }
 
-#ifndef THREAD_MAX
-#define THREAD_MAX 8
-#endif
-
-volatile sig_atomic_t testing;
-
-void pull()
+/* v is a test_param [MAX_THREADS] */
+void * testMgr (void * v)
 {
-        unsigned int i = 0;
-        /* HERE */
-        /* fork log process */
-        /*
-           test_param params[THREAD_MAX];
-           unknownweb uw_objs[THREAD_MAX];
-           for (i = 0; i < THREAD_MAX; i++)
-           {
-           params[i].uw_obj = &(uw_objs[i]);
-           params[i].go = 0;
-           pthread_create();
-           }
-           */
-        testing = 0;
-        if (DEBUG)
+        if (v)
         {
-                // Retrieve
-                fprintf(stderr, "\tentering loop\r\n");
-        }
-
-        /* accept signal from producer to quit */
-        while (shm[CTL][FLAGS] != PDONE)
-        {
-                /* only copy when dhs isn't writing and while there are pending headers to get 
-                */
-                while (shm[CTL][PEND] > 0)
+                int i = 0;
+                /* while not done */
+                while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
                 {
-                        if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
+                        i = 0;
+                        /* check all necessary testing params */
+                        while (i < testing)
                         {
-                                if (DEBUG)
+                                if (((ptest_param)v)[i].flag == START)
                                 {
-                                        // Retrieve
-                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                                        ((ptest_param)v)[i].flag = WORKING;
+                                        /* begin a test, pass (ptest_param)&((test_param *)v[i]), i.e., a ptest_param */
+                                        //pthread_create();
                                 }
-                                shm[CTL][FLAGS] = CRING;
-                                memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
-                                memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
-                                /*
-                                   memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
-                                   */
-                                /* convert sig_atomic_t to char */
-                                /*
-                                   Convert(params[testing].tuple, retrieved_t5s[ct]);
-                                   params[testing].go = 1;
-                                   */
-                                if (testing < THREAD_MAX)
+                                if (((ptest_param)v)[i].flag == DONE)
                                 {
-                                        testing++;
+                                        //pthread_join();
+                                        testing--;
                                 }
-                                else
-                                {
-                                        fprintf(stderr, "Insufficient threads to process incoming signatures\n");
-                                        fflush(stderr);
-                                }
-                                if (DEBUG)
-                                {
-                                        fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
-                                        fprintf(stderr, "\r\nsig:\r\n");
-                                        i = 0;
-                                        while (i < fngPntLen)
-                                        {
-                                                fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
-                                                fprintf(stderr, "\r\n");
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\t");
-                                        i = 0;
-                                        while (i < t5TplLen)
-                                        {
-                                                fprintf(stderr, "%c", retrieved_t5s[ct][i]);
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\r\n");
-                                        fflush(stderr);
-                                }
-                                ct = (ct+1)%SIGBUF;
-                                inPos();
-
-                                /* decrement pending counter
-                                 * should never go below 0,
-                                 * so this test is probably unnecessary
-                                 */
-                                if (shm[CTL][PEND] > 0)
-                                {
-                                        shm[CTL][PEND]--;
-                                }
-                                shm[CTL][FLAGS] = CREAD;
+                                i++;
+                        }
+                }
+                /* for debugging/optimization purposes, figure out how many threads we actually used */
+                i = 0;
+                uint8_t ct = MAX_THREADS;
+                while (i < MAX_THREADS)
+                {
+                        if (((ptest_param)v)[i].flag == UNUSED)
+                        {
+                                ct--;
                         }
                 }
         }
-        /* HERE */
-        /* signal dhs that retrieve is done */
-        /* join threads */
-        /* join logging process */
+        return ((void *)ct);
+}
+
+void pull(Antibody ** pop, const int32_t pipefd)
+{
+        if (pop == NULL)
+        {
+                /* attempt to pull a population from file */
+                /* OR call breed and train module */
+        }
+        champs = pop;
+
+        /* pipe to recieve new antibody populations from breed and train module */
+        if (pipefd < 0)
+        {
+        }
+
+        uint32_t i = 0;
+
+        /*
+        int32_t * snum = 0;
+        snum = (int32_t *)malloc(1 * sizeof(int32_t));
+        *snum = 0;
+        */
+
+        /* fork log process */
+        if ((child_pid = fork()) < 0)
+        {
+                perror("fork()");
+        }
+        /* child - logging process */
+        if (child_pid == 0)
+        {
+                Stats();
+                exit(0);
+        }
+        /* parent - retrieve loop */
+        else
+        {
+                test_param params[MAX_THREADS];
+                for (i = 0; i < MAX_THREADS; i++)
+                {
+                        params[i].flag = UNUSED;
+                        params[i].tnum = i;
+                }
+                /* start testMgr with &params[] */
+                /*
+                   pthread_create();
+                   */
+                testing = 0;
+                if (DEBUG)
+                {
+                        // Retrieve
+                        fprintf(stderr, "\tentering loop\r\n");
+                }
+
+                /* accept signal from producer to quit */
+                while (shm[CTL][FLAGS] != PDONE)
+                {
+                        /* only copy when dhs isn't writing and while there are pending headers to get - add mutex functionality?
+                        */
+                        while (shm[CTL][PEND] > 0)
+                        {
+                                if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
+                                {
+                                        if (DEBUG)
+                                        {
+                                                // Retrieve
+                                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                                        }
+                                        shm[CTL][FLAGS] = CRING;
+                                        memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
+                                        memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
+                                        if (testing < MAX_THREADS)
+                                        {
+                                                memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
+                                                /* convert sig_atomic_t to char */
+                                                Convert(params[testing].tuple, retrieved_t5s[ct]);
+                                                /* these two lines signal the testMgr to spawn a testing thread */
+                                                testing++;
+                                                params[testing].flag = START;
+                                        }
+                                        else
+                                        {
+                                                fprintf(stderr, "Insufficient threads to process incoming signatures\n");
+                                                fflush(stderr);
+                                        }
+                                        if (DEBUG)
+                                        {
+                                                fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
+                                                fprintf(stderr, "\r\nsig:\r\n");
+                                                i = 0;
+                                                while (i < fngPntLen)
+                                                {
+                                                        fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
+                                                        fprintf(stderr, "\r\n");
+                                                        i++;
+                                                }
+                                                fprintf(stderr, "\t");
+                                                i = 0;
+                                                while (i < t5TplLen)
+                                                {
+                                                        fprintf(stderr, "%c", retrieved_t5s[ct][i]);
+                                                        i++;
+                                                }
+                                                fprintf(stderr, "\r\n");
+                                                fflush(stderr);
+                                        }
+                                        /* keep an accurate record of our buffer position and dhs' buffer position */
+                                        ct = (ct+1)%SIGBUF;
+                                        inPos();
+
+                                        /* decrement pending counter
+                                         * should never go below 0,
+                                         * so this test is probably unnecessary
+                                         */
+                                        if (shm[CTL][PEND] > 0)
+                                        {
+                                                shm[CTL][PEND]--;
+                                        }
+                                        /* unlock shared resource */
+                                        shm[CTL][FLAGS] = CREAD;
+                                }
+                        }
+                }
+                /* signal dhs that retrieve is done */
+                shm[CTL][FLAGS] = CDONE;
+                /* join testMgr */
+                wait(&snum);
+
+                exit(EXIT_SUCCESS);
+        }
         return;
 }
