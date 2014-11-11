@@ -3,17 +3,19 @@
 using namespace std;
 
 int32_t child_pid = -1;
+int32_t logfd = -1;
 int32_t snum = 0;
 
-Antibody ** champs;
+pthread_t test_mgr_tid;
 
-int32_t logfd = -1;
+Antibody ** champs;
 
 volatile sig_atomic_t testing = 0;
 
 typedef struct _test_param
 {
-        uint8_t tnum;
+        uint8_t tnum; // thread number
+        pthread_t tid; // thread id
         uint32_t sig[fngPntLen]; // signature to be tested
         char tuple[t5TplLen]; // t5 tuple
         volatile sig_atomic_t flag; // signal to thread to start testing
@@ -26,6 +28,11 @@ void * testThread(void * v)
 {
         if (v)
         {
+                if (DEBUG)
+                {
+                        fprintf(stderr, "\n\t\t[r] --- testThread begin\n");
+                        fflush(stderr);
+                }
                 for (unsigned int i = 0; i < fngPntLen; i++)
                 {
                         if (champs[i]->fitness() > MIN_FITNESS)
@@ -40,6 +47,11 @@ void * testThread(void * v)
                         //log_queue.enqueue(*v);
                 }
                 ((ptest_param)v)->flag = DONE;
+                if (DEBUG)
+                {
+                        fprintf(stderr, "\n\t\t[r] --- testThread begin\n");
+                        fflush(stderr);
+                }
         }
 
         return ((void *)0);
@@ -49,6 +61,10 @@ void * testThread(void * v)
 /* child function that watches the queue for entries that need to be logged and logs new entries */
 void Stats (void)
 {
+        if (DEBUG)
+        {
+                fprintf(stderr, "\n\t\t[r] --- Stats: func begin\n");
+        }
         /* open log file */
         /* start while shm[flag] != done loop */
         /* start while item in queue loop */
@@ -85,11 +101,37 @@ void * testMgr (void * v)
                                 {
                                         ((ptest_param)v)[i].flag = WORKING;
                                         /* begin a test, pass (ptest_param)&((test_param *)v[i]), i.e., a ptest_param */
-                                        //pthread_create();
+                                        /* HERE - exit? if unable to spawn testing threads */
+                                        /*
+                                           if ((pthread_create(&(((ptest_param)v)[i].tid), NULL, testThread, (void *)(&(((ptest_param)v)[i])))) < 0)
+                                           {
+                                           perror("pthread_create()");
+                                           }
+                                           else
+                                           {
+                                           if (DEBUG)
+                                           {
+                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded\n");
+                                           }
+                                           }
+                                           */
                                 }
                                 if (((ptest_param)v)[i].flag == DONE)
                                 {
-                                        //pthread_join();
+                                        /* HERE - exit? if unable to return from testing threads */
+                                        /*
+                                        if ((pthread_join((((ptest_param)v)[i].tid), NULL)) < 0)
+                                        {
+                                                perror("pthread_join()");
+                                        }
+                                        else
+                                        {
+                                                if (DEBUG)
+                                                {
+                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded\n");
+                                                }
+                                        }
+                                        */
                                         testing--;
                                 }
                                 i++;
@@ -125,12 +167,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
 
         uint32_t i = 0;
 
-        /*
-        int32_t * snum = 0;
-        snum = (int32_t *)malloc(1 * sizeof(int32_t));
-        *snum = 0;
-        */
-
         /* fork log process */
         if ((child_pid = fork()) < 0)
         {
@@ -139,12 +175,22 @@ void pull(Antibody ** pop, const int32_t pipefd)
         /* child - logging process */
         if (child_pid == 0)
         {
+                if (DEBUG)
+                {
+                        // Retrieve
+                        fprintf(stderr, "\n\t\t[r] --- fork succeeded - child\n");
+                }
                 Stats();
                 exit(0);
         }
         /* parent - retrieve loop */
         else
         {
+                if (DEBUG)
+                {
+                        // Retrieve
+                        fprintf(stderr, "\n\t\t[r] --- fork succeeded - parent\n");
+                }
                 test_param params[MAX_THREADS];
                 for (i = 0; i < MAX_THREADS; i++)
                 {
@@ -152,9 +198,19 @@ void pull(Antibody ** pop, const int32_t pipefd)
                         params[i].tnum = i;
                 }
                 /* start testMgr with &params[] */
-                /*
-                   pthread_create();
-                   */
+                /* HERE - cleanup and exit */
+                if ((pthread_create(&(test_mgr_tid), NULL, testMgr, (void *)(&(params)))) < 0)
+                {
+                        perror("pthread_create()");
+                }
+                else
+                {
+                        if (DEBUG)
+                        {
+                                // Retrieve
+                                fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
+                        }
+                }
                 testing = 0;
                 if (DEBUG)
                 {
@@ -231,10 +287,26 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                 }
                         }
                 }
+                if (DEBUG)
+                {
+                        if (shm[CTL][FLAGS] == PDONE)
+                        {
+                                fprintf(stderr, "\n\t\t[i] --- Signaled to quit by producer\n");
+                                fflush(stderr);
+                        }
+                }
                 /* signal dhs that retrieve is done */
                 shm[CTL][FLAGS] = CDONE;
-                /* join testMgr */
-                wait(&snum);
+                /* join testMgr. since fork/logging is not a priority, make sure there is actually a child process before waiting for child process */
+                if ((pthread_join(test_mgr_tid, NULL)) < 0)
+                {
+                        perror("pthread_join()");
+                        /* HERE - cleanup and exit */
+                }
+                if (child_pid > 0)
+                {
+                        wait(&snum);
+                }
 
                 exit(EXIT_SUCCESS);
         }
