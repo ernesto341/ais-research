@@ -35,10 +35,12 @@ void * testThread(void * v)
                 }
                 for (unsigned int i = 0; i < fngPntLen; i++)
                 {
-                        if (champs[i]->fitness() > MIN_FITNESS)
-                        {
-                                ((ptest_param)v)->attack = (uint8_t)champs[i]->match((int *)(((ptest_param)v)->sig));
-                        }
+                        /*
+                           if (champs[i]->fitness() > MIN_FITNESS)
+                           {
+                           ((ptest_param)v)->attack = (uint8_t)champs[i]->match((int *)(((ptest_param)v)->sig));
+                           }
+                           */
                 }
 
                 if(LOG_LEVEL - (((ptest_param)v)->attack) <= 0)
@@ -102,24 +104,21 @@ void * testMgr (void * v)
                                         ((ptest_param)v)[i].flag = WORKING;
                                         /* begin a test, pass (ptest_param)&((test_param *)v[i]), i.e., a ptest_param */
                                         /* HERE - exit? if unable to spawn testing threads */
-                                        /*
-                                           if ((pthread_create(&(((ptest_param)v)[i].tid), NULL, testThread, (void *)(&(((ptest_param)v)[i])))) < 0)
-                                           {
-                                           perror("pthread_create()");
-                                           }
-                                           else
-                                           {
-                                           if (DEBUG)
-                                           {
-                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded\n");
-                                           }
-                                           }
-                                           */
+                                        if ((pthread_create(&(((ptest_param)v)[i].tid), NULL, testThread, (void *)(&(((ptest_param)v)[i])))) < 0)
+                                        {
+                                                perror("pthread_create()");
+                                        }
+                                        else
+                                        {
+                                                if (DEBUG)
+                                                {
+                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded\n");
+                                                }
+                                        }
                                 }
                                 if (((ptest_param)v)[i].flag == DONE)
                                 {
                                         /* HERE - exit? if unable to return from testing threads */
-                                        /*
                                         if ((pthread_join((((ptest_param)v)[i].tid), NULL)) < 0)
                                         {
                                                 perror("pthread_join()");
@@ -131,7 +130,6 @@ void * testMgr (void * v)
                                                         fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded\n");
                                                 }
                                         }
-                                        */
                                         testing--;
                                 }
                                 i++;
