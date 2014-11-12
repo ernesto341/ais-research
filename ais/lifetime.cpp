@@ -29,6 +29,7 @@ float BAD_THRESHOLD = 0.0002; // Threshold for bad antibodies in self-test
 int TRAIN_AGREE = 3;          // Number that must agree to mark attack
 
 Antibody *pop[CLASS_COUNT][MAX_ANTIBODIES];
+Antibody champs[CLASS_COUNT][MAX_ANTIBODIES];
 float avgFitness[CLASS_COUNT];
 float falsePos[CLASS_COUNT];
 float falseNeg[CLASS_COUNT];
@@ -56,6 +57,49 @@ void train();
 void testUnknown(int);
 void nextGen(float []);
 void outputTrainedClasses(int);
+
+#define ALL 99
+
+void Copy(const int & c = 0)
+{
+        if (c < 0)
+        {
+                cout << "No antibodies to copy or bad input\n" << "c = " << c << endl << flush;
+                return;
+        }
+        if (c == ALL)
+        {
+                for (int i = 0; i < CLASS_COUNT; i++)
+                {
+                        for (int j = 0; j < MAX_ANTIBODIES; j++)
+                        {
+                                memcpy(&(champs[i][j]), pop[i][j], sizeof(Antibody) * 1);
+                        }
+                }
+                return;
+        }
+        for (int j = 0; j < MAX_ANTIBODIES; j++)
+        {
+                memcpy(&(champs[c][j]), pop[c][j], sizeof(Antibody) * 1);
+        }
+        return;
+}
+
+void Dump (const Antibody c[CLASS_COUNT][MAX_ANTIBODIES])
+{
+        ofstream o("champions.abs", ios::trunc);
+        for (int i = 0; i < CLASS_COUNT; i++)
+        {
+                for (int j = 0; j < MAX_ANTIBODIES; j++)
+                {
+                        o << champs[i][j].dump();
+                }
+                o << endl;
+        }
+        o << endl;
+        o.close();
+        return;
+}
 
 int main(int argc, char *argv[]) {
         char f[500], f2[500], f3[500], f4[500], f5[500], f6[500], f7[500], f8[500];
@@ -165,6 +209,10 @@ int main(int argc, char *argv[]) {
 
         for(int r = 0; r < MAX_RUNS; r++) {
                 initialGen();
+                if (r == 0)
+                {
+                        Copy(ALL);
+                }
                 fout << "Population " << setw(5) << r << endl;
                 cout << "Population " << setw(5) << r << endl;
                 for(int i = 0; i < MAX_ROUNDS; i++) {
@@ -187,7 +235,10 @@ int main(int argc, char *argv[]) {
                                 classAccuracy[r][i][c] = attack.labelAccuracy[c];
                                 averageAccuracy[i][c] += attack.labelAccuracy[c];
                                 if(attack.labelAccuracy[c] > bestAccuracy[i][c])
+                                {
                                         bestAccuracy[i][c] = attack.labelAccuracy[c];
+                                        Copy(c);
+                                }
                         }
                         outputTrainedClasses(i);
                         if(i < MAX_ROUNDS - 1) nextGen(classAccuracy[r][i]);
@@ -199,13 +250,6 @@ int main(int argc, char *argv[]) {
 #endif
                 }
                 testUnknown(r);
-                /* should now have a moderatley effective population, pass to production thread */
-                new_population = true;
-                /* first round, start the worker thread */
-                if (r == 0)
-                {
-                        pthread_create();
-                }
         }
         for(int r = 0; r < MAX_RUNS; r++) {
                 cout << "Overall classification stats for Population " << r << endl;
@@ -248,6 +292,23 @@ int main(int argc, char *argv[]) {
                 }
                 cout << endl;
         }
+        cout << endl << "Champions population statistics:\n";
+        cout << endl;
+        for(int i = 0; i < CLASS_COUNT; i++)
+        {
+                cout << "Class " << i+1 << ":\n";
+                for(int j = 0; j < MAX_ANTIBODIES; j++)
+                {
+                        cout << "\t" << j+1 << " - ";
+                        cout << champs[i][j];
+                        cout << endl;
+                }
+                cout << endl;
+        }
+        cout << endl;
+
+        Dump(champs);
+
         fout.close();
         fout2.close();
 #ifdef VERBOSE_OUTPUT
@@ -451,19 +512,4 @@ void outputTrainedClasses(int i) {
         }
 
         fout7 << endl;
-}
-
-void * test (void * v)
-{
-        return ((void *)0);
-}
-
-void * retrieve (void * v)
-{
-        return ((void *)0);
-}
-
-void * capture (void * v)
-{
-        return ((void *)0);
 }

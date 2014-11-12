@@ -149,12 +149,77 @@ void * testMgr (void * v)
         return ((void *)ct);
 }
 
+int ALEN = 0;
+int CLASS_COUNT = 0;
+int MAX_ANTIBODIES = 0;
+
+bool importChamps (const string fin = "../ais/champions.ab")
+{
+        ifstream in(fin, ios::in);
+        char c = '\0';
+        ALEN = 0;
+        CLASS_COUNT = 0;
+        while (c << in)
+        {
+                if (c == ',')
+                {
+                        ALEN++;
+                }
+                else if (c == ';')
+                {
+                        CLASS_COUNT++;
+                }
+                else if (c == '\n')
+                {
+                        MAX_ANTIBODIES++;
+                }
+        }
+        in.close();
+
+        Antibody pop[CLASS_COUNT][MAX_ANTIBODIES];
+        in.open(fin, ios::in);
+        int i = 0, j = 0, k = 0;
+        while (in.peek() != EOF)
+        {
+                i = 0;
+                while (i < CLASS_COUNT)
+                {
+                        j = 0;
+                        while (j < MAX_ANTIBODIES)
+                        {
+                                k = 0;
+                                while (k < ALEN)
+                                {
+                                        pop[i][j].flags[k] << in;
+                                        k++;
+                                }
+                                pop[i][j].tests << in;
+                                pop[i][j].pos << in;
+                                pop[i][j].false_pos << in;
+                                pop[i][j].neg << in;
+                                pop[i][j].false_neg << in;
+                                k = 0;
+                                while (k < CLASS_COUNT)
+                                {
+                                        pop[i][j].cat[k] << in;
+                                        pop[i][j].catPerc[k] << in;
+                                        k++;
+                                }
+                                j++;
+                        }
+                        i++;
+                }
+        }
+        in.close();
+        return (true);
+}
+
 void pull(Antibody ** pop, const int32_t pipefd)
 {
         if (pop == NULL)
         {
                 /* attempt to pull a population from file */
-                /* OR call breed and train module */
+                /* maybe fork and exec breed and train module regularly */
         }
         champs = pop;
 

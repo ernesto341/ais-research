@@ -40,23 +40,5 @@ antibody.o:	antibody.h antibody.cpp random.h
 random.o:	random.h random.cpp
 	g++ $(CFLAGS) -c random.cpp
 
-veryclean: clean
-	rm -f res/unknown.*
-	rm -f res/details.*
-	rm -f res/false_pos.*
-	rm -f res/false_neg.*
-	rm -f res/full.*
-	rm -f res/bad.*
-	rm -f res/missed.*
-	rm -f res/classifications.*
-	rm -f res/fitness.*
-
 clean:	
-	rm -f *.o lifetime a.out core
-	rm -f lifetime.25
-	rm -f lifetime.50
-	rm -f lifetime.75
-	rm -f lifetime.125
-	rm -f lifetime.250
-	rm -f lifetime.500
-	rm -f lifetime.1000
+	rm -f *.o lifetime a.out core lifetime.25 lifetime.50 lifetime.75 lifetime.125 lifetime.250 lifetime.500 lifetime.1000
