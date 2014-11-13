@@ -153,7 +153,7 @@ int alen = 0;
 int class_count = 0;
 int ab_count = 0;
 
-bool importChamps (Antibody **pop, const string fin = "./ais/champions.abs")
+bool importChamps (Antibody ** & pop, const string fin = "./ais/champions.abs")
 {
         ifstream in(fin.c_str());
         if (in.fail())
