@@ -149,60 +149,101 @@ void * testMgr (void * v)
         return ((void *)ct);
 }
 
-int ALEN = 0;
-int CLASS_COUNT = 0;
-int MAX_ANTIBODIES = 0;
+int alen = 0;
+int class_count = 0;
+int ab_count = 0;
 
-bool importChamps (const string fin = "../ais/champions.ab")
+bool importChamps (Antibody **pop, const string fin = "./ais/champions.abs")
 {
-        ifstream in(fin, ios::in);
-        char c = '\0';
-        ALEN = 0;
-        CLASS_COUNT = 0;
-        while (c << in)
+        ifstream in(fin.c_str());
+        if (in.fail())
         {
-                if (c == ',')
+                cout << "Unable to open champs file\n" << flush;
+                return (false);
+        }
+        char c = '\0';
+        alen = 0;
+        class_count = 0;
+        while (in.get(c))
+        {
+                if (ab_count == 0)
                 {
-                        ALEN++;
+                        if (c == ',')
+                        {
+                                alen++;
+                        }
+                        else if (c == ';')
+                        {
+                                class_count++;
+                        }
                 }
-                else if (c == ';')
+                if (c == '\n')
                 {
-                        CLASS_COUNT++;
-                }
-                else if (c == '\n')
-                {
-                        MAX_ANTIBODIES++;
+                        ab_count++;
                 }
         }
         in.close();
+        if (DEBUG)
+        {
+                cout << "In import function\n";
+                cout << "Got alen: " << alen << endl;
+                cout << "Got class_count: " << class_count << endl;
+                cout << "Got ab_count: " << ab_count << endl;
+        }
 
-        Antibody pop[CLASS_COUNT][MAX_ANTIBODIES];
-        in.open(fin, ios::in);
-        int i = 0, j = 0, k = 0;
+        pop = new Antibody *[class_count];
+        for (int i = 0; i < class_count; i++)
+        {
+                pop[i] = new Antibody [ab_count];
+        }
+
+        in.open(fin.c_str());
+        if (in.fail())
+        {
+                cout << "Unable to open champs file\n" << flush;
+                return (false);
+        }
+        int i = 0, j = 0, k = 0, tmp = 0;
+        if (DEBUG)
+        {
+                cout << "Entering get loop\n";
+        }
         while (in.peek() != EOF)
         {
+                cout << "!eof while loop\n";
                 i = 0;
-                while (i < CLASS_COUNT)
+                while (i < class_count)
                 {
+                        cout << "class_count while loop 1\n";
                         j = 0;
-                        while (j < MAX_ANTIBODIES)
+                        while (j < ab_count)
                         {
+                                cout << "ab_count while loop\n";
                                 k = 0;
-                                while (k < ALEN)
+                                while (k < alen)
                                 {
-                                        pop[i][j].flags[k] << in;
+                                        cout << "alen while loop\n";
+                                        in >> tmp;
+                                        cout << "\tgot " << tmp << endl;
+                                        pop[i][j].setFlag(k, tmp);
                                         k++;
                                 }
-                                pop[i][j].tests << in;
-                                pop[i][j].pos << in;
-                                pop[i][j].false_pos << in;
-                                pop[i][j].neg << in;
-                                pop[i][j].false_neg << in;
+                                in >> tmp;
+                                pop[i][j].setTests(tmp);
+                                in >> tmp;
+                                pop[i][j].setPos(tmp);
+                                in >> tmp;
+                                pop[i][j].setFalsePos(tmp);
+                                in >> tmp;
+                                pop[i][j].setNeg(tmp);
+                                in >> tmp;
+                                pop[i][j].setFalseNeg(tmp);
                                 k = 0;
-                                while (k < CLASS_COUNT)
+                                while (k < class_count)
                                 {
-                                        pop[i][j].cat[k] << in;
-                                        pop[i][j].catPerc[k] << in;
+                                        cout << "class_count while loop 1\n";
+                                        in >> tmp;
+                                        pop[i][j].setCat(k, tmp);
                                         k++;
                                 }
                                 j++;
@@ -211,6 +252,22 @@ bool importChamps (const string fin = "../ais/champions.ab")
                 }
         }
         in.close();
+
+        if (DEBUG)
+        {
+                cout << "Done importing. Got the following:\n";
+                for (int i = 0; i < class_count; i++)
+                {
+                        cout << "Class " << i+1 << ":\n";
+                        for (int j = 0; j < ab_count; j++)
+                        {
+                                cout << "\t" << pop[i][j] << "\n";
+                        }
+                        cout << endl;
+                }
+                cout << endl << flush;
+        }
+
         return (true);
 }
 
@@ -220,8 +277,36 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 /* attempt to pull a population from file */
                 /* maybe fork and exec breed and train module regularly */
+                if (!importChamps(champs))
+                {
+                        cout << "Unable to get antibodies to test with, quitting\n" << flush;
+                        shm[CTL][FLAGS] = CDONE;
+                        return;
+                }
+
+                if (DEBUG)
+                {
+                        cout << "In main. Got the following:\n";
+                        for (int i = 0; i < class_count; i++)
+                        {
+                                cout << "Class " << i+1 << ":\n";
+                                for (int j = 0; j < ab_count; j++)
+                                {
+                                        cout << "\t" << champs[i][j] << "\n";
+                                }
+                                cout << endl;
+                        }
+                        cout << endl << flush;
+
+                        /* HERE - just debugging the import function */
+                        shm[CTL][FLAGS] = CDONE;
+                        return;
+                }
         }
-        champs = pop;
+        else
+        {
+                champs = pop;
+        }
 
         /* pipe to recieve new antibody populations from breed and train module */
         if (pipefd < 0)

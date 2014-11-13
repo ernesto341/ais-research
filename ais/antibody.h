@@ -2,6 +2,8 @@
 #define __ANTIBODY_H__
 
 #include <iostream>
+#include <sstream>
+#include <string>
 using namespace std;
 
 // HTTP request antibody.
@@ -82,6 +84,84 @@ class Antibody {
 
                 friend ostream &operator<<(ostream &o, Antibody &a);
 
+                void setCatPerc(const int &pos, const float &val)
+                {
+                        if (pos < 0 || pos >= CLASS_COUNT)
+                        {
+                                return;
+                        }
+                        catPerc[pos] = val;
+                }
+
+                void setCat(const int &pos, const int &val)
+                {
+                        if (pos < 0 || pos >= CLASS_COUNT)
+                        {
+                                return;
+                        }
+                        cat[pos] = val;
+                }
+
+                void setPos(const int &val)
+                {
+                        pos = val;
+                }
+
+                void setFalsePos(const int &val)
+                {
+                        false_pos = val;
+                }
+
+                void setNeg(const int &val)
+                {
+                        neg = val;
+                }
+
+                void setFalseNeg(const int &val)
+                {
+                        false_neg = val;
+                }
+
+                void setTests(const int &val)
+                {
+                        tests = val;
+                }
+
+                void setAttr(const int &pos, const int &val)
+                {
+                        if (pos < 0 || pos >= ALEN)
+                        {
+                                return;
+                        }
+                        a[pos] = val;
+                }
+
+                void setOffset(const int &pos, const int &val)
+                {
+                        if (pos < 0 || pos >= ALEN)
+                        {
+                                return;
+                        }
+                        offset[pos] = val;
+                }
+
+                void setMax(const int &pos, const int &val)
+                {
+                        if (pos < 0 || pos >= ALEN)
+                        {
+                                return;
+                        }
+                        max[pos] = val;
+                }
+
+                void setFlag(const int &pos, const int &val)
+                {
+                        if (pos < 0 || pos >= ALEN)
+                        {
+                                return;
+                        }
+                        flags[pos] = val;
+                }
                 string dump(void);
 };
 

@@ -316,46 +316,44 @@ void Antibody::mutate() {
 
 string Antibody::dump (void)
 {
-        string s;
+        ostringstream s;
         for(int i = 0; i < ALEN; i++)
         {
                 /* flags - is the attribute expressed */
-                s += (int)(this->flags[i]);
-                s += " ";
+                s << (int)(this->flags[i]);
+                s << " ";
                 /* attributes */
-                s += (int)(this->a[i]);
-                s += " ";
+                s << (int)(this->a[i]);
+                s << " ";
                 /* offsets for ranges of values */
-                s += (int)(this->offset[i]);
-                s += " ";
+                s << (int)(this->offset[i]);
+                s << " ";
                 /* max values for each attrubute */
-                s += (int)(this->max[i]);
+                s << (int)(this->max[i]);
                 /* commas to indicate ALEN */
-                s += ", ";
+                s << ", ";
         }
         // Statistics for this antibody
-        s += "\t";
-        s += (int)(this->tests);           // Total tests performed
-        s += " ";
-        s += (int)(this->pos);             // Number of attacks labeled as attacks
-        s += " ";
-        s += (int)(this->false_pos);       // Number of normal requests labeled as attacks
-        s += " ";
-        s += (int)(this->neg);             // Number of normal requests labeled as normal
-        s += " ";
-        s += (int)(this->false_neg);       // Number of attacks labeled as normal
-        s += "\t";
+        s << "\t";
+        s << (int)(this->tests);           // Total tests performed
+        s << " ";
+        s << (int)(this->pos);             // Number of attacks labeled as attacks
+        s << " ";
+        s << (int)(this->false_pos);       // Number of normal requests labeled as attacks
+        s << " ";
+        s << (int)(this->neg);             // Number of normal requests labeled as normal
+        s << " ";
+        s << (int)(this->false_neg);       // Number of attacks labeled as normal
+        s << "\t";
         for(int i = 0; i < CLASS_COUNT; i++)
         {
-                s += (int)(this->cat[i]);  // Count of matches in each classification category
-                s += " ";
-                s += (float)(this->catPerc[i]);
+                s << (int)(this->cat[i]);  // Count of matches in each classification category
                 /* semicolons to indicate CLASS_COUNT */
-                s += "; ";
+                s << "; ";
         }
-        s += "\n";
+        s << "\n";
 
-        return (s);
+        return (s.str());
 }
 
 // Output the value of the antibody

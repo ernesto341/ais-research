@@ -1,6 +1,7 @@
 #pragma once
 #include <sys/wait.h>
 #include <queue>
+#include <fstream>
 
 #include <retglobals.h>
 #include <tools.hpp>

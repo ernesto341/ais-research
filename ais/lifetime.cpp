@@ -94,9 +94,7 @@ void Dump (const Antibody c[CLASS_COUNT][MAX_ANTIBODIES])
                 {
                         o << champs[i][j].dump();
                 }
-                o << endl;
         }
-        o << endl;
         o.close();
         return;
 }
