@@ -24,6 +24,7 @@ typedef struct _test_param
 
 queue<test_param> log_queue;
 
+/* v is a test_param *, ie ptest_param */
 void * testThread(void * v)
 {
         if (v)
@@ -33,25 +34,27 @@ void * testThread(void * v)
                         fprintf(stderr, "\n\t\t[r] --- testThread begin\n");
                         fflush(stderr);
                 }
-                for (unsigned int i = 0; i < fngPntLen; i++)
+                /* HERE - FIX THIS */
+                if (((int *)(((ptest_param)(v))->sig))[0] != -1)
                 {
-                        /*
-                           if (champs[i]->fitness() > MIN_FITNESS)
-                           {
-                           ((ptest_param)v)->attack = (uint8_t)champs[i]->match((int *)(((ptest_param)v)->sig));
-                           }
-                           */
-                }
+                        for (unsigned int i = 0; i < fngPntLen; i++)
+                        {
+                                if (champs[i]->fitness() > MIN_FITNESS)
+                                {
+                                        ((ptest_param)v)->attack = (uint8_t)(champs[i]->match((int *)(((ptest_param)v)->sig)));
+                                }
+                        }
 
-                if(LOG_LEVEL - (((ptest_param)v)->attack) <= 0)
-                {
-                        // HERE - need to enforce mutual exclusion?
-                        //log_queue.enqueue(*v);
+                        if((((ptest_param)v)->attack) > 0)
+                        {
+                                // HERE - need to enforce mutual exclusion?
+                                log_queue.push(*((ptest_param)(v)));
+                        }
                 }
                 ((ptest_param)v)->flag = DONE;
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\n\t\t[r] --- testThread begin\n");
+                        fprintf(stderr, "\n\t\t[r] --- testThread end\n");
                         fflush(stderr);
                 }
         }
@@ -59,20 +62,62 @@ void * testThread(void * v)
         return ((void *)0);
 }
 
-/* HERE */
 /* child function that watches the queue for entries that need to be logged and logs new entries */
-void Stats (void)
+void Stats (const char * n = "traffic.log\0")
 {
         if (DEBUG)
         {
                 fprintf(stderr, "\n\t\t[r] --- Stats: func begin\n");
         }
         /* open log file */
+        ofstream fout (n);
+        if (fout.fail())
+        {
+                if (DEBUG)
+                {
+                        cout << "Unable to open file for logging\n" << flush;
+                }
+                return;
+        }
+        test_param tmp;
         /* start while shm[flag] != done loop */
-        /* start while item in queue loop */
-        /* log new item to queue */
+        while (shm[FLAGS][CTL] != PDONE && shm[FLAGS][CTL] != CDONE)
+        {
+                /* start while item in queue loop */
+                while (log_queue.size() != 0)
+                {
+                        if (DEBUG)
+                        {
+                                cout << "Something to log is in the queue!\n" << flush;
+                        }
+                        /* log new item to queue */
+                        tmp = log_queue.front();
+                        log_queue.pop();
+                        if (tmp.attack == 1)
+                        {
+                                if (DEBUG)
+                                {
+                                        cout << "An attack\n" << flush;
+                                }
+                                fout << "[A] --- Attack Identified:" << endl
+                                        << "\t" << "Unique Tuple:    " << tmp.tuple << endl
+                                        << "\t" << "HTTP Signature:  " << tmp.sig << endl;
+                        }
+                        else
+                        {
+                                if (DEBUG)
+                                {
+                                        cout << "Normal traffic\n" << flush;
+                                }
+                                fout << "[N] --- Normal Traffic:" << endl
+                                        << "\t" << "Unique Tuple:    " << tmp.tuple << endl
+                                        << "\t" << "HTTP Signature:  " << tmp.sig << endl;
+                        }
+                }
+        }
         /* dump overall statistics to log file */
         /* close log file */
+        fout.close();
         return;
 }
 
@@ -164,6 +209,7 @@ bool importChamps (Antibody ** & pop, const string fin = "./ais/champions.abs")
         char c = '\0';
         alen = 0;
         class_count = 0;
+        /* maybe check read/calculated values below against what they should be? */
         while (in.get(c))
         {
                 if (ab_count == 0)
@@ -204,27 +250,18 @@ bool importChamps (Antibody ** & pop, const string fin = "./ais/champions.abs")
                 return (false);
         }
         int i = 0, j = 0, k = 0, tmp = 0;
-        if (DEBUG)
-        {
-                cout << "Entering get loop\n";
-        }
         while (in.peek() != EOF)
         {
-                cout << "!eof while loop\n";
                 i = 0;
                 while (i < class_count)
                 {
-                        cout << "class_count while loop 1\n";
                         j = 0;
                         while (j < ab_count)
                         {
-                                cout << "ab_count while loop\n";
                                 k = 0;
                                 while (k < alen)
                                 {
-                                        cout << "alen while loop\n";
                                         in >> tmp;
-                                        cout << "\tgot " << tmp << endl;
                                         pop[i][j].setFlag(k, tmp);
                                         k++;
                                 }
@@ -241,7 +278,6 @@ bool importChamps (Antibody ** & pop, const string fin = "./ais/champions.abs")
                                 k = 0;
                                 while (k < class_count)
                                 {
-                                        cout << "class_count while loop 1\n";
                                         in >> tmp;
                                         pop[i][j].setCat(k, tmp);
                                         k++;
@@ -253,20 +289,22 @@ bool importChamps (Antibody ** & pop, const string fin = "./ais/champions.abs")
         }
         in.close();
 
-        if (DEBUG)
-        {
-                cout << "Done importing. Got the following:\n";
-                for (int i = 0; i < class_count; i++)
-                {
-                        cout << "Class " << i+1 << ":\n";
-                        for (int j = 0; j < ab_count; j++)
-                        {
-                                cout << "\t" << pop[i][j] << "\n";
-                        }
-                        cout << endl;
-                }
-                cout << endl << flush;
-        }
+        /* Excessive output
+           if (DEBUG)
+           {
+           cout << "Done importing. Got the following:\n";
+           for (int i = 0; i < class_count; i++)
+           {
+           cout << "Class " << i+1 << ":\n";
+           for (int j = 0; j < ab_count; j++)
+           {
+           cout << "\t" << pop[i][j] << "\n";
+           }
+           cout << endl;
+           }
+           cout << endl << flush;
+           }
+           */
 
         return (true);
 }
@@ -284,31 +322,29 @@ void pull(Antibody ** pop, const int32_t pipefd)
                         return;
                 }
 
-                if (DEBUG)
-                {
-                        cout << "In main. Got the following:\n";
-                        for (int i = 0; i < class_count; i++)
-                        {
-                                cout << "Class " << i+1 << ":\n";
-                                for (int j = 0; j < ab_count; j++)
-                                {
-                                        cout << "\t" << champs[i][j] << "\n";
-                                }
-                                cout << endl;
-                        }
-                        cout << endl << flush;
-
-                        /* HERE - just debugging the import function */
-                        shm[CTL][FLAGS] = CDONE;
-                        return;
-                }
+                /* excessive output
+                   if (DEBUG)
+                   {
+                   cout << "In main. Got the following:\n";
+                   for (int i = 0; i < class_count; i++)
+                   {
+                   cout << "Class " << i+1 << ":\n";
+                   for (int j = 0; j < ab_count; j++)
+                   {
+                   cout << "\t" << champs[i][j] << "\n";
+                   }
+                   cout << endl;
+                   }
+                   cout << endl << flush;
+                   }
+                   */
         }
         else
         {
                 champs = pop;
         }
 
-        /* pipe to recieve new antibody populations from breed and train module */
+        /* pipe to recieve new antibody populations from breed and train module ??? */
         if (pipefd < 0)
         {
         }
@@ -325,7 +361,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 if (DEBUG)
                 {
-                        // Retrieve
                         fprintf(stderr, "\n\t\t[r] --- fork succeeded - child\n");
                 }
                 Stats();
@@ -336,7 +371,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 if (DEBUG)
                 {
-                        // Retrieve
                         fprintf(stderr, "\n\t\t[r] --- fork succeeded - parent\n");
                 }
                 test_param params[MAX_THREADS];
