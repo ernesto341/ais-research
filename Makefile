@@ -8,14 +8,14 @@ CC              =  gcc $(CFLAGS) $(INCFLAGS)
 DHSFILES        =  $(LIB)/itoa.o $(LIB)/ipv6defrag.o $(LIB)/ipv4defrag.o $(LIB)/common.o $(LIB)/sfhash.o $(LIB)/tcpreassembly.o $(LIB)/libntoh.o $(LIB)/share.o
 RETFILES        =  $(LIB)/pull.o $(LIB)/antibody.o $(LIB)/random.o
 
-all: retrieve dhs
+all: retrieve dump
 
 retrieve: rand ab pull consumer
 
-dhs: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
+dump: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
 
 pull:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-variable
+	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-variable -Wno-unused-parameter
 
 ab:
 	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/antibody.o $(AIS)/antibody.cpp
@@ -52,17 +52,18 @@ share:
 
 prod: /usr/local/lib/libpcap.a
 	$(CC) -o dhs dhs.c /usr/local/lib/libpcap.a $(DHSFILES)
-#	$(CC) -o dhs dhs.c /usr/local/lib/libpcap.a $(LIB)/itoa.o $(LIB)/ipv6defrag.o $(LIB)/ipv4defrag.o $(LIB)/common.o $(LIB)/sfhash.o $(LIB)/tcpreassembly.o $(LIB)/libntoh.o $(LIB)/share.o
 
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
 	rm -f *.o
+	rm -f *.log
 	rm -f *.gch
 	rm -f err
 	rm -f dhs_err
 	rm -f ret_err
 	rm -f core
+	rm -f ret
 	rm -f dhs
 	rm -f $(RET)/retrieve
 	rm -f $(RET)/*.gch

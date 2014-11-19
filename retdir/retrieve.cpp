@@ -35,16 +35,10 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        if (DEBUG)
+        if (shm)
         {
-                if (shm[CTL][FLAGS] == PDONE)
-                {
-                        fprintf(stderr, "\n\t\t[i] --- Signaled to quit by producer\n");
-                        fprintf(stderr, "\n\t\t[i] --- Sign passed to retrieve shandler is %d\n", sign);
-                        fflush(stderr);
-                }
+                shm[CTL][FLAGS] = CDONE;
         }
-        shm[CTL][FLAGS] = CDONE;
 
         dShmids();
 
@@ -61,25 +55,9 @@ inline static void setup (void)
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
-        if (DEBUG)
-        {
-                fprintf(stderr, "retrieve\n\tcalling ishms()\r\n");
-        }
         iShms();
-        if (DEBUG)
-        {
-                fprintf(stderr, "\tcalling iData()\r\n");
-        }
         iData();
-        if (DEBUG)
-        {
-                fprintf(stderr, "\tcalling ishmids()\r\n");
-        }
         iShmids();
-        if (DEBUG)
-        {
-                fprintf(stderr, "\tcalling ashmids()\r\n");
-        }
         aShmids();
 }
 

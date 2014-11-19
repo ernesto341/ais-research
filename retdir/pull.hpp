@@ -1,6 +1,8 @@
 #pragma once
 #include <sys/wait.h>
 #include <queue>
+#include <list>
+#include <iomanip>
 #include <fstream>
 
 #include <retglobals.h>
@@ -33,6 +35,7 @@ using namespace std;
 #define START 1
 #define WORKING 2
 #define DONE 3
+#define LOG 4
 
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];

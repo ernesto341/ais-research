@@ -70,6 +70,7 @@
 #include <itoa.h>
 #include <share.h>
 #include <globals.h>
+#include <contains.h>
 
 #define DEBUG 1
 
@@ -990,13 +991,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
 
         if (pinfo != 0)
         {
-                /* HERE 
-                 *
-                 * maybe replace dst port with Contians(header, "HTTP")
-                 *
-                 * */
-                uint32_t port = getDstPrt((pinfo->path));
-                if (port == 80 || port == 8080)
+                if (Contains((char *)payload, "HTTP") && (Contains((char *)payload, "GET") || Contains((char *)payload, "POST") || Contains((char *)payload, "HEAD")))
                 {
                         pending_more_hdr_data = extractHttpHdr((const char *)(payload));
                         /* got entire header, dump to shm */

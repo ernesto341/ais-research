@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -66,9 +67,11 @@ inline void fData(void)
 
 inline void dShmids(void)
 {
+        cout << "in dshmids\n" << flush;
         unsigned int i = 0;
-        while (i < (SIGQTY + 1))
+        while (i < (SIGQTY))
         {
+                cout << "\t" << i << endl << flush;
                 if (i < SIGQTY)
                 {
                         shmdt((void *)t5shm[i]);
@@ -76,6 +79,7 @@ inline void dShmids(void)
                 shmdt((void *)shm[i]);
                 i++;
         }
+        cout << "leaving dshmids\n" << flush;
 }
 
 inline void iData(void)
