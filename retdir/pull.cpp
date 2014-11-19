@@ -6,9 +6,9 @@ ofstream fout;
 
 static bool quit = false;
 
-int alen = 0;
-int class_count = 0;
-int ab_count = 0;
+volatile sig_atomic_t alen = 0;
+volatile sig_atomic_t class_count = 0;
+volatile sig_atomic_t ab_count = 0;
 
 void cleanup(void);
 int32_t child_pid = -1;
@@ -234,6 +234,10 @@ volatile static sig_atomic_t do_import = 0;
 void onDemandImport (int sign)
 {
         signal(SIGUSR1, &onDemandImport);
+        if (DEBUG)
+        {
+                cout << "recieved import signal!\n" << flush;
+        }
         if (sign != SIGUSR1)
         {
                 if (DEBUG)
@@ -247,9 +251,14 @@ void onDemandImport (int sign)
         signal(SIGUSR1, &onDemandImport);
 }
 
-Antibody ** importChamps (const string fin = "./ais/champions.abs")
+Antibody ** importChamps (char * fin = 0)
 {
-        ifstream in(fin.c_str());
+        if (fin == (char *)0)
+        {
+                fin = (char *)"./ais/champions.abs\0";
+        }
+        cout << "importChamps: filename = " << fin << endl << flush;
+        ifstream in(fin);
         if (in.fail())
         {
                 cout << "Unable to open champs file\n" << flush;
@@ -261,6 +270,7 @@ Antibody ** importChamps (const string fin = "./ais/champions.abs")
         /* maybe check read/calculated values below against what they should be? */
         while (in.get(c))
         {
+                cout << c << flush;
                 if (ab_count == 0)
                 {
                         if (c == ',')
@@ -277,13 +287,17 @@ Antibody ** importChamps (const string fin = "./ais/champions.abs")
                         ab_count++;
                 }
         }
+        cout << endl << flush;
         in.close();
-        ab_count /= class_count;
         if (DEBUG)
         {
                 cout << "In import function\n";
                 cout << "Got alen: " << alen << endl;
                 cout << "Got class_count: " << class_count << endl;
+        }
+        ab_count /= class_count;
+        if (DEBUG)
+        {
                 cout << "Got ab_count: " << ab_count << endl;
         }
 
@@ -294,7 +308,7 @@ Antibody ** importChamps (const string fin = "./ais/champions.abs")
                 pop[i] = new Antibody [ab_count];
         }
 
-        in.open(fin.c_str());
+        in.open(fin);
         if (in.fail())
         {
                 cout << "Unable to open champs file\n" << flush;
@@ -341,21 +355,21 @@ Antibody ** importChamps (const string fin = "./ais/champions.abs")
         in.close();
 
         /* Excessive output
-           if (DEBUG)
-           {
-           cout << "Done importing. Got the following:\n";
-           for (int i = 0; i < class_count; i++)
-           {
-           cout << "Class " << i+1 << ":\n";
-           for (int j = 0; j < ab_count; j++)
-           {
-           cout << "\t" << pop[i][j] << "\n";
-           }
-           cout << endl;
-           }
-           cout << endl << flush;
-           }
-           */
+        */
+        if (DEBUG)
+        {
+                cout << "Done importing. Got the following:\n";
+                for (int i = 0; i < class_count; i++)
+                {
+                        cout << "Class " << i+1 << ":\n";
+                        for (int j = 0; j < ab_count; j++)
+                        {
+                                cout << "\t" << pop[i][j] << "\n";
+                        }
+                        cout << endl;
+                }
+                cout << endl << flush;
+        }
 
         return (pop);
 }
@@ -372,18 +386,40 @@ void * importManager (void * v)
         {
                 if (do_import == 1)
                 {
-                        Antibody ** tmp = importChamps(fname);
+                        if (DEBUG)
+                        {
+                                cout << "import initiated!\n" << flush;
+                        }
+                        //Antibody ** tmp = importChamps(fname);
                         /* lock access to champs */
                         pthread_mutex_lock(&champs_mutex);
-                        int sz = sizeof(Antibody);
-                        for (int i = 0; i < class_count; i++)
-                        {
-                                for (int j = 0; i < ab_count; i++)
-                                {
-                                        memcpy(&champs[i][j], &tmp[i][j], sz);
-                                }
-                        }
+                        champs = importChamps(fname);
+                        /*
+                           int sz = sizeof(Antibody);
+                           for (int i = 0; i < class_count; i++)
+                           {
+                           for (int j = 0; i < ab_count; i++)
+                           {
+                           memcpy(&champs[i][j], &tmp[i][j], sz);
+                           }
+                           }
+                           */
                         /* log import success/failure */
+
+                        if (DEBUG)
+                        {
+                                cout << "In onDemandImport. Got the following:\n";
+                                for (int i = 0; i < class_count; i++)
+                                {
+                                        cout << "Class " << i+1 << ":\n";
+                                        for (int j = 0; j < ab_count; j++)
+                                        {
+                                                cout << "\t" << champs[i][j] << "\n";
+                                        }
+                                        cout << endl;
+                                }
+                                cout << endl << flush;
+                        }
                         /* unlock access to champs */
                         pthread_mutex_unlock(&champs_mutex);
                         do_import = 0;

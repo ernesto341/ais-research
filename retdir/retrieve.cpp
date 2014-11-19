@@ -34,6 +34,7 @@ void shandler ( int sign )
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
+        signal( SIGABRT, &shandler );
 
         if (shm)
         {
@@ -55,6 +56,7 @@ inline static void setup (void)
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
+        signal( SIGABRT, &shandler );
         iShms();
         iData();
         iShmids();
