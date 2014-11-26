@@ -10,6 +10,7 @@
 #include <mem.hpp>
 #include <itoa.h>
 #include <antibody.h>
+#include <import.hpp>
 
 using namespace std;
 
@@ -36,6 +37,7 @@ using namespace std;
 #define WORKING 2
 #define DONE 3
 #define LOG 4
+#define COMPLETE 5
 
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];

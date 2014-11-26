@@ -3,16 +3,19 @@ RET             =  ./retdir
 AIS             =  ./ais
 INCFLAGS        =  -I $(INC) -I $(RET) -I /usr/include -I /usr/local/include -I $(AIS)
 LIB             =  ./lib
-CFLAGS          =  -Wall -Wextra -ggdb -O2 -lpthread -Wno-int-to-pointer-cast
+CFLAGS          =  -Wall -Wextra -ggdb -O2 -lpthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
 DHSFILES        =  $(LIB)/itoa.o $(LIB)/ipv6defrag.o $(LIB)/ipv4defrag.o $(LIB)/common.o $(LIB)/sfhash.o $(LIB)/tcpreassembly.o $(LIB)/libntoh.o $(LIB)/share.o
-RETFILES        =  $(LIB)/pull.o $(LIB)/antibody.o $(LIB)/random.o
+RETFILES        =  $(LIB)/pull.o $(LIB)/antibody.o $(LIB)/random.o $(LIB)/import.o $(LIB)/itoa.o
 
 all: retrieve dump
 
-retrieve: rand ab pull consumer
+retrieve: rand ab itoa imp pull consumer
 
 dump: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
+
+imp:
+	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-variable -Wno-unused-parameter -Wno-sign-compare
 
 pull:
 	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-variable -Wno-unused-parameter

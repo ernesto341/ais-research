@@ -2,9 +2,14 @@
 
 using namespace std;
 
+int status = 0;
+int pipefd[2];
+
+volatile sig_atomic_t do_import = 0;
+
 ofstream fout;
 
-static bool quit = false;
+bool quit = false;
 
 volatile sig_atomic_t alen = 0;
 volatile sig_atomic_t class_count = 0;
@@ -43,9 +48,13 @@ void * testThread(void * v)
 {
         if (v)
         {
+                fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
+                fflush(stderr);
                 /* HERE - FIX THIS */
                 if (((int *)(((ptest_param)(v))->sig))[0] != -1)
                 {
+                        fprintf(stderr, "\n\t\t[T] --- testThread: Good Signature\n");
+                        fflush(stderr);
                         pthread_mutex_lock(&champs_mutex);
                         /*
                            for (unsigned int i = 0; i < fngPntLen; i++)
@@ -70,12 +79,19 @@ void * testThread(void * v)
 
                         //if((((ptest_param)v)->attack) > 0)
                         {
+                                fprintf(stderr, "\n\t\t[T] --- testThread: Something to log\n");
+                                fflush(stderr);
                                 pthread_mutex_lock(&log_mutex);
                                 log_queue.push(*(ptest_param)(v));
                                 pthread_mutex_unlock(&log_mutex);
                         }
-                        ((ptest_param)v)->flag = DONE;
                 }
+                else
+                {
+                        fprintf(stderr, "\n\t\t[T] --- testThread: Bad Signature\n");
+                        fflush(stderr);
+                }
+                ((ptest_param)v)->flag = DONE;
         }
 
         return ((void *)0);
@@ -119,8 +135,10 @@ void * Stats (void * v)
         while (!quit)
         {
                 pthread_mutex_lock(&log_mutex);
-                if (!log_queue.empty())
+                while (!log_queue.empty())
                 {
+                        fprintf(stderr, "\n\t\t[S] --- Stats: Something to log\n");
+                        fflush(stderr);
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
@@ -138,14 +156,16 @@ void * Stats (void * v)
                            }
                            else
                            {
-                           fout << "[N] --- Normal Traffic ---" << endl
-                           << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
-                           fout << "\t" << "HTTP Signature:  \t";
-                           for (unsigned int i = 0; i < fngPntLen; i++)
-                           {
-                           fout << tmp.sig[i] << " ";
-                           }
-                           fout << endl;
+                           */
+                        fout << "[N] --- Normal Traffic ---" << endl
+                                << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
+                        fout << "\t" << "HTTP Signature:  \t";
+                        for (unsigned int i = 0; i < fngPntLen; i++)
+                        {
+                                fout << tmp.sig[i] << " ";
+                        }
+                        fout << endl;
+                        /*
                            }
                            */
                 }
@@ -171,6 +191,11 @@ void * testMgr (void * v)
 {
         if (v)
         {
+                /* spawn log process */
+                if ((pthread_create(&(log_tid), NULL, Stats, (void *)0)) < 0)
+                {
+                        perror("pthread_create()");
+                }
                 int i = 0;
                 /* while not done */
                 while (!quit)
@@ -192,7 +217,8 @@ void * testMgr (void * v)
                                         {
                                                 if (DEBUG)
                                                 {
-                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded\n");
+                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded, starting testing on a test_param struct\n");
+                                                        fflush(stderr);
                                                 }
                                         }
                                 }
@@ -207,10 +233,12 @@ void * testMgr (void * v)
                                         {
                                                 if (DEBUG)
                                                 {
-                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded\n");
+                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded, done testing on a test_param\n");
+                                                        fflush(stderr);
                                                 }
                                         }
                                         testing--;
+                                        ((ptest_param)v)[i].flag = COMPLETE;
                                 }
                                 i++;
                         }
@@ -225,208 +253,12 @@ void * testMgr (void * v)
                                 ct--;
                         }
                 }
+                if ((pthread_join(log_tid, NULL)) < 0)
+                {
+                        perror("pthread_join()");
+                }
         }
         return ((void *)ct);
-}
-
-volatile static sig_atomic_t do_import = 0;
-
-void onDemandImport (int sign)
-{
-        signal(SIGUSR1, &onDemandImport);
-        if (DEBUG)
-        {
-                cout << "recieved import signal!\n" << flush;
-        }
-        if (sign != SIGUSR1)
-        {
-                if (DEBUG)
-                {
-                        cout << "onDemandImport signaled by invalid signal!\n" << flush;
-                }
-                return;
-        }
-        do_import = 1;
-        while (do_import != 0);
-        signal(SIGUSR1, &onDemandImport);
-}
-
-Antibody ** importChamps (char * fin = 0)
-{
-        if (fin == (char *)0)
-        {
-                fin = (char *)"./ais/champions.abs\0";
-        }
-        cout << "importChamps: filename = " << fin << endl << flush;
-        ifstream in(fin);
-        if (in.fail())
-        {
-                cout << "Unable to open champs file\n" << flush;
-                return (0);
-        }
-        char c = '\0';
-        alen = 0;
-        class_count = 0;
-        /* maybe check read/calculated values below against what they should be? */
-        while (in.get(c))
-        {
-                cout << c << flush;
-                if (ab_count == 0)
-                {
-                        if (c == ',')
-                        {
-                                alen++;
-                        }
-                        else if (c == ';')
-                        {
-                                class_count++;
-                        }
-                }
-                if (c == '\n')
-                {
-                        ab_count++;
-                }
-        }
-        cout << endl << flush;
-        in.close();
-        if (DEBUG)
-        {
-                cout << "In import function\n";
-                cout << "Got alen: " << alen << endl;
-                cout << "Got class_count: " << class_count << endl;
-        }
-        ab_count /= class_count;
-        if (DEBUG)
-        {
-                cout << "Got ab_count: " << ab_count << endl;
-        }
-
-        Antibody ** pop = 0;
-        pop = new Antibody *[class_count];
-        for (int i = 0; i < class_count; i++)
-        {
-                pop[i] = new Antibody [ab_count];
-        }
-
-        in.open(fin);
-        if (in.fail())
-        {
-                cout << "Unable to open champs file\n" << flush;
-                return (0);
-        }
-        int i = 0, j = 0, k = 0, tmp = 0;
-        while (in.peek() != EOF)
-        {
-                i = 0;
-                while (i < class_count)
-                {
-                        j = 0;
-                        while (j < ab_count)
-                        {
-                                k = 0;
-                                while (k < alen)
-                                {
-                                        in >> tmp;
-                                        pop[i][j].setFlag(k, tmp);
-                                        k++;
-                                }
-                                in >> tmp;
-                                pop[i][j].setTests(tmp);
-                                in >> tmp;
-                                pop[i][j].setPos(tmp);
-                                in >> tmp;
-                                pop[i][j].setFalsePos(tmp);
-                                in >> tmp;
-                                pop[i][j].setNeg(tmp);
-                                in >> tmp;
-                                pop[i][j].setFalseNeg(tmp);
-                                k = 0;
-                                while (k < class_count)
-                                {
-                                        in >> tmp;
-                                        pop[i][j].setCat(k, tmp);
-                                        k++;
-                                }
-                                j++;
-                        }
-                        i++;
-                }
-        }
-        in.close();
-
-        /* Excessive output
-        */
-        if (DEBUG)
-        {
-                cout << "Done importing. Got the following:\n";
-                for (int i = 0; i < class_count; i++)
-                {
-                        cout << "Class " << i+1 << ":\n";
-                        for (int j = 0; j < ab_count; j++)
-                        {
-                                cout << "\t" << pop[i][j] << "\n";
-                        }
-                        cout << endl;
-                }
-                cout << endl << flush;
-        }
-
-        return (pop);
-}
-
-void * importManager (void * v)
-{
-        if (DEBUG)
-        {
-                cout << "start import manager\n" << flush;
-        }
-
-        char * fname = (char *)v;
-        while (!quit)
-        {
-                if (do_import == 1)
-                {
-                        if (DEBUG)
-                        {
-                                cout << "import initiated!\n" << flush;
-                        }
-                        //Antibody ** tmp = importChamps(fname);
-                        /* lock access to champs */
-                        pthread_mutex_lock(&champs_mutex);
-                        champs = importChamps(fname);
-                        /*
-                           int sz = sizeof(Antibody);
-                           for (int i = 0; i < class_count; i++)
-                           {
-                           for (int j = 0; i < ab_count; i++)
-                           {
-                           memcpy(&champs[i][j], &tmp[i][j], sz);
-                           }
-                           }
-                           */
-                        /* log import success/failure */
-
-                        if (DEBUG)
-                        {
-                                cout << "In onDemandImport. Got the following:\n";
-                                for (int i = 0; i < class_count; i++)
-                                {
-                                        cout << "Class " << i+1 << ":\n";
-                                        for (int j = 0; j < ab_count; j++)
-                                        {
-                                                cout << "\t" << champs[i][j] << "\n";
-                                        }
-                                        cout << endl;
-                                }
-                                cout << endl << flush;
-                        }
-                        /* unlock access to champs */
-                        pthread_mutex_unlock(&champs_mutex);
-                        do_import = 0;
-                }
-        }
-
-        return ((void *)0);
 }
 
 void pull(Antibody ** pop, const int32_t pipefd)
@@ -500,11 +332,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 }
         }
 
-        /* fork log process */
-        if (pthread_create(&log_tid, NULL, Stats, (void *)(0)) < 0)
-        {
-                perror("pthread_create()");
-        }
         /* parent - retrieve loop */
         if (DEBUG)
         {
@@ -534,7 +361,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
         if (DEBUG)
         {
                 // Retrieve
-                fprintf(stderr, "\tentering loop\r\n");
+                fprintf(stderr, "\tentering loop\n");
         }
         /* import mgr thread */
         if (pthread_create(&import_mgr_tid, NULL, importManager, (void *)(0)) < 0)
@@ -554,11 +381,12 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                 if (DEBUG)
                                 {
                                         // Retrieve
-                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\r\n");
+                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
                                 }
                                 shm[CTL][FLAGS] = CRING;
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
+                                /* HERE - lock individual param structs before modification? */
                                 if (testing < MAX_THREADS)
                                 {
                                         memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
@@ -575,13 +403,13 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                 }
                                 if (DEBUG)
                                 {
-                                        fprintf(stderr, "pos = %d, pend = %d\r\n", shm[CTL][POS], shm[CTL][PEND]);
-                                        fprintf(stderr, "\r\nsig:\r\n");
+                                        fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
+                                        fprintf(stderr, "\nsig:\n");
                                         i = 0;
                                         while (i < fngPntLen)
                                         {
                                                 fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
-                                                fprintf(stderr, "\r\n");
+                                                fprintf(stderr, "\n");
                                                 i++;
                                         }
                                         fprintf(stderr, "\t");
@@ -591,7 +419,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                                 fprintf(stderr, "%c", retrieved_t5s[ct][i]);
                                                 i++;
                                         }
-                                        fprintf(stderr, "\r\n");
+                                        fprintf(stderr, "\n");
                                         fflush(stderr);
                                 }
                                 /* keep an accurate record of our buffer position and dhs' buffer position */
@@ -624,11 +452,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 /* HERE - cleanup and exit */
         }
         if ((pthread_join(test_mgr_tid, NULL)) < 0)
-        {
-                perror("pthread_join()");
-                /* HERE - cleanup and exit */
-        }
-        if ((pthread_join(log_tid, NULL)) < 0)
         {
                 perror("pthread_join()");
                 /* HERE - cleanup and exit */
