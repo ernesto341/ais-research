@@ -4,8 +4,6 @@ using namespace std;
 
 void onDemandImport (int sign)
 {
-        /* stop accepting new signals to import while involved in an import */
-        signal(SIGUSR1, &onDemandImport);
         if (DEBUG)
         {
                 cerr << "recieved import signal!\n" << flush;
@@ -19,10 +17,6 @@ void onDemandImport (int sign)
                 return;
         }
         do_import = 1;
-        /* wait for import operation to finish */
-        while (do_import != 0);
-        /* accept new signals */
-        signal(SIGUSR1, &onDemandImport);
 }
 
 inline static void resizeChar(char ** a = 0, unsigned int * s = 0)
@@ -64,6 +58,7 @@ Antibody ** importChamps (char * fin)
                 return (0);
         }
         int i = 0;
+        ab_count = 0;
         alen = 0;
         class_count = 0;
         /* maybe check read/calculated values below against what they should be? */
@@ -95,12 +90,11 @@ Antibody ** importChamps (char * fin)
         in.close();
         if (DEBUG)
         {
-                cerr << "In import function\n";
                 cerr << "Got alen: " << alen << endl;
                 cerr << "Got class_count: " << class_count << endl;
         }
         ab_count /= class_count;
-        const int data_size = strlen(data);
+        int data_size = strlen(data);
         if (DEBUG)
         {
                 cerr << "Got ab_count: " << ab_count << endl;
