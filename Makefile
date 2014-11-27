@@ -15,10 +15,10 @@ retrieve: rand ab itoa imp pull consumer
 dump: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
 
 imp:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-variable -Wno-unused-parameter -Wno-sign-compare
+	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-parameter
 
 pull:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-variable -Wno-unused-parameter
+	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-parameter
 
 ab:
 	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/antibody.o $(AIS)/antibody.cpp
@@ -27,7 +27,7 @@ rand:
 	g++ $(INCFLAGS) $(CLFAGS) -c -o $(LIB)/random.o $(AIS)/random.cpp
 
 consumer:
-	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve $(RETFILES) -Wno-unused-variable
+	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve $(RETFILES)
 
 itoa:
 	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c

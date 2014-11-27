@@ -4,21 +4,24 @@ using namespace std;
 
 void onDemandImport (int sign)
 {
+        /* stop accepting new signals to import while involved in an import */
         signal(SIGUSR1, &onDemandImport);
         if (DEBUG)
         {
-                cout << "recieved import signal!\n" << flush;
+                cerr << "recieved import signal!\n" << flush;
         }
         if (sign != SIGUSR1)
         {
                 if (DEBUG)
                 {
-                        cout << "onDemandImport signaled by invalid signal!\n" << flush;
+                        cerr << "onDemandImport signaled by invalid signal!\n" << flush;
                 }
                 return;
         }
         do_import = 1;
+        /* wait for import operation to finish */
         while (do_import != 0);
+        /* accept new signals */
         signal(SIGUSR1, &onDemandImport);
 }
 
@@ -47,11 +50,11 @@ Antibody ** importChamps (char * fin)
         {
                 fin = (char *)"./ais/champions.abs\0";
         }
-        cout << "importChamps: filename = " << fin << endl << flush;
+        cerr << "importChamps: filename = " << fin << endl << flush;
         ifstream in(fin);
         if (in.fail())
         {
-                cout << "Unable to open champs file\n" << flush;
+                cerr << "Unable to open champs file\n" << flush;
                 return (0);
         }
         char * data = 0;
@@ -60,13 +63,13 @@ Antibody ** importChamps (char * fin)
         {
                 return (0);
         }
-        unsigned int i = 0;
+        int i = 0;
         alen = 0;
         class_count = 0;
         /* maybe check read/calculated values below against what they should be? */
         while (in.get(data[i]))
         {
-                cout << data[i] << flush;
+                cerr << data[i] << flush;
                 if (ab_count == 0)
                 {
                         if (data[i] == ',')
@@ -83,25 +86,25 @@ Antibody ** importChamps (char * fin)
                         ab_count++;
                 }
                 i++;
-                if (i == arr_size - 1)
+                if ((unsigned int)i == arr_size - 1)
                 {
                         resizeChar(&data, &arr_size);
                 }
         }
-        cout << endl << flush;
+        cerr << endl << flush;
         in.close();
         if (DEBUG)
         {
-                cout << "In import function\n";
-                cout << "Got alen: " << alen << endl;
-                cout << "Got class_count: " << class_count << endl;
+                cerr << "In import function\n";
+                cerr << "Got alen: " << alen << endl;
+                cerr << "Got class_count: " << class_count << endl;
         }
         ab_count /= class_count;
-        const unsigned int data_size = strlen(data);
+        const int data_size = strlen(data);
         if (DEBUG)
         {
-                cout << "Got ab_count: " << ab_count << endl;
-                cout << "Got data_size: " << data_size << endl;
+                cerr << "Got ab_count: " << ab_count << endl;
+                cerr << "Got data_size: " << data_size << endl << flush;
         }
 
         Antibody ** pop = 0;
@@ -111,7 +114,7 @@ Antibody ** importChamps (char * fin)
                 pop[k] = new Antibody [ab_count];
         }
 
-        unsigned int j = 0, k = 0, l = 0, tmp = 0, begin = 0;
+        int j = 0, k = 0, l = 0, tmp = 0, begin = 0;
         i = 0;
         while (i < class_count && l < data_size)
         {
@@ -131,42 +134,37 @@ Antibody ** importChamps (char * fin)
                                 {
                                         l++;
                                 }
-                                l++;
                                 tmp = atoi(&data[begin]);
                                 pop[i][j].setFlag(k, tmp);
                                 begin = l;
+                                l++;
                                 while (data[l] != 32)
                                 {
                                         l++;
                                 }
-                                l++;
                                 tmp = atoi(&data[begin]);
                                 pop[i][j].setAttr(k, tmp);
                                 begin = l;
+                                l++;
                                 while (data[l] != 32)
                                 {
                                         l++;
                                 }
-                                l++;
                                 tmp = atoi(&data[begin]);
                                 pop[i][j].setOffset(k, tmp);
                                 begin = l;
+                                l++;
+                                while (data[l] != 32)
+                                {
+                                        l++;
+                                }
+                                tmp = atoi(&data[begin]);
+                                pop[i][j].setMax(k, tmp);
                                 while (data[l] != 32)
                                 {
                                         l++;
                                 }
                                 l++;
-                                tmp = atoi(&data[begin]);
-                                pop[i][j].setMax(k, tmp);
-                                /* comma space */
-                                while (data[l] != 44)
-                                {
-                                        l++;
-                                }
-                                while (data[l] != 32)
-                                {
-                                        l++;
-                                }
                                 k++;
                         }
                         /* tab to stats */
@@ -174,62 +172,55 @@ Antibody ** importChamps (char * fin)
                         {
                                 l++;
                         }
-                        l++;
                         begin = l;
+                        l++;
                         while (data[l] != 32)
                         {
                                 l++;
                         }
-                        l++;
                         tmp = atoi(&data[begin]);
                         pop[i][j].setTests(tmp);
                         begin = l;
+                        l++;
                         while (data[l] != 32)
                         {
                                 l++;
                         }
-                        l++;
                         tmp = atoi(&data[begin]);
                         pop[i][j].setPos(tmp);
                         begin = l;
+                        l++;
                         while (data[l] != 32)
                         {
                                 l++;
                         }
-                        l++;
                         tmp = atoi(&data[begin]);
                         pop[i][j].setFalsePos(tmp);
                         begin = l;
+                        l++;
                         while (data[l] != 32)
                         {
                                 l++;
                         }
-                        l++;
                         tmp = atoi(&data[begin]);
                         pop[i][j].setNeg(tmp);
                         begin = l;
-                        while (data[l] != 32)
-                        {
-                                l++;
-                        }
-                        l++;
                         tmp = atoi(&data[begin]);
                         pop[i][j].setFalseNeg(tmp);
                         while (data[l] != 9)
                         {
                                 l++;
                         }
-                        l++;
                         k = 0;
                         while (k < class_count)
                         {
                                 begin = l;
                                 tmp = atoi(&data[begin]);
+                                l++;
                                 while (data[l] != 32)
                                 {
                                         l++;
                                 }
-                                l++;
                                 pop[i][j].setCat(k, tmp);
                                 k++;
                         }
@@ -242,20 +233,21 @@ Antibody ** importChamps (char * fin)
                 }
                 i++;
         }
+        cerr << endl << flush;
 
         /* Excessive output
         */
-        cout << "\n\nDone importing. Got the following:\n";
+        fprintf(stderr, "\n\nDone importing. Got the following:\n");
         for (int i = 0; i < class_count; i++)
         {
-                cout << "Class " << i+1 << ":\n";
+                fprintf(stderr, "Class %d :\n", i + 1);
                 for (int j = 0; j < ab_count; j++)
                 {
-                        cout << "\t" << pop[i][j] << "\n";
+                        cerr << "\t" << pop[i][j] << "\n";
                 }
-                cout << endl;
+                cerr << endl;
         }
-        cout << endl << endl << flush;
+        cerr << endl << endl << flush;
 
         return (pop);
 }
@@ -264,7 +256,7 @@ void * importManager (void * v)
 {
         if (DEBUG)
         {
-                cout << "start import manager\n" << flush;
+                cerr << "start import manager\n" << flush;
         }
 
         char * fname = (char *)v;
@@ -274,7 +266,7 @@ void * importManager (void * v)
                 {
                         if (DEBUG)
                         {
-                                cout << "import initiated!\n" << flush;
+                                cerr << "import initiated!\n" << flush;
                         }
                         /* lock access to champs */
                         pthread_mutex_lock(&champs_mutex);
@@ -283,17 +275,17 @@ void * importManager (void * v)
 
                         if (DEBUG)
                         {
-                                cout << "In onDemandImport. Got the following:\n";
+                                cerr << "In onDemandImport. Got the following:\n";
                                 for (int i = 0; i < class_count; i++)
                                 {
-                                        cout << "Class " << i+1 << ":\n";
+                                        cerr << "Class " << i+1 << ":\n";
                                         for (int j = 0; j < ab_count; j++)
                                         {
-                                                cout << "\t" << champs[i][j] << "\n";
+                                                cerr << "\t" << champs[i][j] << "\n";
                                         }
-                                        cout << endl;
+                                        cerr << endl;
                                 }
-                                cout << endl << flush;
+                                cerr << endl << flush;
                         }
                         /* unlock access to champs */
                         pthread_mutex_unlock(&champs_mutex);

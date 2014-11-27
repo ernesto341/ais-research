@@ -3,6 +3,7 @@
 using namespace std;
 
 int status = 0;
+int32_t import_mgr_pid = -1;
 int pipefd[2];
 
 volatile sig_atomic_t do_import = 0;
@@ -258,7 +259,7 @@ void * testMgr (void * v)
                         perror("pthread_join()");
                 }
         }
-        return ((void *)ct);
+        return ((void *)0);
 }
 
 void pull(Antibody ** pop, const int32_t pipefd)
@@ -364,105 +365,113 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 fprintf(stderr, "\tentering loop\n");
         }
         /* import mgr thread */
-        if (pthread_create(&import_mgr_tid, NULL, importManager, (void *)(0)) < 0)
+        if ((import_mgr_pid = fork()) < 0)
         {
-                perror("pthread_create()");
+                perror("fork()");
         }
-
-        /* accept signal from producer to quit */
-        while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
+        if (import_mgr_pid == 0)
         {
-                /* only copy when dhs isn't writing and while there are pending headers to get - add mutex functionality?
-                */
-                while (shm[CTL][PEND] > 0)
-                {
-                        if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
-                        {
-                                if (DEBUG)
-                                {
-                                        // Retrieve
-                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
-                                }
-                                shm[CTL][FLAGS] = CRING;
-                                memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
-                                memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
-                                /* HERE - lock individual param structs before modification? */
-                                if (testing < MAX_THREADS)
-                                {
-                                        memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
-                                        /* convert sig_atomic_t to char */
-                                        Convert(params[testing].tuple, retrieved_t5s[ct]);
-                                        /* these two lines signal the testMgr to spawn a testing thread */
-                                        testing++;
-                                        params[testing].flag = START;
-                                }
-                                else
-                                {
-                                        fprintf(stderr, "Insufficient threads to process incoming signatures\n");
-                                        fflush(stderr);
-                                }
-                                if (DEBUG)
-                                {
-                                        fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
-                                        fprintf(stderr, "\nsig:\n");
-                                        i = 0;
-                                        while (i < fngPntLen)
-                                        {
-                                                fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
-                                                fprintf(stderr, "\n");
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\t");
-                                        i = 0;
-                                        while (i < t5TplLen)
-                                        {
-                                                fprintf(stderr, "%c", retrieved_t5s[ct][i]);
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\n");
-                                        fflush(stderr);
-                                }
-                                /* keep an accurate record of our buffer position and dhs' buffer position */
-                                ct = (ct+1)%SIGBUF;
-                                inPos();
+                importManager((void *)0);
+                exit(EXIT_SUCCESS);
+        }
+        else
+        {
 
-                                /* decrement pending counter
-                                 * should never go below 0,
-                                 * so this test is probably unnecessary
-                                 */
-                                if (shm[CTL][PEND] > 0)
+                /* accept signal from producer to quit */
+                while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
+                {
+                        /* only copy when dhs isn't writing and while there are pending headers to get - add mutex functionality?
+                        */
+                        while (shm[CTL][PEND] > 0)
+                        {
+                                if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
                                 {
-                                        shm[CTL][PEND]--;
+                                        if (DEBUG)
+                                        {
+                                                // Retrieve
+                                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
+                                        }
+                                        shm[CTL][FLAGS] = CRING;
+                                        memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
+                                        memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
+                                        /* HERE - lock individual param structs before modification? */
+                                        if (testing < MAX_THREADS)
+                                        {
+                                                memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
+                                                /* convert sig_atomic_t to char */
+                                                Convert(params[testing].tuple, retrieved_t5s[ct]);
+                                                /* these two lines signal the testMgr to spawn a testing thread */
+                                                testing++;
+                                                params[testing].flag = START;
+                                        }
+                                        else
+                                        {
+                                                fprintf(stderr, "Insufficient threads to process incoming signatures\n");
+                                                fflush(stderr);
+                                        }
+                                        if (DEBUG)
+                                        {
+                                                fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
+                                                fprintf(stderr, "\nsig:\n");
+                                                i = 0;
+                                                while (i < fngPntLen)
+                                                {
+                                                        fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
+                                                        fprintf(stderr, "\n");
+                                                        i++;
+                                                }
+                                                fprintf(stderr, "\t");
+                                                i = 0;
+                                                while (i < t5TplLen)
+                                                {
+                                                        fprintf(stderr, "%c", retrieved_t5s[ct][i]);
+                                                        i++;
+                                                }
+                                                fprintf(stderr, "\n");
+                                                fflush(stderr);
+                                        }
+                                        /* keep an accurate record of our buffer position and dhs' buffer position */
+                                        ct = (ct+1)%SIGBUF;
+                                        inPos();
+
+                                        /* decrement pending counter
+                                         * should never go below 0,
+                                         * so this test is probably unnecessary
+                                         */
+                                        if (shm[CTL][PEND] > 0)
+                                        {
+                                                shm[CTL][PEND]--;
+                                        }
+                                        /* unlock shared resource */
+                                        shm[CTL][FLAGS] = CREAD;
                                 }
-                                /* unlock shared resource */
-                                shm[CTL][FLAGS] = CREAD;
                         }
                 }
-        }
-        quit = true;
-        /* signal dhs that retrieve is done */
-        if (shm)
-        {
-                shm[CTL][FLAGS] = CDONE;
-        }
-        /* join testMgr. since fork/logging is not a priority, make sure there is actually a child process before waiting for child process */
-        if ((pthread_join(import_mgr_tid, NULL)) < 0)
-        {
-                perror("pthread_join()");
-                /* HERE - cleanup and exit */
-        }
-        if ((pthread_join(test_mgr_tid, NULL)) < 0)
-        {
-                perror("pthread_join()");
-                /* HERE - cleanup and exit */
-        }
-        /*
-           delete champs;
-           pthread_mutex_destroy(&champs_mutex);
-           */
-        cleanup();
+                quit = true;
+                /* signal dhs that retrieve is done */
+                if (shm)
+                {
+                        shm[CTL][FLAGS] = CDONE;
+                }
+                /* join testMgr. since fork/logging is not a priority, make sure there is actually a child process before waiting for child process */
+                if ((pthread_join(import_mgr_tid, NULL)) < 0)
+                {
+                        perror("pthread_join()");
+                        /* HERE - cleanup and exit */
+                }
+                if ((pthread_join(test_mgr_tid, NULL)) < 0)
+                {
+                        perror("pthread_join()");
+                        /* HERE - cleanup and exit */
+                }
+                /*
+                   delete champs;
+                   pthread_mutex_destroy(&champs_mutex);
+                   */
+                cleanup();
 
-        exit(EXIT_SUCCESS);
+                exit(EXIT_SUCCESS);
+        }
         return;
 }
 
