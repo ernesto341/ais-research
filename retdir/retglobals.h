@@ -39,9 +39,9 @@ static const uint32_t t5TplLen = 44;
 
 static const uint32_t SIGQTY = 5;
 
-static uint8_t pending_more_hdr_data = 0;
-static unsigned char * hdr_data = 0;
-static uint32_t hdr_size = 850;
+//static uint8_t pending_more_hdr_data = 0;
+//static unsigned char * hdr_data = 0;
+//static uint32_t hdr_size = 850;
 
 #endif
 

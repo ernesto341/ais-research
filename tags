@@ -273,7 +273,7 @@ a	ais/antibody.h	/^                int a[ALEN];         \/\/ Attributes, indexed
 aShmids	inc/share.c	/^inline void aShmids(psnc_t snc)$/;"	f
 aShmids	inc/snc.hpp	/^                inline void aShmids(void)$/;"	f	class:snc
 aShmids	retdir/mem.hpp	/^inline void aShmids(void)$/;"	f
-ab_count	retdir/pull.cpp	/^volatile sig_atomic_t ab_count = 0;$/;"	v
+ab_count	retdir/import.hpp	/^volatile static sig_atomic_t ab_count = 0;$/;"	v
 ack	inc/tcpreassembly.h	/^	unsigned long 			ack;$/;"	m	struct:_tcp_segment_
 addr	inc/tcpreassembly.h	/^	unsigned int 		addr;$/;"	m	struct:__anon18
 adjCategory	ais/antibody.h	/^                void adjCategory(int i) { if(i > -1) cat[i]++; }$/;"	f	class:Antibody
@@ -281,7 +281,7 @@ adjFalseNeg	ais/antibody.h	/^                void adjFalseNeg() { false_neg++; }
 adjFalsePos	ais/antibody.h	/^                void adjFalsePos() { false_pos++; }$/;"	f	class:Antibody
 adjNeg	ais/antibody.h	/^                void adjNeg()      { neg++; }$/;"	f	class:Antibody
 adjPos	ais/antibody.h	/^                void adjPos()      { pos++; }$/;"	f	class:Antibody
-alen	retdir/pull.cpp	/^volatile sig_atomic_t alen = 0;$/;"	v
+alen	retdir/import.hpp	/^volatile static sig_atomic_t alen = 0;$/;"	v
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
 arr_size	retdir/import.cpp	/^unsigned int arr_size = 100;$/;"	v
 attack	retdir/pull.cpp	/^        int8_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
@@ -301,7 +301,7 @@ champs_mutex	retdir/pull.cpp	/^pthread_mutex_t champs_mutex;$/;"	v
 check_timeout	inc/tcpreassembly.h	/^enum check_timeout$/;"	g
 child_pid	retdir/pull.cpp	/^int32_t child_pid = -1;$/;"	v
 cksum	inc/ipv4defrag.c	/^inline static unsigned short cksum(unsigned short *buf, int nwords)$/;"	f	file:
-class_count	retdir/pull.cpp	/^volatile sig_atomic_t class_count = 0;$/;"	v
+class_count	retdir/import.hpp	/^volatile static sig_atomic_t class_count = 0;$/;"	v
 cleanup	retdir/pull.cpp	/^void cleanup(void)$/;"	f
 client	inc/tcpreassembly.h	/^	ntoh_tcp_peer_t 	client;$/;"	m	struct:_tcp_stream_
 closedby	inc/tcpreassembly.h	/^	unsigned short 		closedby;$/;"	m	struct:_tcp_stream_
@@ -422,9 +422,7 @@ handle_closing_connection	inc/tcpreassembly.c	/^inline static void handle_closin
 handle_established_connection	inc/tcpreassembly.c	/^inline static int handle_established_connection ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , struct tcphdr *tcp , size_t payload_len , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , void *udata, int who )$/;"	f	file:
 handle_new_connection	inc/tcpreassembly.c	/^inline static int handle_new_connection ( pntoh_tcp_stream_t stream , struct tcphdr *tcp , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , void *udata )$/;"	f	file:
 hdr_data	inc/globals.h	/^static unsigned char * hdr_data = 0;$/;"	v
-hdr_data	retdir/retglobals.h	/^static unsigned char * hdr_data = 0;$/;"	v
 hdr_size	inc/globals.h	/^static uint32_t hdr_size = 850;$/;"	v
-hdr_size	retdir/retglobals.h	/^static uint32_t hdr_size = 850;$/;"	v
 htable_count	inc/common.c	/^_HIDDEN unsigned int htable_count ( phtable_t ht )$/;"	f
 htable_destroy	inc/common.c	/^_HIDDEN void htable_destroy ( phtable_t *ht )$/;"	f
 htable_find	inc/common.c	/^_HIDDEN void *htable_find ( phtable_t ht , unsigned int key, void* ip_tuple4 )$/;"	f
@@ -635,7 +633,6 @@ pcond	inc/libntoh.h	/^	pthread_cond_t	pcond;$/;"	m	struct:__anon16
 pdata_t	inc/snc.hpp	/^} data_t, *pdata_t;$/;"	t	typeref:struct:__anon6
 peer_info_t	dhs.c	/^} peer_info_t, *ppeer_info_t;$/;"	t	typeref:struct:__anon1	file:
 pending_more_hdr_data	inc/globals.h	/^static uint8_t pending_more_hdr_data = 0;$/;"	v
-pending_more_hdr_data	retdir/retglobals.h	/^static uint8_t pending_more_hdr_data = 0;$/;"	v
 phtable_t	inc/common.h	/^} htable_t , *phtable_t;$/;"	t	typeref:struct:__anon10
 phtnode_t	inc/common.h	/^} htnode_t , *phtnode_t;$/;"	t	typeref:struct:_hash_node_
 pipefd	retdir/pull.cpp	/^int pipefd[2];$/;"	v
