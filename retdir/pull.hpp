@@ -1,5 +1,6 @@
 #pragma once
 #include <sys/wait.h>
+#include <sys/sem.h>
 #include <queue>
 #include <list>
 #include <iomanip>
@@ -29,7 +30,7 @@ using namespace std;
 #endif
 
 #ifndef MAX_THREADS
-#define MAX_THREADS 8
+#define MAX_THREADS 16
 #endif
 
 #define UNUSED 0

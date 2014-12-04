@@ -2,6 +2,19 @@
 
 using namespace std;
 
+union _sem_u
+{
+        int  val;    
+        struct semid_ds *buf;   
+        unsigned short  *array; 
+        struct seminfo  *__buf; 
+} sem_u; 
+
+int32_t semid = 0;
+const static uint8_t nsems = 1;
+const static uint8_t sops_qty = 1;
+struct sembuf sops[sops_qty];
+
 int status = 0;
 int32_t import_mgr_pid = -1;
 int pipefd[2];
@@ -26,7 +39,7 @@ Antibody ** champs;
 pthread_mutex_t champs_mutex;
 pthread_mutex_t log_mutex;
 
-volatile sig_atomic_t testing = 0;
+volatile static sig_atomic_t testing = 0;
 
 typedef struct _test_param
 {
@@ -39,6 +52,20 @@ typedef struct _test_param
 } test_param, *ptest_param;
 
 queue<test_param> log_queue;
+
+inline static void incTesting(void)
+{
+        sops[0].sem_op = +1;
+        sops[0].sem_num = 0;
+        semop(semid, sops, 1);
+}
+
+inline static void decTesting(void)
+{
+        sops[0].sem_op = -1;
+        sops[0].sem_num = 0;
+        semop(semid, sops, 1);
+}
 
 /* v is a test_param *, ie ptest_param */
 void * testThread(void * v)
@@ -89,6 +116,10 @@ void * testThread(void * v)
                         fflush(stderr);
                 }
                 ((ptest_param)v)->flag = DONE;
+        }
+        else
+        {
+                cerr << "\n\t\t[T] --- Nothing passed to testThread !!!!!     HERE     !!!!!\n" << flush;
         }
 
         return ((void *)0);
@@ -154,15 +185,15 @@ void * Stats (void * v)
                            else
                            {
                            */
-                        fout << "[N] --- Normal Traffic ---" << endl
-                                << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
-                        fout << "\t" << "HTTP Signature:  \t";
-                        for (unsigned int i = 0; i < fngPntLen; i++)
-                        {
-                                fout << tmp.sig[i] << " ";
-                        }
-                        fout << endl;
+                        fout << "[N] --- Normal Traffic ---" << endl;
                         /*
+                           fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
+                           fout << "\t" << "HTTP Signature:  \t";
+                           for (unsigned int i = 0; i < fngPntLen; i++)
+                           {
+                           fout << tmp.sig[i] << " ";
+                           }
+                           fout << endl;
                            }
                            */
                 }
@@ -199,8 +230,12 @@ void * testMgr (void * v)
                 {
                         i = 0;
                         /* check all necessary testing params */
+                        testing = semctl(semid, 0, GETVAL);
                         while (i < testing)
                         {
+                                testing = semctl(semid, 0, GETVAL);
+                                //cerr << "testMgr, i = " << i << ", testing = " << testing << endl << flush;
+                                //cerr << "flag = " << ((ptest_param)v)[i].flag << endl << flush;
                                 if (((ptest_param)v)[i].flag == START)
                                 {
                                         ((ptest_param)v)[i].flag = WORKING;
@@ -219,7 +254,7 @@ void * testMgr (void * v)
                                                 }
                                         }
                                 }
-                                if (((ptest_param)v)[i].flag == DONE)
+                                else if (((ptest_param)v)[i].flag == DONE)
                                 {
                                         /* HERE - exit? if unable to return from testing threads */
                                         if ((pthread_join((((ptest_param)v)[i].tid), NULL)) < 0)
@@ -234,8 +269,24 @@ void * testMgr (void * v)
                                                         fflush(stderr);
                                                 }
                                         }
-                                        testing--;
+                                        testing = semctl(semid, 0, GETVAL);
+                                        cerr << "about to decrement testing, testing = " << testing << "...\n" << flush;
+                                        sops[0].sem_op = -1;
+                                        sops[0].sem_num = 0;
+                                        semop(semid, sops, 1);
+                                        //testing--;
+                                        testing = semctl(semid, 0, GETVAL);
+                                        cerr << "testing decremented, testing = " << testing << "\n" << flush;
                                         ((ptest_param)v)[i].flag = COMPLETE;
+                                }
+                                /*
+                                   else if (((ptest_param)v)[i].flag == COMPLETE)
+                                   {
+                                   }
+                                   */
+                                else
+                                {
+                                        cerr << "\n\t\t[M] --- Thread " << i << " incomplete, flag = " << ((ptest_param)v)[i].flag << flush;
                                 }
                                 i++;
                         }
@@ -314,7 +365,31 @@ void pull(Antibody ** pop, const int32_t pipefd)
            }
            */
 
+        /* set up a timer to ensure this operation doesn't permanently lock up */
+        while (semid < 1)
+        {
+                semid = semget((rand() % 65530) + 1, nsems, IPC_CREAT | 0600);
+        }
+        if (semid < 0)
+        {
+                perror("semget()");
+                exit(-1);
+        }
+        sem_u.val = 0;
+        if (semctl(semid, 0, SETVAL, sem_u))
+        {
+                perror("semget(SETVAL): ");
+                exit(-1);
+        }
         uint32_t i = 0;
+        while (i < sops_qty)
+        {
+                sops[i].sem_num = i;
+                sops[i].sem_flg = 0;
+                i++;
+        }
+
+        i = 0;
         pthread_mutex_init(&champs_mutex, NULL);
         pthread_mutex_init(&log_mutex, NULL);
         char * n = (char *)"./traffic.log\0";
@@ -391,41 +466,48 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
                                 /* HERE - lock individual param structs before modification? */
-                                if (testing < MAX_THREADS)
+                                //if (testing < MAX_THREADS)
+                                testing = semctl(semid, 0, GETVAL);
+                                if ((testing) < MAX_THREADS)
                                 {
                                         memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
                                         /* convert sig_atomic_t to char */
                                         Convert(params[testing].tuple, retrieved_t5s[ct]);
                                         /* these two lines signal the testMgr to spawn a testing thread */
-                                        testing++;
+                                        sops[0].sem_op = +1;
+                                        sops[0].sem_num = 0;
+                                        semop(semid, sops, 1);
+                                        //testing++;
                                         params[testing].flag = START;
                                 }
                                 else
                                 {
-                                        fprintf(stderr, "Insufficient threads to process incoming signatures\n");
+                                        fprintf(stderr, "Insufficient threads to process incoming signatures, testing = %d\n", testing);
                                         fflush(stderr);
                                 }
-                                if (DEBUG)
-                                {
-                                        fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
-                                        fprintf(stderr, "\nsig:\n");
-                                        i = 0;
-                                        while (i < fngPntLen)
-                                        {
-                                                fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
-                                                fprintf(stderr, "\n");
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\t");
-                                        i = 0;
-                                        while (i < t5TplLen)
-                                        {
-                                                fprintf(stderr, "%c", retrieved_t5s[ct][i]);
-                                                i++;
-                                        }
-                                        fprintf(stderr, "\n");
-                                        fflush(stderr);
-                                }
+                                /*
+                                   if (DEBUG)
+                                   {
+                                   fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
+                                   fprintf(stderr, "\nsig:\n");
+                                   i = 0;
+                                   while (i < fngPntLen)
+                                   {
+                                   fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
+                                   fprintf(stderr, "\n");
+                                   i++;
+                                   }
+                                   fprintf(stderr, "\t");
+                                   i = 0;
+                                   while (i < t5TplLen)
+                                   {
+                                   fprintf(stderr, "%c", retrieved_t5s[ct][i]);
+                                   i++;
+                                   }
+                                   fprintf(stderr, "\n");
+                                   fflush(stderr);
+                                   }
+                                   */
                                 /* keep an accurate record of our buffer position and dhs' buffer position */
                                 ct = (ct+1)%SIGBUF;
                                 inPos();
@@ -475,6 +557,12 @@ void cleanup(void)
         delete champs;
         pthread_mutex_destroy(&champs_mutex);
         pthread_mutex_destroy(&log_mutex);
+        int32_t ret = semctl(semid, 0, IPC_RMID);
+        if (ret < 0)
+        {
+                perror("shmctl()");
+        }
         /* close log file */
         fout.close();
 }
+
