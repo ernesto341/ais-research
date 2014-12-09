@@ -30,7 +30,7 @@ using namespace std;
 #endif
 
 #ifndef MAX_THREADS
-#define MAX_THREADS 16
+#define MAX_THREADS 6
 #endif
 
 #define UNUSED 0

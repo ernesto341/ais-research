@@ -72,13 +72,17 @@ void * testThread(void * v)
 {
         if (v)
         {
-                fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
-                fflush(stderr);
+                /*
+                   fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
+                   fflush(stderr);
+                   */
                 /* HERE - FIX THIS */
                 if (((int *)(((ptest_param)(v))->sig))[0] != -1)
                 {
-                        fprintf(stderr, "\n\t\t[T] --- testThread: Good Signature\n");
-                        fflush(stderr);
+                        /*
+                           fprintf(stderr, "\n\t\t[T] --- testThread: Good Signature\n");
+                           fflush(stderr);
+                           */
                         pthread_mutex_lock(&champs_mutex);
                         /*
                            for (unsigned int i = 0; i < fngPntLen; i++)
@@ -139,18 +143,6 @@ inline static void Copy(test_param & d, test_param s)
         }
 }
 
-/*
-   typedef struct _test_param
-   {
-   uint8_t tnum; // thread number
-   pthread_t tid; // thread id
-   uint32_t sig[fngPntLen]; // signature to be tested
-   char tuple[t5TplLen]; // t5 tuple
-   volatile sig_atomic_t flag; // signal to thread to start testing
-   int8_t attack; // whether or not the tested signature was determined to be an attack
-   } test_param, *ptest_param;
-   */
-
 /* child function that watches the queue for entries that need to be logged and logs new entries */
 void * Stats (void * v)
 {
@@ -165,37 +157,35 @@ void * Stats (void * v)
                 pthread_mutex_lock(&log_mutex);
                 while (!log_queue.empty())
                 {
-                        fprintf(stderr, "\n\t\t[S] --- Stats: Something to log\n");
-                        fflush(stderr);
+                        /*
+                           fprintf(stderr, "\n\t\t[S] --- Stats: Something to log\n");
+                           fflush(stderr);
+                           */
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
-                        /*
-                           if (tmp.attack == 1)
-                           {
-                           fout << "[A] --- Attack Identified:" << endl
-                           << "\t" << "Unique Tuple:    " << tmp.tuple << endl
-                           << "\t" << "HTTP Signature:  \t";
-                           for (unsigned int i = 0; i < fngPntLen; i++)
-                           {
-                           fout << tmp.sig[i] << " ";
-                           }
-                           fout << endl;
-                           }
-                           else
-                           {
-                           */
-                        fout << "[N] --- Normal Traffic ---" << endl;
-                        /*
-                           fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
-                           fout << "\t" << "HTTP Signature:  \t";
-                           for (unsigned int i = 0; i < fngPntLen; i++)
-                           {
-                           fout << tmp.sig[i] << " ";
-                           }
-                           fout << endl;
-                           }
-                           */
+                        if (tmp.attack == 1)
+                        {
+                                fout << "[A] --- Attack Identified:" << endl;
+                                fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
+                                fout << "\t" << "HTTP Signature:  \t";
+                                for (unsigned int i = 0; i < fngPntLen; i++)
+                                {
+                                        fout << tmp.sig[i] << " ";
+                                }
+                                fout << endl;
+                        }
+                        else
+                        {
+                                fout << "[N] --- Normal Traffic ---" << endl;
+                                fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
+                                fout << "\t" << "HTTP Signature:  \t";
+                                for (unsigned int i = 0; i < fngPntLen; i++)
+                                {
+                                        fout << tmp.sig[i] << " ";
+                                }
+                                fout << endl;
+                        }
                 }
                 /* unlock never blocks, so shouldn't matter */
                 pthread_mutex_unlock(&log_mutex);
@@ -230,10 +220,10 @@ void * testMgr (void * v)
                 {
                         i = 0;
                         /* check all necessary testing params */
-                        testing = semctl(semid, 0, GETVAL);
+                        //testing = semctl(semid, 0, GETVAL);
                         while (i < testing)
                         {
-                                testing = semctl(semid, 0, GETVAL);
+                                //testing = semctl(semid, 0, GETVAL);
                                 //cerr << "testMgr, i = " << i << ", testing = " << testing << endl << flush;
                                 //cerr << "flag = " << ((ptest_param)v)[i].flag << endl << flush;
                                 if (((ptest_param)v)[i].flag == START)
@@ -245,14 +235,16 @@ void * testMgr (void * v)
                                         {
                                                 perror("pthread_create()");
                                         }
-                                        else
-                                        {
-                                                if (DEBUG)
-                                                {
-                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded, starting testing on a test_param struct\n");
-                                                        fflush(stderr);
-                                                }
-                                        }
+                                        /*
+                                           else
+                                           {
+                                           if (DEBUG)
+                                           {
+                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded, starting testing on a test_param struct\n");
+                                           fflush(stderr);
+                                           }
+                                           }
+                                           */
                                 }
                                 else if (((ptest_param)v)[i].flag == DONE)
                                 {
@@ -261,33 +253,35 @@ void * testMgr (void * v)
                                         {
                                                 perror("pthread_join()");
                                         }
-                                        else
-                                        {
-                                                if (DEBUG)
-                                                {
-                                                        fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded, done testing on a test_param\n");
-                                                        fflush(stderr);
-                                                }
-                                        }
-                                        testing = semctl(semid, 0, GETVAL);
-                                        cerr << "about to decrement testing, testing = " << testing << "...\n" << flush;
-                                        sops[0].sem_op = -1;
-                                        sops[0].sem_num = 0;
-                                        semop(semid, sops, 1);
-                                        //testing--;
-                                        testing = semctl(semid, 0, GETVAL);
-                                        cerr << "testing decremented, testing = " << testing << "\n" << flush;
+                                        /*
+                                           else
+                                           {
+                                           if (DEBUG)
+                                           {
+                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded, done testing on a test_param\n");
+                                           fflush(stderr);
+                                           }
+                                           }
+                                           */
+                                        //testing = semctl(semid, 0, GETVAL);
+                                        //cerr << "about to decrement testing, testing = " << testing << "...\n" << flush;
+                                        //sops[0].sem_op = -1;
+                                        //sops[0].sem_num = 0;
+                                        //semop(semid, sops, 1);
+                                        testing--;
+                                        //testing = semctl(semid, 0, GETVAL);
+                                        //cerr << "testing decremented, testing = " << testing << "\n" << flush;
                                         ((ptest_param)v)[i].flag = COMPLETE;
                                 }
                                 /*
                                    else if (((ptest_param)v)[i].flag == COMPLETE)
                                    {
                                    }
+                                   else
+                                   {
+                                   cerr << "\n\t\t[M] --- Thread " << i << " incomplete, flag = " << ((ptest_param)v)[i].flag << flush;
+                                   }
                                    */
-                                else
-                                {
-                                        cerr << "\n\t\t[M] --- Thread " << i << " incomplete, flag = " << ((ptest_param)v)[i].flag << flush;
-                                }
                                 i++;
                         }
                 }
@@ -317,7 +311,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 /* maybe fork and exec breed and train module regularly */
                 if ((champs = importChamps()) == 0)
                 {
-                        cout << "Unable to get antibodies to test with, quitting\n" << flush;
+                        cerr << "Unable to get antibodies to test with, quitting\n" << flush;
                         shm[CTL][FLAGS] = CDONE;
                         return;
                 }
@@ -381,7 +375,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 perror("semget(SETVAL): ");
                 exit(-1);
         }
-        uint32_t i = 0;
+        uint32_t i = 0, j = 0;
         while (i < sops_qty)
         {
                 sops[i].sem_num = i;
@@ -400,15 +394,17 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 if (DEBUG)
                 {
-                        cout << "Unable to open file for logging\n" << flush;
+                        cerr << "Unable to open file for logging\n" << flush;
                 }
         }
 
         /* parent - retrieve loop */
-        if (DEBUG)
-        {
-                fprintf(stderr, "\n\t\t[r] --- fork succeeded - parent\n");
-        }
+        /*
+           if (DEBUG)
+           {
+           fprintf(stderr, "\n\t\t[r] --- fork succeeded - parent\n");
+           }
+           */
         test_param params[MAX_THREADS];
         for (i = 0; i < MAX_THREADS; i++)
         {
@@ -421,32 +417,40 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 perror("pthread_create()");
         }
-        else
-        {
-                if (DEBUG)
-                {
-                        // Retrieve
-                        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
-                }
+        /*
+           else
+           {
+           if (DEBUG)
+           {
+        // Retrieve
+        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
         }
+        }
+        */
         testing = 0;
         if ((pthread_create(&(import_mgr_tid), NULL, importManager, (void *)(0))) < 0)
         {
                 perror("pthread_create()");
         }
-        else
-        {
-                if (DEBUG)
-                {
-                        // Retrieve
-                        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
-                }
+        /*
+           else
+           {
+           if (DEBUG)
+           {
+        // Retrieve
+        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
         }
-        if (DEBUG)
-        {
-                // Retrieve
-                fprintf(stderr, "\tentering loop\n");
         }
+        */
+        /*
+           if (DEBUG)
+           {
+        // Retrieve
+        fprintf(stderr, "\tentering loop\n");
+        }
+        */
+
+        bool started = false;
 
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
@@ -457,28 +461,45 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 {
                         if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
                         {
-                                if (DEBUG)
-                                {
-                                        // Retrieve
-                                        fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
+                                /*
+                                   if (DEBUG)
+                                   {
+                                // Retrieve
+                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
                                 }
+                                */
                                 shm[CTL][FLAGS] = CRING;
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
                                 /* HERE - lock individual param structs before modification? */
                                 //if (testing < MAX_THREADS)
-                                testing = semctl(semid, 0, GETVAL);
+                                //testing = semctl(semid, 0, GETVAL);
                                 if ((testing) < MAX_THREADS)
                                 {
-                                        memcpy((void *)&(params[testing].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
-                                        /* convert sig_atomic_t to char */
-                                        Convert(params[testing].tuple, retrieved_t5s[ct]);
-                                        /* these two lines signal the testMgr to spawn a testing thread */
-                                        sops[0].sem_op = +1;
-                                        sops[0].sem_num = 0;
-                                        semop(semid, sops, 1);
-                                        //testing++;
-                                        params[testing].flag = START;
+                                        started = false;
+                                        j = 0;
+                                        while (j <= MAX_THREADS && !started)
+                                        {
+                                                if (params[j].flag != START && params[j].flag != WORKING && params[j].flag != DONE && params[j].flag != LOG)
+                                                {
+                                                        memcpy((void *)&(params[j].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
+                                                        /* convert sig_atomic_t to char */
+                                                        Convert(params[j].tuple, retrieved_t5s[ct]);
+                                                        /* these two lines signal the testMgr to spawn a testing thread */
+                                                        //sops[0].sem_op = +1;
+                                                        //sops[0].sem_num = 0;
+                                                        //semop(semid, sops, 1);
+                                                        testing++;
+                                                        params[j].flag = START;
+                                                        started = true;
+                                                }
+                                                j++;
+                                        }
+                                        if (!started)
+                                        {
+                                                fprintf(stderr, "Insufficient threads to process incoming signatures, testing = %d\n", testing);
+                                                fflush(stderr);
+                                        }
                                 }
                                 else
                                 {
