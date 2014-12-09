@@ -168,7 +168,7 @@ void shandler ( int sign )
         {
                 putc(buf[i++], stderr);
         }
-        _exit( sign );
+        exit(sign);
 }
 
 void resizeInt(int ** in, unsigned int * len)
