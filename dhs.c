@@ -991,7 +991,10 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
 
         if (pinfo != 0)
         {
-                if (Contains((char *)payload, "HTTP") && (Contains((char *)payload, "GET") || Contains((char *)payload, "POST") || Contains((char *)payload, "HEAD")))
+                fprintf(stderr, "srcprt: %d\tdstprt: %d\n", ntohs(tcpt5.sport), ntohs(tcpt5.dport));
+                fflush(stderr);
+                //if (Contains((char *)payload, "HTTP") && (Contains((char *)payload, "GET") || Contains((char *)payload, "POST") || Contains((char *)payload, "HEAD")))
+                if (ntohs(tcpt5.dport) == 80)
                 {
                         pending_more_hdr_data = extractHttpHdr((const char *)(payload));
                         /* got entire header, dump to shm */
