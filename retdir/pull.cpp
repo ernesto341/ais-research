@@ -53,6 +53,12 @@ typedef struct _test_param
 
 queue<test_param> log_queue;
 
+inline static void inPos(void)
+{
+        ((local_pos))++;
+        ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
+}
+
 inline static void incTesting(void)
 {
         sops[0].sem_op = +1;

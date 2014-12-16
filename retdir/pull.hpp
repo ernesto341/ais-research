@@ -7,7 +7,6 @@
 #include <fstream>
 
 #include <retglobals.h>
-#include <tools.hpp>
 #include <mem.hpp>
 #include <itoa.h>
 #include <antibody.h>

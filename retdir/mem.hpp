@@ -6,8 +6,6 @@
 #include <signal.h>
 #include <time.h>
 
-#include <tools.hpp>
-
 using namespace std;
 
 #define DEBUG 1

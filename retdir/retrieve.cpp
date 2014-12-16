@@ -2,8 +2,6 @@
 #include <queue>
 
 #include <retglobals.h>
-
-#include <tools.hpp>
 #include <mem.hpp>
 #include <pull.hpp>
 
