@@ -51,7 +51,7 @@ libntoh:
 	$(CC) -o $(LIB)/libntoh.o -c $(INC)/libntoh.c
 
 share:
-	$(CC) -o $(LIB)/share.o -c $(INC)/share.c -Wno-unused-variable
+	$(CC) -o $(LIB)/share.o -c $(INC)/share.c
 
 prod: /usr/local/lib/libpcap.a
 	$(CC) -o dhs dhs.c /usr/local/lib/libpcap.a $(DHSFILES)
@@ -59,8 +59,8 @@ prod: /usr/local/lib/libpcap.a
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
-	rm -f *.o
 	rm -f *.log
+	rm -f *.o
 	rm -f *.gch
 	rm -f err
 	rm -f dhs_err
@@ -71,7 +71,6 @@ clean:
 	rm -f $(RET)/retrieve
 	rm -f $(RET)/*.gch
 	rm -f $(RET)/*.o
-	rm -f dhs
 	rm -f $(LIB)/*.o
 	rm -f $(LIB)/*.gch
 	rm -f $(INC)/*.o

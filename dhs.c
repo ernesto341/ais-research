@@ -1,6 +1,9 @@
 /* Written by Ernest Richards
  *
- * modified from 'example.c' written by Chema Garcia
+ * Modified from 'example.c' written by Chema Garcia
+ * Major contributions by Alfonso Puga
+ * Other contributions by the Hardins, as well as all of the tutors in the tutoring center.
+ *
  */
 
 /********************************************************************************
@@ -33,21 +36,13 @@
  * POSSIBILITY OF SUCH DAMAGE.                                                  *
  ********************************************************************************/
 
-/*
- * PWING = 1 --- Producer is writing to shared memory
- * PWTEN = 2 --- Producer has written to shared memory
- * CRING = 3 --- Consumer is reading from shared memory
- * CREAD = 4 --- Consumer has read from shared memory
+/* TO DO:
  *
- *
- * TO DO:
- *
- * Ensure no buffer overflows, use resize
- * replace all print statements with putc(int character, FILE io) loops for thread operation
- *
- * prepend a 0 to signatures in order to facilitate use of current Webdata class file
+ * ensure that pcktFingerPrint function handles hex substitutions?
+ * handle non http packets in extractHttpHdr
  *
  */
+
 
 #include <getopt.h>
 
@@ -84,23 +79,11 @@ typedef struct
         char *path;
 } peer_info_t, *ppeer_info_t;
 
-/* capture handle */
 pcap_t *handle = 0;
 pntoh_tcp_session_t tcp_session = 0;
 pntoh_ipv4_session_t ipv4_session = 0;
 unsigned short	receive = 0;
 
-/* header extract and signiture storage, memory */
-/*
-uint8_t pending_more_hdr_data = 0;
-unsigned char * hdr_data = 0;
-uint32_t hdr_size = 850;
-*/
-/* low end of average HTTP header size is 200
- * high end can be over 2kb, hdr_data size will auto adjust as the program runs
- * 850 given as sufficient for most headers to minimize resize operations
- * thanks to stackoverflow forum, typo.pl
- */
 #ifndef _keys
 #define _keys
 uint32_t shmkey[] = {6511, 5433, 9884, 1763, 5782, 6284};
@@ -110,8 +93,14 @@ snc_t snc;
 
 char * tmp = 0;
 sig_atomic_t * t5Convert;
+static uint8_t pending_more_hdr_data = 0;
+int32_t fd = 0;
 
-/* a double ptr by reference */
+uint32_t i = 0;
+
+/**
+ * @brief Increments a double ptr by reference
+ */
 inline static void inCtr(sig_atomic_t *** s)
 {
         ((*s)[0][0])++;
@@ -127,27 +116,20 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        unsigned int i = 0, len = 0;
+        uint32_t len = 0;
         if (DEBUG)
         {
                 if (snc.smem.shm[CTL][FLAGS] == CDONE)
                 {
                         strncpy(buf, "\n\t\t[i] --- Signaled to quit by consumer\n", 40);
-                        while (i < 42)
-                        {
-                                putc(buf[i++], stderr);
-                        }
+                        write(2, buf, 40);
                 }
                 strncpy(buf, "\n\t\t[i] --- Signal: ", 19);
                 tmp = itoa(sign);
                 len = strlen(tmp);
                 strncat(buf, tmp, len);
                 len += 19;
-                i = 0;
-                while (i < len)
-                {
-                        putc(buf[i++], stderr);
-                }
+                write(2, buf, len);
         }
         snc.smem.shm[CTL][FLAGS] = PDONE;
 
@@ -163,56 +145,9 @@ void shandler ( int sign )
         ntoh_exit();
 
         strncpy(buf, "\n\t\tX      -----   Inactive   -----      X\n\n", 43);
-        i = 0;
-        while (i < 46)
-        {
-                putc(buf[i++], stderr);
-        }
+        write(2, buf, 43);
+
         exit(sign);
-}
-
-void resizeInt(int ** in, unsigned int * len)
-{
-        if (in == 0 || len == 0 || *in == 0)
-        {
-                return;
-        }
-        int * tmp = 0;
-        tmp = (int *)malloc(sizeof(int) * (*len) * 2);
-        if (tmp == 0)
-        {
-                if (DEBUG)
-                {
-                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
-                        shandler(0);
-                }
-        }
-        memcpy(tmp, (*in), (*len));
-        free(*in);
-        *in = tmp;
-        *len *= 2;
-}
-
-void resizeChar(char ** in, unsigned int * len)
-{
-        if (in == 0 || len == 0 || *in == 0)
-        {
-                return;
-        }
-        char * tmp = 0;
-        tmp = (char *)malloc(sizeof(char) * (*len) * 2);
-        if (tmp == 0)
-        {
-                if (DEBUG)
-                {
-                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
-                        shandler(0);
-                }
-        }
-        memcpy(tmp, (*in), (*len));
-        free(*in);
-        *in = tmp;
-        *len *= 2;
 }
 
 /**
@@ -287,23 +222,25 @@ inline char *get_proto_description ( unsigned short proto )
         }
 }
 
+/**
+ * @brief Writes anything to a dump file in the current directory. Currently unused.
+ */
 void generic_write_data ( void * data )
 {
         if (data == 0 || strlen((const char *)data) < 1)
         {
                 if (DEBUG)
                 {
-                        fprintf( stderr, "No data passed to generic_write_data\n");
+                        write(2, "[e] No data passed to generic_write_data\n", 41);
                 }
                 return;
         }
-        int fd = 0;
 
-        if ( (fd = open ( (const char *)"/home/ernest/research/generic_dump" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
+        if ( (fd = open ( (const char *)"./generic_dump" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error opening data file \"/home/ernest/research/generic_dump\"");
+                        write(2 , "\n[e] Error opening data file \"./generic_dump\"\n", 46);
                 }
                 return;
         }
@@ -313,22 +250,27 @@ void generic_write_data ( void * data )
         return;
 }
 
-
+/**
+ * @brief Writes whatever is currently in the 'hdr_data' global to a file in the current directory. Currently unused.
+ */
 void write_hdr_data ( void )
 {
         if (hdr_data == 0 || strlen((char *)hdr_data) < 1)
         {
+                if (DEBUG)
+                {
+                        write(2 , "\n[e] Nothing to write\n", 22);
+                }
                 return;
         }
-        int fd = 0;
 
         char path [102];
 
-        if ( (fd = open ( (const char *)"/home/ernest/research/hdr_and_sig" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
+        if ( (fd = open ( (const char *)"./hdr_and_sig" , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error opening data file \"/home/ernest/research/hdr_and_sig\"");
+                        write(2 , "\n[e] Error opening data file \"./hdr_and_sig\"\n", 45);
                 }
                 return;
         }
@@ -357,12 +299,12 @@ void write_hdr_data ( void )
         write (fd, "Finger Print:", 13);
         if (snc.mem.sigs == 0 || snc.mem.sigs[(snc.mem.sigs[CTL][POS])] == 0)
         {
-                write(fd, "\nNo fingerprint found\n\0", 22);
+                write(fd, "\nNo fingerprint found\n", 21);
                 close ( fd );
                 pending_more_hdr_data = 0;
                 return;
         }
-        unsigned int i = 0;
+        i = 0;
         while (i < fngPntLen)
         {
                 strncpy (path, "\n", 1);
@@ -422,7 +364,7 @@ void write_hdr_data ( void )
                 {
                         strncat (path, ">    -  ", 8);
                 }
-                unsigned int t = snc.mem.sigs[CTL][POS] - 1;
+                uint16_t t = snc.mem.sigs[CTL][POS] - 1;
                 char * tmp = itoa(snc.mem.sigs[(t > 0 ? t : SIGQTY)][i]);
                 strncat (path, tmp, strlen(tmp));
                 strncat (path, "\n", 1);
@@ -449,13 +391,11 @@ void write_data ( ppeer_info_t info )
                 return;
         }
 
-        int fd = 0;
-
         if ( (fd = open ( info->path , O_CREAT | O_WRONLY | O_APPEND | O_NOFOLLOW , S_IRWXU | S_IRWXG | S_IRWXO )) < 0 )
         {
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error %d writting data to \"%s\": %s" , errno , info->path , strerror( errno ) );
+                        fprintf(stderr , "\n[e] Error %d writting data to \"%s\": %s" , errno , info->path , strerror( errno ) );
                 }
                 return;
         }
@@ -469,19 +409,18 @@ void write_data ( ppeer_info_t info )
 /**
  * @brief Create the firnger print from a HTTP header
  */
-int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int dataLen)
+int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 {
-        if(curPcktData == 0 || dataLen == 0 )
+        if(curPcktData == 0 || dataLen == 0)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "There was not header to parse\n");
+                        write(2, "There was not header to parse\n", 30);
                 }
-
                 return (0);
         }
 
-        unsigned int i = 0;
+        i = 0;
 
         if (DEBUG)
         {
@@ -499,30 +438,30 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
 
         i = 0;
 
-        int cmd = 8;
-        int cmdSet = 0;
-        int proto = 8;
-        int protoSet = 0;
-        unsigned int len = dataLen;   //calculated during parsing
-        int var = 0;
-        int pcnt = 0;
-        int apos = 0;
-        int plus = 0;
-        int cdot = 0;
-        int bckslsh = 0;
-        int oparen = 0;
-        int cparen = 0;
-        int fwrd = 0;
-        int lt = 0;
-        int gt = 0;
-        int qstnmrk = 0;
+        int32_t cmd = 8;
+        int32_t cmdSet = 0;
+        int32_t proto = 8;
+        int32_t protoSet = 0;
+        uint32_t len = dataLen;   //calculated during parsing
+        int32_t var = 0;
+        int32_t pcnt = 0;
+        int32_t apos = 0;
+        int32_t plus = 0;
+        int32_t cdot = 0;
+        int32_t bckslsh = 0;
+        int32_t oparen = 0;
+        int32_t cparen = 0;
+        int32_t fwrd = 0;
+        int32_t lt = 0;
+        int32_t gt = 0;
+        int32_t qstnmrk = 0;
         unsigned char *target = 0;
-        int *fngPnt = malloc(sizeof(int) * fngPntLen);
+        int32_t *fngPnt = malloc(sizeof(int32_t) * fngPntLen);
         if (fngPnt == 0)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory\n");
+                        write(2, "\n\t[e] --- Unable to allocate sufficient memory\n", 47);
                 }
                 shandler(0);
         }
@@ -681,8 +620,8 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
                         pcnt++;
                 }
 
-                else if (qstnmrk == 1 && *target == 38)
-                {        //variable counter
+                else if (qstnmrk == 1 && *target == 38) //variable counter
+                {
                         var++;
                 }
 
@@ -759,6 +698,9 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const unsigned int data
         return (fngPnt);
 }
 
+/**
+ * @brief Function to resize 'hdr_data' global if necessary
+ */
 inline static void resizeHdr(void)
 {
         unsigned char * tmp = 0;
@@ -767,9 +709,9 @@ inline static void resizeHdr(void)
         {
                 if (DEBUG)
                 {
-                        fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
-                        shandler(0);
+                        write(2, "\n\t[e] --- Unable to allocate sufficient memory!\n", 47);
                 }
+                shandler(0);
         }
         memcpy(tmp, hdr_data, hdr_size);
         free(hdr_data);
@@ -777,10 +719,12 @@ inline static void resizeHdr(void)
         hdr_size *= 2;
 }
 
+/**
+ * @brief Function to extract the header from a packet
+ */
 uint8_t extractHttpHdr (const char * udata)
 {
-        unsigned int i = 0;
-        unsigned int j = 0;
+        uint32_t j = 0;
         if (pending_more_hdr_data != 0)
         {
                 j = strlen((const char *)hdr_data);
@@ -792,25 +736,24 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\n\t[e] --- Unable to allocate sufficient memory!\n");
-                                shandler(0);
+                                write(2, "\n\t[e] --- Unable to allocate sufficient memory!\n", 47);
                         }
+                        shandler(0);
                 }
         }
         uint8_t eoh = 1;
-        unsigned int data_len = strlen((const char *)udata);
+        uint32_t data_len = strlen((const char *)udata);
         while (i < data_len && eoh != 0)
         {
                 hdr_data[j++] = udata[i++];
                 /* HERE
-                 * reevaluate this!!! need to dump headers to determine if one of these is right 
-                 * maybe check to see if system is little endian or big endian??
-                 * */
+                 * maybe check to see if system is little endian or big endian?
+                 */
                 if (i > 3 && (udata[i] == 0x0a && udata[i-1] == 0x0d && udata[i-2] == 0x0a && udata[i-3] == 0x0d))
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\n\t[i] --- Found end of header with 0d0a 0d0a\n");
+                                write(2, "\n\t[i] --- Found end of header with 0d0a 0d0a\n", 45);
                         }
                         eoh = 0;
                 }
@@ -818,7 +761,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\n\t[i] --- Found end of header with 0a0d 0a0d\n");
+                                write(2, "\n\t[i] --- Found end of header with 0a0d 0a0d\n", 45);
                         }
                         eoh = 0;
                 }
@@ -826,7 +769,7 @@ uint8_t extractHttpHdr (const char * udata)
                 {
                         if (DEBUG)
                         {
-                                fprintf(stderr, "\n\t[a] --- Resizing header\n");
+                                write(2, "\n\t[a] --- Resizing header\n", 26);
                         }
                         resizeHdr();
                 }
@@ -834,33 +777,25 @@ uint8_t extractHttpHdr (const char * udata)
         return (eoh);
 }
 
+/**
+ * @brief Function to dump Fingerprint and Uniqe tuple to shared memory for pickup by receive and pull
+ */
 inline uint8_t dumpToShm(void)
 {
         if (DEBUG)
         {
                 fprintf(stderr, "\nin dumpToShm, snc.smem.shm[CTL][POS] = %d\n", snc.smem.shm[CTL][POS]);
-                fprintf(stderr, "\nsnc.mem.sigs[above] = %p\n", snc.mem.sigs[(snc.smem.shm[CTL][POS])]);
-                fprintf(stderr, "\nsnc.mem.t5s[above-1] = %p\n", snc.mem.t5s[(snc.smem.shm[CTL][POS])-1]);
-                fprintf(stderr, "\nsnc.smem.shm[above] = %p\n", snc.smem.shm[(snc.smem.shm[CTL][POS])]);
-                fprintf(stderr, "\nsnc.smem.t5shm[above-1] = %p\n", snc.smem.t5shm[(snc.smem.shm[CTL][POS])-1]);
                 fflush(stderr);
         }
         /* try-lock shared memory */
         if (snc.smem.shm[CTL][FLAGS] == CREAD || snc.smem.shm[CTL][FLAGS] == 0)
         {
-
                 snc.smem.shm[CTL][FLAGS] = PWING;
                 /* do the dump to shm routine */
                 while (snc.smem.shm[CTL][POS] != snc.mem.sigs[CTL][POS])
                 {
-                        fprintf(stderr, "start of loop, memcpy 1\n");
-                        fflush(stderr);
                         memcpy((sig_atomic_t *)snc.smem.t5shm[((snc.smem.shm[CTL][POS] - 1))], (sig_atomic_t *)snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1], (sizeof(sig_atomic_t) * t5TplLen));
-                        fprintf(stderr, "start of memcpy 2\n");
-                        fflush(stderr);
                         memcpy((sig_atomic_t *)snc.smem.shm[snc.smem.shm[CTL][POS]], (sig_atomic_t *)snc.mem.sigs[snc.smem.shm[CTL][POS]], (sizeof(sig_atomic_t) * fngPntLen));
-                        fprintf(stderr, "done with memcpys\n");
-                        fflush(stderr);
                         /* unlock shared memory */
                         if ((snc.smem.shm[CTL][PEND]) == 5)
                         {
@@ -874,8 +809,6 @@ inline uint8_t dumpToShm(void)
                                 snc.smem.shm[CTL][PEND] += 1; // pending
                         }
                         inCtr((sig_atomic_t ***)(&snc.smem.shm)); // pos
-                        fprintf(stderr, "end of loop\n");
-                        fflush(stderr);
                 }
                 snc.smem.shm[CTL][FLAGS] = PWTEN;
                 /* reset vars */
@@ -893,6 +826,9 @@ inline uint8_t dumpToShm(void)
         }
 }
 
+/**
+ * @brief Fingerprints header, increments counter, and resets hdr_data
+ */
 inline static void extractSig(void)
 {
         snc.mem.sigs[(snc.mem.sigs[CTL][POS])] = pcktFingerPrint(hdr_data, strlen((const char *)hdr_data));
@@ -900,9 +836,11 @@ inline static void extractSig(void)
         inCtr(&snc.mem.sigs);
 }
 
+/**
+ * @brief Attempts to manually pull source port from a t5tuple string. currently not in use.
+ */
 inline uint32_t getSrcPrt(const char * path)
 {
-        uint32_t i = 0;
         uint32_t len = strlen(path);
         while (path[i] != ':' && i < len)
         {
@@ -916,9 +854,11 @@ inline uint32_t getSrcPrt(const char * path)
         return ((uint32_t)(atoi((char *)(&(path[i])))));
 }
 
+/**
+ * @brief Attempts to manually pull destination port from a t5tuple string. currently not in use.
+ */
 inline uint32_t getDstPrt(const char * path)
 {
-        uint32_t i = 0;
         uint32_t len = strlen(path);
         while (path[i] != ':' && i < len)
         {
@@ -950,7 +890,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
         size_t				size_tcp;
         size_t				size_payload;
         unsigned char		*payload;
-        int					ret;
+        int32_t					ret;
         unsigned int		error;
 
         size_ip = iphdr->ip_hl * 4;
@@ -991,32 +931,20 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
 
         if (pinfo != 0)
         {
-                fprintf(stderr, "srcprt: %d\tdstprt: %d\n", ntohs(tcpt5.sport), ntohs(tcpt5.dport));
-                fflush(stderr);
                 //if (Contains((char *)payload, "HTTP") && (Contains((char *)payload, "GET") || Contains((char *)payload, "POST") || Contains((char *)payload, "HEAD")))
                 if (ntohs(tcpt5.dport) == 80)
                 {
                         pending_more_hdr_data = extractHttpHdr((const char *)(payload));
-                        /* got entire header, dump to shm */
                         if (pending_more_hdr_data == 0)
                         {
-                                /* try lock memory */
                                 size_t l = (strlen((const char *)(pinfo->path)));
-                                uint32_t i = 0;
+                                i = 0;
                                 while (i < l)
                                 {
-                                        /*
-                                        if (DEBUG)
-                                        {
-                                                fprintf(stderr, "(pinfo->path[%d]): %c\n(sig_atomic_t)(pinfo->path[%d]) *(simulated with cast to int): %d\n", i, (pinfo->path[i]), i, (int)(pinfo->path[i]));
-                                                fflush(stderr);
-                                        }
-                                        */
                                         snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1][i] = (sig_atomic_t)(pinfo->path[i]);
                                         i++;
                                 }
                                 snc.mem.t5s[(snc.smem.shm[CTL][POS]) - 1][i] = (sig_atomic_t)((const char)'\0');
-                                /* unlock memory */
                                 if (DEBUG)
                                 {
                                         write(2, "\n\t[i] --- tcp tuple 5 --- ", 27);
@@ -1036,7 +964,7 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                                 {
                                         if (DEBUG)
                                         {
-                                                fprintf(stderr, "\n\tSuccessfully dumped signature to shared memory\n");
+                                                write(2, "\n\tSuccessfully dumped signature to shared memory\n", 49);
                                         }
                                 }
                                 ret = 0;
@@ -1074,8 +1002,8 @@ void send_ipv4_fragment ( struct ip *iphdr , pipv4_dfcallback_t callback )
         ntoh_ipv4_tuple4_t 	ipt4;
         pntoh_ipv4_flow_t 	flow;
         size_t			total_len;
-        int 			ret;
-        unsigned int		error;
+        int32_t 			ret;
+        uint32_t		error;
 
         total_len = ntohs( iphdr->ip_len );
 
@@ -1104,7 +1032,9 @@ void send_ipv4_fragment ( struct ip *iphdr , pipv4_dfcallback_t callback )
         return;
 }
 
-/* TCP Callback */
+/**
+ * @brief TCP callback function
+ */
 void tcp_callback ( pntoh_tcp_stream_t stream , pntoh_tcp_peer_t orig , pntoh_tcp_peer_t dest , pntoh_tcp_segment_t seg , int reason , int extra )
 {
         /* receive data only from the peer given by the user */
@@ -1179,16 +1109,18 @@ void tcp_callback ( pntoh_tcp_stream_t stream , pntoh_tcp_peer_t orig , pntoh_tc
 
         if (DEBUG)
         {
-                fprintf ( stderr , "\n" );
+                write(2, "\n", 1);
         }
 
         return;
 }
 
-/* IPv4 Callback */
+/**
+ * @brief IPv4 callback function
+ */
 void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_tuple4_t tuple , unsigned char *data , size_t len , unsigned short reason )
 {
-        unsigned int i = 0;
+        i = 0;
 
         if (DEBUG)
         {
@@ -1213,48 +1145,49 @@ void ipv4_callback ( pntoh_ipv4_flow_t flow , pntoh_ipv4_tuple4_t tuple , unsign
 
         if (DEBUG)
         {
-                fprintf( stderr, "\n" );
+                write(2, "\n", 1);
         }
 
         return;
 }
 
-int main ( int argc , char *argv[] )
+int main (int argc , char *argv[])
 {
-
         signal( SIGINT, &shandler );
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
-        fprintf( stderr, "\n\t\t######################################" );
-        fprintf( stderr, "\n\t\t#           Dump HTTP Sigs           #" );
-        fprintf( stderr, "\n\t\t# ---------------------------------- #" );
-        fprintf( stderr, "\n\t\t#     Written by Ernest Richards     #" );
-        fprintf( stderr, "\n\t\t#  Based on code from Chema Garcia   #" );
-        fprintf( stderr, "\n\t\t# ---------------------------------- #" );
-        fprintf( stderr, "\n\t\t# Github.com/ernesto341/ais-research #" );
-        fprintf( stderr, "\n\t\t######################################\n" );
-        fprintf( stderr, "\n\t\tX      -----    Active    -----      X\n\n" );
+        write(2, "\n\t\t######################################", 41);
+        write(2, "\n\t\t#           Dump HTTP Sigs           #", 41);
+        write(2, "\n\t\t# ---------------------------------- #", 41);
+        write(2, "\n\t\t#     Written by Ernest Richards     #", 41);
+        write(2, "\n\t\t#  Based on code from Chema Garcia   #", 41);
+        write(2, "\n\t\t# ---------------------------------- #", 41);
+        write(2, "\n\t\t# Github.com/ernesto341/ais-research #", 41);
+        write(2, "\n\t\t######################################\n", 42);
+        write(2, "\n\t\tX      -----    Active    -----      X\n\n", 43);
 
         if (DEBUG)
         {
-                fprintf( stderr, "\n[i] libntoh version: %s\n", ntoh_version() );
+                sprintf(buf, "\n[i] libntoh version: %s\n", ntoh_version());
+                write(2, buf, strlen(buf));
         }
 
         if ( argc < 3 )
         {
-                fprintf( stderr, "\n[+] Usage: %s <options>\n", argv[0] );
-                fprintf( stderr, "\n+ Options:" );
-                fprintf( stderr, "\n\t-i | --iface <val> -----> Interface to read packets from" );
-                fprintf( stderr, "\n\t-f | --file <val> ------> File path to read packets from" );
-                fprintf( stderr, "\n\t-F | --filter <val> ----> Capture filter (must contain \"tcp\" or \"ip\")" );
-                fprintf( stderr, "\n\t-c | --client ----------> Receive client data only");
-                fprintf( stderr, "\n\t-s | --server ----------> Receive server data only\n\n");
-                exit( 1 );
+                sprintf(buf, "\n[+] Usage: %s <options>\n", argv[0]);
+                write(2, buf, strlen(buf));
+                write(2, "\n+ Options:", 11);      // 28
+                write(2, "\n\t-i | --iface <val> -----> Interface to read packets from", 58);
+                write(2, "\n\t-f | --file <val> ------> File path to read packets from", 58);
+                write(2, "\n\t-F | --filter <val> ----> Capture filter (must contain \"tcp\" or \"ip\")", 71);
+                write(2, "\n\t-c | --client ----------> Receive client data only", 52);
+                write(2, "\n\t-s | --server ----------> Receive server data only\n\n", 54);
+                exit(1);
         }
 
         /* parameters parsing */
-        int c = 0;
+        int32_t c = 0;
 
         /* pcap */
         char errbuf[PCAP_ERRBUF_SIZE];
@@ -1267,15 +1200,15 @@ int main ( int argc , char *argv[] )
 
         /* packet dissection */
         struct ip	*ip;
-        unsigned int	error;
+        uint32_t error = 0;
 
         /* extra */
-        unsigned int ipf, tcps;
+        uint32_t ipf, tcps;
 
         /* check parameters */
         while ( c >= 0 )
         {
-                int option_index = 0;
+                int32_t option_index = 0;
                 static struct option long_options[] =
                 {
                         { "iface" , 1 , 0 , 'i' },
@@ -1398,7 +1331,7 @@ int main ( int argc , char *argv[] )
 
         if ((t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen)) < (sig_atomic_t *)0)
         {
-                fprintf(stderr, "Memory\n");
+                write(2, "\n\t[e] --- Unable to allocate sufficient memory\n", 47);
                 fflush(stderr);
                 _exit(-1);
         }

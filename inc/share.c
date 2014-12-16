@@ -10,11 +10,9 @@
 #define DEBUG 1
 #endif
 
-unsigned int i = 0;
-
 inline void dShmids(psnc_t snc)
 {
-        i = 0;
+        uint32_t i = 0;
         while (i < (SIGQTY + 1))
         {
                 shmdt((sig_atomic_t *)snc->smem.shm[i]);
@@ -34,7 +32,7 @@ inline void fData(psnc_t snc)
         {
                 free(hdr_data);
         }
-        i = 0;
+        uint32_t i = 0;
         if (snc->mem.sigs && snc->mem.t5s)
         {
                 while (i < (SIGQTY + 1))
@@ -117,7 +115,7 @@ inline void iData(psnc_t snc)
                 }
                 _exit(-1);
         }
-        i = 0;
+        uint32_t i = 0;
         while (i < (SIGQTY + 1))
         {
                 snc->mem.sigs[i] = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
@@ -164,7 +162,7 @@ inline void iShms(psnc_t snc)
 
 inline void iShmids(psnc_t snc)
 {
-        i = 0;
+        uint32_t i = 0;
         srand(time(NULL));
         snc->smem.shmid = (int32_t *)malloc(sizeof(int32_t) * (SIGQTY + 1));
         snc->smem.t5shmid = (int32_t *)malloc(sizeof(int32_t) * (SIGQTY));
@@ -212,7 +210,7 @@ inline void iShmids(psnc_t snc)
 
 inline void aShmids(psnc_t snc)
 {
-        i = 0;
+        uint32_t i = 0;
         while (i < (SIGQTY + 1))
         {
                 snc->smem.shm[i] = shmat(snc->smem.shmid[i], (void *) 0, 0);
@@ -253,8 +251,8 @@ void initMem(psnc_t snc)
                 aShmids(snc);
 
                 /* initialize some values */
-                i = 0;
-                unsigned int j = 0;
+                uint32_t i = 0;
+                uint32_t j = 0;
                 while (i < SIGQTY + 1)
                 {
                         j = 0;

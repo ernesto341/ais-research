@@ -6,166 +6,166 @@ Class          Percent   Detect Total
 info           0              0      5      
 traversal      0              0      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
+buffer         0.285714       2      7      
 script         0              0      86     
 xss            0              0      40     
 Generation 1
 Class          Percent   Detect Total  
 info           0              0      5      
-traversal      0.216216       8      37     
+traversal      0.0540541      2      37     
 sql            0              0      4      
 buffer         0.285714       2      7      
-script         0              0      86     
-xss            0.025          1      40     
+script         0.0116279      1      86     
+xss            0              0      40     
 Generation 2
 Class          Percent   Detect Total  
 info           0              0      5      
-traversal      0.216216       8      37     
+traversal      0.0540541      2      37     
 sql            0              0      4      
 buffer         0.285714       2      7      
-script         0              0      86     
-xss            0.075          3      40     
+script         0.44186        38     86     
+xss            0              0      40     
 Generation 3
 Class          Percent   Detect Total  
 info           0              0      5      
-traversal      0.216216       8      37     
+traversal      0.0810811      3      37     
 sql            0              0      4      
 buffer         0.285714       2      7      
-script         0              0      86     
-xss            0.85           34     40     
+script         0.44186        38     86     
+xss            0              0      40     
 Generation 4
 Class          Percent   Detect Total  
 info           0              0      5      
-traversal      0.216216       8      37     
-sql            0              0      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0.85           34     40     
+traversal      0.0810811      3      37     
+sql            1              4      4      
+buffer         0.285714       2      7      
+script         0.44186        38     86     
+xss            0              0      40     
 Generation 5
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.216216       8      37     
-sql            0              0      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0.85           34     40     
+info           0.2            1      5      
+traversal      0.189189       7      37     
+sql            1              4      4      
+buffer         0.285714       2      7      
+script         0.44186        38     86     
+xss            0              0      40     
 Generation 6
 Class          Percent   Detect Total  
 info           0.2            1      5      
-traversal      0.432432       16     37     
-sql            0              0      4      
+traversal      0.189189       7      37     
+sql            1              4      4      
 buffer         0.285714       2      7      
-script         0              0      86     
-xss            0.9            36     40     
+script         0.825581       71     86     
+xss            0              0      40     
 Generation 7
 Class          Percent   Detect Total  
 info           0.2            1      5      
-traversal      0.648649       24     37     
-sql            0              0      4      
+traversal      0.621622       23     37     
+sql            1              4      4      
 buffer         0.285714       2      7      
-script         0.523256       45     86     
-xss            0.9            36     40     
+script         0.837209       72     86     
+xss            0              0      40     
 Generation 8
 Class          Percent   Detect Total  
 info           0.2            1      5      
-traversal      0.675676       25     37     
-sql            0              0      4      
+traversal      0.621622       23     37     
+sql            1              4      4      
 buffer         0.285714       2      7      
-script         0.523256       45     86     
-xss            0.9            36     40     
+script         0.848837       73     86     
+xss            0              0      40     
 Generation 9
 Class          Percent   Detect Total  
 info           0.2            1      5      
-traversal      0.675676       25     37     
-sql            0              0      4      
-buffer         0.285714       2      7      
-script         0.523256       45     86     
-xss            0.95           38     40     
+traversal      0.621622       23     37     
+sql            1              4      4      
+buffer         0.571429       4      7      
+script         0.848837       73     86     
+xss            0              0      40     
 Population 1    
 Generation 0
 Class          Percent   Detect Total  
 info           0              0      5      
 traversal      0              0      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0              0      40     
+buffer         0.428571       3      7      
+script         0.325581       28     86     
+xss            0.05           2      40     
 Generation 1
 Class          Percent   Detect Total  
 info           0              0      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0              0      86     
+script         0.325581       28     86     
 xss            0.075          3      40     
 Generation 2
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.0116279      1      86     
+script         0.325581       28     86     
 xss            0.075          3      40     
 Generation 3
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.0116279      1      86     
+script         0.325581       28     86     
 xss            0.075          3      40     
 Generation 4
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.0116279      1      86     
-xss            0.775          31     40     
+script         0.325581       28     86     
+xss            0.075          3      40     
 Generation 5
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.0116279      1      86     
-xss            0.775          31     40     
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0.25           1      4      
+buffer         0.428571       3      7      
+script         0.325581       28     86     
+xss            0.075          3      40     
 Generation 6
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.0116279      1      86     
-xss            0.775          31     40     
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0.25           1      4      
+buffer         0.428571       3      7      
+script         0.337209       29     86     
+xss            0.075          3      40     
 Generation 7
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0              0      4      
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0.25           1      4      
 buffer         0.428571       3      7      
-script         0.0116279      1      86     
-xss            0.65           26     40     
+script         0.337209       29     86     
+xss            0.075          3      40     
 Generation 8
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.162162       6      37     
-sql            0              0      4      
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0.25           1      4      
 buffer         0.428571       3      7      
-script         0.0116279      1      86     
-xss            0.775          31     40     
+script         0.337209       29     86     
+xss            0.1            4      40     
 Generation 9
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.351351       13     37     
+info           0.2            1      5      
+traversal      0.0810811      3      37     
 sql            0.25           1      4      
 buffer         0.571429       4      7      
-script         0.0116279      1      86     
-xss            0.775          31     40     
+script         0.337209       29     86     
+xss            0.1            4      40     
 Population 2    
 Generation 0
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.285714       2      7      
@@ -173,75 +173,75 @@ script         0              0      86
 xss            0              0      40     
 Generation 1
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
-sql            0              0      4      
-buffer         0.142857       1      7      
-script         0.313953       27     86     
+sql            0.75           3      4      
+buffer         0.285714       2      7      
+script         0              0      86     
 xss            0              0      40     
 Generation 2
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
-buffer         0.285714       2      7      
-script         0.313953       27     86     
-xss            0.8            32     40     
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.075          3      40     
 Generation 3
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0              0      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.313953       27     86     
-xss            0.825          33     40     
+script         0              0      86     
+xss            0.075          3      40     
 Generation 4
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0.72973        27     37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.744186       64     86     
-xss            0.825          33     40     
+script         0.0116279      1      86     
+xss            0.075          3      40     
 Generation 5
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0.72973        27     37     
-sql            0              0      4      
+sql            1              4      4      
 buffer         0.571429       4      7      
-script         0.744186       64     86     
-xss            0.875          35     40     
+script         0.0116279      1      86     
+xss            0.075          3      40     
 Generation 6
 Class          Percent   Detect Total  
-info           0              0      5      
+info           0.2            1      5      
 traversal      0.72973        27     37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.744186       64     86     
-xss            0.875          35     40     
+script         0.0116279      1      86     
+xss            0.925          37     40     
 Generation 7
 Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.72973        27     37     
-sql            1              4      4      
-buffer         0.571429       4      7      
-script         0.837209       72     86     
-xss            0.875          35     40     
-Generation 8
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.72973        27     37     
-sql            1              4      4      
-buffer         0.571429       4      7      
-script         0.837209       72     86     
-xss            0.875          35     40     
-Generation 9
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.72973        27     37     
+info           0.2            1      5      
+traversal      0.675676       25     37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.837209       72     86     
+script         0.0116279      1      86     
+xss            0.925          37     40     
+Generation 8
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0.675676       25     37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0.0116279      1      86     
+xss            0.925          37     40     
+Generation 9
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0.675676       25     37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0.0116279      1      86     
 xss            0.925          37     40     
 Population 3    
 Generation 0
@@ -249,709 +249,709 @@ Class          Percent   Detect Total
 info           0              0      5      
 traversal      0              0      37     
 sql            0              0      4      
-buffer         0.142857       1      7      
-script         0              0      86     
-xss            0.025          1      40     
-Generation 1
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0.75           3      4      
-buffer         0.714286       5      7      
-script         0              0      86     
-xss            0.025          1      40     
-Generation 2
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0.75           3      4      
-buffer         0.714286       5      7      
-script         0              0      86     
-xss            0.9            36     40     
-Generation 3
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0.0810811      3      37     
-sql            0.75           3      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 4
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.0810811      3      37     
-sql            0.75           3      4      
-buffer         0.428571       3      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 5
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.0810811      3      37     
-sql            0.75           3      4      
-buffer         0.428571       3      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 6
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.0810811      3      37     
-sql            0.75           3      4      
-buffer         0.428571       3      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 7
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.351351       13     37     
-sql            0.75           3      4      
-buffer         0.428571       3      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 8
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.351351       13     37     
-sql            0.75           3      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0.975          39     40     
-Generation 9
-Class          Percent   Detect Total  
-info           0.2            1      5      
-traversal      0.351351       13     37     
-sql            1              4      4      
-buffer         0.571429       4      7      
-script         0              0      86     
-xss            0.975          39     40     
-Population 4    
-Generation 0
-Class          Percent   Detect Total  
-info           0              0      5      
-traversal      0              0      37     
-sql            0              0      4      
-buffer         0.571429       4      7      
+buffer         0.285714       2      7      
 script         0              0      86     
 xss            0              0      40     
 Generation 1
 Class          Percent   Detect Total  
 info           0              0      5      
-traversal      0              0      37     
+traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.05           2      40     
+buffer         0.285714       2      7      
+script         0              0      86     
+xss            0.075          3      40     
 Generation 2
 Class          Percent   Detect Total  
 info           0              0      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
 buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.7            28     40     
+script         0              0      86     
+xss            0.125          5      40     
+Generation 3
+Class          Percent   Detect Total  
+info           0              0      5      
+traversal      0.0810811      3      37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.3            12     40     
+Generation 4
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0              0      37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.3            12     40     
+Generation 5
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0              0      37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.3            12     40     
+Generation 6
+Class          Percent   Detect Total  
+info           0              0      5      
+traversal      0              0      37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.925          37     40     
+Generation 7
+Class          Percent   Detect Total  
+info           0              0      5      
+traversal      0.0810811      3      37     
+sql            0              0      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.925          37     40     
+Generation 8
+Class          Percent   Detect Total  
+info           0              0      5      
+traversal      0.0810811      3      37     
+sql            1              4      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.925          37     40     
+Generation 9
+Class          Percent   Detect Total  
+info           0              0      5      
+traversal      0.0810811      3      37     
+sql            1              4      4      
+buffer         0.571429       4      7      
+script         0              0      86     
+xss            0.925          37     40     
+Population 4    
+Generation 0
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0              0      37     
+sql            0              0      4      
+buffer         0.142857       1      7      
+script         0              0      86     
+xss            0.025          1      40     
+Generation 1
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0              0      4      
+buffer         0.142857       1      7      
+script         0              0      86     
+xss            0.025          1      40     
+Generation 2
+Class          Percent   Detect Total  
+info           0.2            1      5      
+traversal      0.0810811      3      37     
+sql            0              0      4      
+buffer         1              7      7      
+script         0              0      86     
+xss            0.025          1      40     
 Generation 3
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.675          27     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.025          1      40     
 Generation 4
 Class          Percent   Detect Total  
 info           0.2            1      5      
-traversal      0.0810811      3      37     
+traversal      0.135135       5      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.95           38     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.025          1      40     
 Generation 5
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.975          39     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.125          5      40     
 Generation 6
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.975          39     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.125          5      40     
 Generation 7
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.302326       26     86     
-xss            0.975          39     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.725          29     40     
 Generation 8
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.325581       28     86     
-xss            0.975          39     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.05           2      40     
 Generation 9
 Class          Percent   Detect Total  
 info           0.2            1      5      
 traversal      0.0810811      3      37     
 sql            0              0      4      
-buffer         0.571429       4      7      
-script         0.325581       28     86     
-xss            0.975          39     40     
+buffer         1              7      7      
+script         0              0      86     
+xss            0.8            32     40     
 Overall classification stats for Population 0
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.571429  0         0         
-1    0         0.216216  0         0.285714  0         0.025     
-2    0         0.216216  0         0.285714  0         0.075     
-3    0         0.216216  0         0.285714  0         0.85      
-4    0         0.216216  0         0.571429  0         0.85      
-5    0         0.216216  0         0.571429  0         0.85      
-6    0.2       0.432432  0         0.285714  0         0.9       
-7    0.2       0.648649  0         0.285714  0.523256  0.9       
-8    0.2       0.675676  0         0.285714  0.523256  0.9       
-9    0.2       0.675676  0         0.285714  0.523256  0.95      
+0    0         0         0         0.285714  0         0         
+1    0         0.0540541 0         0.285714  0.0116279 0         
+2    0         0.0540541 0         0.285714  0.44186   0         
+3    0         0.0810811 0         0.285714  0.44186   0         
+4    0         0.0810811 1         0.285714  0.44186   0         
+5    0.2       0.189189  1         0.285714  0.44186   0         
+6    0.2       0.189189  1         0.285714  0.825581  0         
+7    0.2       0.621622  1         0.285714  0.837209  0         
+8    0.2       0.621622  1         0.285714  0.848837  0         
+9    0.2       0.621622  1         0.571429  0.848837  0         
 Overall classification stats for Population 1
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.571429  0         0         
-1    0         0         0         0.571429  0         0.075     
-2    0         0         0         0.571429  0.0116279 0.075     
-3    0         0         0         0.571429  0.0116279 0.075     
-4    0         0         0         0.571429  0.0116279 0.775     
-5    0         0         0         0.571429  0.0116279 0.775     
-6    0         0         0         0.571429  0.0116279 0.775     
-7    0         0         0         0.428571  0.0116279 0.65      
-8    0         0.162162  0         0.428571  0.0116279 0.775     
-9    0         0.351351  0.25      0.571429  0.0116279 0.775     
+0    0         0         0         0.428571  0.325581  0.05      
+1    0         0         0         0.571429  0.325581  0.075     
+2    0.2       0         0         0.571429  0.325581  0.075     
+3    0.2       0         0         0.571429  0.325581  0.075     
+4    0.2       0         0         0.571429  0.325581  0.075     
+5    0.2       0.0810811 0.25      0.428571  0.325581  0.075     
+6    0.2       0.0810811 0.25      0.428571  0.337209  0.075     
+7    0.2       0.0810811 0.25      0.428571  0.337209  0.075     
+8    0.2       0.0810811 0.25      0.428571  0.337209  0.1       
+9    0.2       0.0810811 0.25      0.571429  0.337209  0.1       
 Overall classification stats for Population 2
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.285714  0         0         
-1    0         0         0         0.142857  0.313953  0         
-2    0         0         0         0.285714  0.313953  0.8       
-3    0         0         0         0.571429  0.313953  0.825     
-4    0         0.72973   0         0.571429  0.744186  0.825     
-5    0         0.72973   0         0.571429  0.744186  0.875     
-6    0         0.72973   0         0.571429  0.744186  0.875     
-7    0         0.72973   1         0.571429  0.837209  0.875     
-8    0         0.72973   1         0.571429  0.837209  0.875     
-9    0         0.72973   0         0.571429  0.837209  0.925     
+0    0.2       0         0         0.285714  0         0         
+1    0.2       0         0.75      0.285714  0         0         
+2    0.2       0         0         0.571429  0         0.075     
+3    0.2       0         0         0.571429  0         0.075     
+4    0.2       0.72973   0         0.571429  0.0116279 0.075     
+5    0.2       0.72973   1         0.571429  0.0116279 0.075     
+6    0.2       0.72973   0         0.571429  0.0116279 0.925     
+7    0.2       0.675676  0         0.571429  0.0116279 0.925     
+8    0.2       0.675676  0         0.571429  0.0116279 0.925     
+9    0.2       0.675676  0         0.571429  0.0116279 0.925     
 Overall classification stats for Population 3
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.142857  0         0.025     
-1    0         0         0.75      0.714286  0         0.025     
-2    0         0         0.75      0.714286  0         0.9       
-3    0         0.0810811 0.75      0.571429  0         0.975     
-4    0.2       0.0810811 0.75      0.428571  0         0.975     
-5    0.2       0.0810811 0.75      0.428571  0         0.975     
-6    0.2       0.0810811 0.75      0.428571  0         0.975     
-7    0.2       0.351351  0.75      0.428571  0         0.975     
-8    0.2       0.351351  0.75      0.571429  0         0.975     
-9    0.2       0.351351  1         0.571429  0         0.975     
+0    0         0         0         0.285714  0         0         
+1    0         0.0810811 0         0.285714  0         0.075     
+2    0         0.0810811 0         0.571429  0         0.125     
+3    0         0.0810811 0         0.571429  0         0.3       
+4    0.2       0         0         0.571429  0         0.3       
+5    0.2       0         0         0.571429  0         0.3       
+6    0         0         0         0.571429  0         0.925     
+7    0         0.0810811 0         0.571429  0         0.925     
+8    0         0.0810811 1         0.571429  0         0.925     
+9    0         0.0810811 1         0.571429  0         0.925     
 Overall classification stats for Population 4
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.571429  0         0         
-1    0         0         0         0.571429  0.302326  0.05      
-2    0         0.0810811 0         0.571429  0.302326  0.7       
-3    0.2       0.0810811 0         0.571429  0.302326  0.675     
-4    0.2       0.0810811 0         0.571429  0.302326  0.95      
-5    0.2       0.0810811 0         0.571429  0.302326  0.975     
-6    0.2       0.0810811 0         0.571429  0.302326  0.975     
-7    0.2       0.0810811 0         0.571429  0.302326  0.975     
-8    0.2       0.0810811 0         0.571429  0.325581  0.975     
-9    0.2       0.0810811 0         0.571429  0.325581  0.975     
+0    0.2       0         0         0.142857  0         0.025     
+1    0.2       0.0810811 0         0.142857  0         0.025     
+2    0.2       0.0810811 0         1         0         0.025     
+3    0.2       0.0810811 0         1         0         0.025     
+4    0.2       0.135135  0         1         0         0.025     
+5    0.2       0.0810811 0         1         0         0.125     
+6    0.2       0.0810811 0         1         0         0.125     
+7    0.2       0.0810811 0         1         0         0.725     
+8    0.2       0.0810811 0         1         0         0.05      
+9    0.2       0.0810811 0         1         0         0.8       
 Average accuracy over all populations.
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.428571  0         0.005     
-1    0         0.0432432 0.15      0.457143  0.123256  0.035     
-2    0         0.0594595 0.15      0.485714  0.125581  0.51      
-3    0.04      0.0756757 0.15      0.514286  0.125581  0.68      
-4    0.08      0.221622  0.15      0.542857  0.211628  0.875     
-5    0.08      0.221622  0.15      0.542857  0.211628  0.89      
-6    0.12      0.264865  0.15      0.485714  0.211628  0.9       
-7    0.12      0.362162  0.35      0.457143  0.334884  0.875     
-8    0.12      0.4       0.35      0.485714  0.339535  0.9       
-9    0.12      0.437838  0.25      0.514286  0.339535  0.92      
+0    0.08      0         0         0.285714  0.0651163 0.015     
+1    0.08      0.0432432 0.15      0.314286  0.0674419 0.035     
+2    0.12      0.0432432 0         0.6       0.153488  0.06      
+3    0.12      0.0486486 0         0.6       0.153488  0.095     
+4    0.16      0.189189  0.2       0.6       0.155814  0.095     
+5    0.2       0.216216  0.45      0.571429  0.155814  0.115     
+6    0.16      0.216216  0.25      0.571429  0.234884  0.41      
+7    0.16      0.308108  0.25      0.571429  0.237209  0.53      
+8    0.16      0.308108  0.45      0.571429  0.239535  0.4       
+9    0.16      0.308108  0.45      0.657143  0.239535  0.55      
 Best accuracy over all populations.
 Gen  info      traversal sql       buffer    script    xss       
-0    0         0         0         0.571429  0         0.025     
-1    0         0.216216  0.75      0.714286  0.313953  0.075     
-2    0         0.216216  0.75      0.714286  0.313953  0.9       
-3    0.2       0.216216  0.75      0.571429  0.313953  0.975     
-4    0.2       0.72973   0.75      0.571429  0.744186  0.975     
-5    0.2       0.72973   0.75      0.571429  0.744186  0.975     
-6    0.2       0.72973   0.75      0.571429  0.744186  0.975     
-7    0.2       0.72973   1         0.571429  0.837209  0.975     
-8    0.2       0.72973   1         0.571429  0.837209  0.975     
-9    0.2       0.72973   1         0.571429  0.837209  0.975     
+0    0.2       0         0         0.428571  0.325581  0.05      
+1    0.2       0.0810811 0.75      0.571429  0.325581  0.075     
+2    0.2       0.0810811 0         1         0.44186   0.125     
+3    0.2       0.0810811 0         1         0.44186   0.3       
+4    0.2       0.72973   1         1         0.44186   0.3       
+5    0.2       0.72973   1         1         0.44186   0.3       
+6    0.2       0.72973   1         1         0.825581  0.925     
+7    0.2       0.675676  1         1         0.837209  0.925     
+8    0.2       0.675676  1         1         0.848837  0.925     
+9    0.2       0.675676  1         1         0.848837  0.925     
 
 Champions population statistics:
 
 Class 1:
-	1 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 13(0) 0(0) 4(2) 7(1) +0(0) 0(0) 2(5) 0(0) 0(0) +5(0) +6(3) 7(1) 6(1) 
+	1 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +14(0) +10(0) 0(0) +3(2) +0(0) 0(0) +6(0) +1(4) 0(0) 0(0) +0(1) +3(2) +1(2) 0(0) 
 
-	2 -   Fit: -0.000187635 (10841 0 1 10656 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +494(111) 0(0) 0(0) +1(3) +6(3) 0(0) 0(0) 0(0) +6(0) 0(0) 0(0) 0(0) 
+	2 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) +9(0) 116(27) +3(1) +11(0) 0(0) +4(1) +9(1) 0(0) 4(2) +5(0) +0(0) +0(0) 0(0) 
 
-	3 -   Fit: 0.0111732 (10841 1 0 10657 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     4(0) 0(0) 0(0) 0(0) 5(6) 4(2) 0(0) +12(2) 0(0) 4(2) +0(0) 0(0) 5(3) +6(3) 
+	3 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +12(0) 0(0) +475(154) +0(0) +3(15) 0(0) +5(2) 0(0) 7(3) 0(0) 0(0) 5(0) 5(0) 0(0) 
 
-	4 -   Fit: 0.0111732 (10841 1 0 10657 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 186(56) 0(3) 0(0) 1(0) 0(0) +14(0) 0(0) 0(0) +3(0) 6(1) 0(0) +6(3) 
+	4 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +14(0) 15(0) +0(0) +6(2) +0(0) 0(0) +1(0) 0(0) 0(0) 6(3) 0(0) 0(0) 0(0) 0(0) 
 
-	5 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +10(0) 0(0) 0(0) 0(0) 0(0) +6(1) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 6(1) 
+	5 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +5(0) 0(0) 7(2) +0(0) 1(2) 0(0) 0(0) +5(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	6 -   Fit: 0.0107978 (10841 1 2 10655 178)  Cat: (1 0.2) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +14(0) 0(0) 0(0) 0(0) 0(0) +0(0) 5(2) 6(1) 0(0) 0(0) 2(0) 1(0) 0(0) 4(1) 
+	6 -   Fit: 0.0111732 (10811 1 0 10627 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +10(2) 0(0) 0(0) 0(0) +5(3) +7(3) 0(0) 
 
-	7 -   Fit: 0.0111732 (10841 1 0 10657 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 15(0) 0(0) 0(0) 0(0) 4(1) 0(0) +0(0) 0(0) 6(2) +0(0) +7(0) 2(1) 0(0) 
+	7 -   Fit: 0.368715 (10811 33 0 10627 146)  Cat: (0 0) (0 0) (1 0.25) (1 0.142857) (0 0) (31 0.775) 
+     0(0) 0(0) 282(24) 0(0) 0(0) 0(0) 0(1) +2(4) 0(0) 0(0) 0(0) 0(0) 0(0) +3(2) 
 
-	8 -   Fit: 0.625698 (10841 56 0 10657 123)  Cat: (0 0) (17 0.459459) (0 0) (1 0.142857) (38 0.44186) (0 0) 
-     0(0) 8(0) 0(0) 4(3) 0(0) 1(0) 7(3) +10(4) 4(2) 0(0) +0(0) +0(1) 0(0) 0(0) 
+	8 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +3(0) 0(0) 0(0) 0(0) 0(0) +2(1) 0(0) 0(0) +4(1) +0(3) +6(3) 0(0) +0(2) 
 
-	9 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) 414(228) 0(0) 0(0) 0(0) 7(1) 0(0) 0(0) 0(0) +0(0) 1(2) +6(0) 0(0) 
+	9 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +3(0) 0(0) +0(0) +5(8) 0(0) 6(2) 0(0) +5(1) 0(0) +0(0) +6(2) 0(0) 0(0) 
 
-	10 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 9(0) 0(0) 0(0) 0(0) 0(0) 5(2) 7(5) 0(0) 2(1) +5(3) 0(0) +0(0) 0(0) 
+	10 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +6(1) +0(1) +5(2) 0(0) 0(0) 0(0) +2(2) +3(1) +0(1) 0(0) 
 
-	11 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 0(0) 0(0) 0(0) 3(3) 0(0) 0(0) +0(0) 0(0) +3(0) 5(0) +4(3) 7(3) 0(0) 
+	11 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +7(0) +311(220) 2(1) 0(0) 0(0) 0(0) +7(0) 3(2) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	12 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 13(0) 0(0) 4(2) 7(1) 1(0) 0(0) +0(0) 0(0) +1(2) 0(0) +5(3) 2(0) 7(0) 
+	12 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     7(0) +12(0) +393(30) 0(0) 0(0) 3(3) 0(0) +5(3) 0(0) 0(0) 0(0) 0(0) 1(2) 0(0) 
 
-	13 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +6(0) 0(0) 0(0) +12(1) 0(0) +5(0) 0(0) +2(3) +2(2) +4(1) +0(3) 0(0) +2(0) 
+	13 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +12(0) 10(0) 0(0) 0(0) +0(0) 0(0) 4(2) 0(0) 0(0) 0(0) +2(0) 0(0) 0(0) +4(3) 
 
-	14 -   Fit: 0.0109856 (10841 1 1 10656 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 0(0) 17(0) 0(0) +4(0) +13(2) 3(3) +2(2) +7(1) 0(0) 0(0) 0(0) 
+	14 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) 0(0) 266(234) 0(0) +12(2) 0(0) 0(0) 12(4) 0(0) 0(0) +0(2) 3(1) 4(2) +5(0) 
 
-	15 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 13(0) 0(0) 4(2) 7(1) 1(0) 0(0) +0(0) 0(0) 1(2) +5(0) +4(3) 7(3) 0(0) 
+	15 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) +2(0) 0(0) 0(0) +7(9) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	16 -   Fit: 0.0111732 (10841 1 0 10657 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 394(56) 0(0) 0(0) +0(3) 6(0) +10(2) 1(2) 0(0) +6(3) +4(2) 0(0) +6(2) 
+	16 -   Fit: -0.000376344 (10811 0 2 10625 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +7(0) +12(0) +311(220) +2(1) 0(0) 0(0) 0(0) +7(0) +3(2) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	17 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +14(0) 0(0) 0(0) 0(0) +0(0) +6(1) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +6(1) 
+	17 -   Fit: 0.0780241 (10811 7 1 10626 172)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (3 0.0348837) (2 0.05) 
+     +9(0) +10(0) 0(0) 0(0) +10(15) 0(0) 0(0) 0(0) +1(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	18 -   Fit: -0.000187635 (10841 0 1 10656 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 9(0) +0(0) 0(0) 0(0) 0(0) 5(2) 7(5) 0(0) 2(1) +5(3) 0(0) +0(0) 0(0) 
+	18 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +7(0) +393(30) 0(0) 0(0) +3(3) 0(0) +5(3) 0(0) 0(0) 0(0) 0(0) +1(2) 0(0) 
 
-	19 -   Fit: 0.0111732 (10841 1 0 10657 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 414(228) 0(0) 0(0) 0(0) 7(1) +0(0) 0(0) 0(0) 0(0) 1(2) +6(0) 0(0) 
+	19 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +5(0) 0(0) +7(2) 0(0) +1(2) 0(0) 0(0) +7(3) 0(0) +1(0) +0(1) +1(0) 0(0) 
 
-	20 -   Fit: -0.000187635 (10841 0 1 10656 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +47(26) 0(2) 0(0) 0(0) 0(0) 0(0) 0(0) +2(1) +0(0) +6(3) 7(1) 6(1) 
+	20 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +14(0) +10(0) 0(0) +3(2) 0(0) 0(0) +6(0) +1(4) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 
 
-	21 -   Fit: -0.000187635 (10841 0 1 10656 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     5(0) 0(0) +477(21) 0(0) 0(0) 0(0) 0(0) 13(2) 3(3) +2(2) +7(1) +0(0) 0(0) 0(0) 
+	21 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +12(0) +10(0) 0(0) 0(0) 0(0) 0(0) +4(2) 0(0) 0(0) 0(0) +2(0) +3(1) +4(2) +5(0) 
 
-	22 -   Fit: 0.0446928 (10841 4 0 10657 175)  Cat: (0 0) (3 0.0810811) (0 0) (1 0.142857) (0 0) (0 0) 
-     4(0) 0(0) 0(0) 0(0) 5(6) 4(2) 0(0) +12(2) 0(0) 4(2) +0(0) +6(1) 0(0) +6(3) 
+	22 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +266(234) 0(0) +12(2) 0(0) 0(0) +12(4) 0(0) 0(0) +0(2) 0(0) 0(0) +4(3) 
 
-	23 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +15(0) 0(0) 0(0) 0(0) +4(1) 0(0) 0(0) 0(0) +6(2) 0(0) +0(1) 0(0) 0(0) 
+	23 -   Fit: 0.010985 (10811 1 1 10626 178)  Cat: (1 0.2) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +14(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(3) 0(0) +1(2) 0(0) 0(0) 
 
-	24 -   Fit: 0 (10841 0 0 10657 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 8(0) 0(0) 4(3) 0(0) 1(0) 7(3) +10(4) 4(2) 0(0) +0(0) +7(0) 2(1) 0(0) 
+	24 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +282(24) 0(0) 0(0) 0(0) +0(1) +2(4) 0(0) 0(0) +0(0) 0(0) 0(0) +3(2) 
 
-	25 -   Fit: -0.000187635 (10841 0 1 10656 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +186(56) 0(3) +0(0) 1(0) 0(0) 14(0) 0(0) 0(0) +3(0) 0(0) +5(3) 6(3) 
+	25 -   Fit: 0 (10811 0 0 10627 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +10(0) 0(0) 0(0) +26(1) 0(0) +6(2) 0(0) +5(1) 0(0) 0(0) +6(2) 0(0) 0(0) 
 
 
 Class 2:
-	1 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +6(0) 0(0) 0(0) +16(4) 0(0) 0(0) +4(1) +2(3) +0(3) 0(0) +6(2) 0(0) +0(3) 
+	1 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +4(0) +226(65) 5(1) 0(0) 0(0) 7(2) 11(4) 0(1) 2(3) 0(0) 0(0) 0(0) 0(0) 
 
-	2 -   Fit: 0.0111732 (10765 1 0 10549 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(2) 0(0) 0(0) 0(0) +7(1) 0(0) 0(0) 
+	2 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     11(0) +0(0) +363(162) 0(0) 15(9) 4(0) 0(0) 0(0) 2(1) 0(0) 5(2) 1(2) 0(0) 0(0) 
 
-	3 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     2(0) +0(0) +133(128) 0(0) 0(0) 4(3) 4(2) 6(3) 4(0) 0(0) +7(0) 0(0) 4(0) 2(3) 
+	3 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +8(0) 0(0) 0(0) +7(2) 0(0) 0(0) +2(3) 0(0) +7(1) +7(1) 4(1) +4(3) 0(0) 0(0) 
 
-	4 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +4(0) +278(165) 0(0) 0(0) 0(0) 0(0) 5(3) 0(1) 0(0) +0(0) 0(0) 0(0) 4(2) 
+	4 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) 0(0) 21(153) +4(2) 17(14) 0(0) +0(0) 0(0) +0(0) +5(3) 0(0) +0(1) 0(0) 0(0) 
 
-	5 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +14(0) +8(0) 0(0) 0(0) 0(0) +5(1) +4(1) +9(3) 0(0) 0(0) +4(2) 0(0) 0(0) +7(2) 
+	5 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +7(0) 0(0) +6(1) 0(0) +0(2) +5(3) +12(0) 0(0) 0(0) +6(2) 0(0) 0(0) 0(0) 
 
-	6 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     2(0) +0(0) +0(0) 0(0) 0(0) 0(0) 0(0) 11(4) 0(0) 0(0) 0(0) 0(0) 0(0) 7(1) 
+	6 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +14(0) +324(75) +7(1) 0(0) +7(2) 0(0) 0(0) +7(2) 0(0) 0(0) 0(0) +2(0) +3(2) 
 
-	7 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +430(231) 0(0) 0(0) +2(3) 0(0) 0(0) 0(0) 0(0) 0(0) +4(1) +4(0) 0(0) 
+	7 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +22(2) 0(0) +2(0) 7(7) 7(2) 4(1) 0(0) 0(0) 0(0) +1(0) 
 
-	8 -   Fit: 0.0335195 (10765 3 0 10549 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
-     5(0) 0(0) +184(154) 7(2) 0(0) +0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) +0(1) 4(2) 
+	8 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +29(13) 1(1) +3(1) 0(0) 7(1) 0(0) 0(0) 0(0) 0(0) +1(1) 
 
-	9 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 0(1) 0(0) 0(0) 0(0) 4(0) 2(3) 
+	9 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +6(0) +13(0) 0(0) 0(0) +20(13) 0(0) +2(2) +10(2) +3(3) +6(1) 0(0) 0(0) 0(0) 0(0) 
 
-	10 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	10 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 7(0) 0(0) 0(0) 0(0) +1(0) +3(1) 0(0) 0(0) 0(0) 0(0) 4(1) 0(0) 0(0) 
 
-	11 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +0(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	11 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +5(0) +69(78) +0(2) 0(0) +7(1) 0(0) +2(4) +0(3) +7(2) 0(0) 0(0) 0(0) +4(1) 
 
-	12 -   Fit: 0.0111732 (10765 1 0 10549 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) +10(0) +278(165) 0(0) 0(0) 0(0) 0(0) +5(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	12 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +2(0) +317(60) 0(0) 3(0) 0(0) +6(0) 0(0) 0(0) 0(0) 0(2) 4(0) 0(0) 0(0) 
 
-	13 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     15(0) +0(0) 0(0) 0(0) 0(0) 4(3) 4(2) +7(4) 0(0) 0(0) 0(0) 0(0) 0(0) 7(1) 
+	13 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     1(0) +1(0) +445(2) 4(1) +6(13) 0(0) +6(3) +0(0) 4(1) 0(0) 0(0) +0(0) +3(3) +3(2) 
 
-	14 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +0(0) 222(120) 0(0) 0(0) 1(2) 0(0) +10(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	14 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +0(0) +194(54) 0(0) +8(2) 0(0) +0(0) +4(0) 0(0) 0(0) 0(0) +7(1) +0(0) +4(0) 
 
-	15 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	15 -   Fit: 0.0111732 (10913 1 0 10697 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) 0(0) 0(0) +7(2) +4(3) +0(0) +5(2) 
 
-	16 -   Fit: 0.726257 (10765 65 0 10549 114)  Cat: (0 0) (21 0.567568) (0 0) (0 0) (44 0.511628) (0 0) 
-     10(0) +2(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	16 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +29(13) 1(1) +3(1) 0(0) 7(1) 0(0) 0(0) 0(0) +0(0) 1(0) 
 
-	17 -   Fit: 0.0335195 (10765 3 0 10549 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) +0(0) 0(0) 
+	17 -   Fit: 0.0335195 (10913 3 0 10697 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +7(0) +82(216) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(2) +4(0) 0(0) 0(0) 
 
-	18 -   Fit: 0.167598 (10765 15 0 10549 164)  Cat: (0 0) (13 0.351351) (0 0) (1 0.142857) (1 0.0116279) (0 0) 
-     0(0) 0(0) 222(120) 0(0) 0(0) +1(2) 0(0) +11(4) +0(0) 0(0) 0(0) 0(0) 0(0) 7(1) 
+	18 -   Fit: 0.0111732 (10913 1 0 10697 178)  Cat: (0 0) (0 0) (0 0) (0 0) (1 0.0116279) (0 0) 
+     0(0) 0(0) 194(54) 0(0) +8(2) +0(3) +3(1) 0(0) +0(0) 0(0) 0(0) 4(1) 0(0) 0(0) 
 
-	19 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	19 -   Fit: 0.0335195 (10913 3 0 10697 176)  Cat: (0 0) (0 0) (0 0) (3 0.428571) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +4(7) +2(1) +5(1) +1(2) +1(2) 0(0) +1(3) 
 
-	20 -   Fit: 0 (10765 0 0 10549 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     15(0) +0(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	20 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +2(0) +317(60) 0(0) 3(0) 0(0) +6(3) 0(0) +3(3) +0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	21 -   Fit: 0.156425 (10765 14 0 10549 165)  Cat: (0 0) (13 0.351351) (0 0) (0 0) (1 0.0116279) (0 0) 
-     0(0) +6(0) 0(0) 0(0) 0(0) 0(0) 0(0) +11(4) 0(0) 0(0) 0(0) 0(0) 0(0) 7(1) 
+	21 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     11(0) +0(0) +363(163) 5(1) 0(0) 0(0) +7(2) 11(4) +0(1) +2(3) 0(0) 0(0) 0(0) 0(0) 
 
-	22 -   Fit: 0.0335195 (10765 3 0 10549 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
-     +5(0) 0(0) 184(154) 7(2) 0(0) +0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) +0(0) 0(0) 
+	22 -   Fit: 0.0111732 (10913 1 0 10697 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 2(0) 0(0) 0(0) 1(2) 6(0) +0(1) 0(0) 0(0) 3(3) 0(3) 0(0) 0(0) +7(0) 
 
-	23 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 4(0) 0(0) 7(0) 0(0) 0(0) 4(2) 
+	23 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +1(0) +1(0) +445(2) +4(1) +6(13) 0(0) +6(3) +4(0) 0(0) 0(0) 0(0) +6(1) 0(0) +4(0) 
 
-	24 -   Fit: 0.0558659 (10765 5 0 10549 174)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (2 0.0232558) (0 0) 
-     2(0) 0(0) +133(128) 2(3) 5(4) 0(0) 3(1) 0(0) +1(2) 0(0) 0(0) +2(0) 0(0) 7(1) 
+	24 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +21(153) +5(2) 0(0) 0(0) +2(3) 0(0) +7(1) +7(1) +4(1) +4(3) 0(0) 0(0) 
 
-	25 -   Fit: 0.77095 (10765 69 0 10549 110)  Cat: (0 0) (23 0.621622) (0 0) (1 0.142857) (45 0.523256) (0 0) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 4(3) 4(2) +6(3) 0(1) 0(0) 0(0) 0(0) 4(0) 2(3) 
+	25 -   Fit: 0 (10913 0 0 10697 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +0(0) 0(0) +0(0) +0(0) +0(0) 0(0) +4(1) 0(0) 0(0) 0(0) 3(3) 3(2) 
 
 
 Class 3:
-	1 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +4(0) 1(0) 0(0) 0(0) 11(10) +2(0) 0(0) 0(0) 3(3) 7(3) 0(0) 6(0) 1(3) 0(0) 
+	1 -   Fit: 0.0111732 (10846 1 0 10663 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     14(0) 12(0) 0(0) 7(2) 0(0) 0(0) 0(0) +14(4) 0(0) +1(2) +6(3) +0(0) 0(0) 0(0) 
 
-	2 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 7(0) 0(0) 0(0) 4(3) +2(0) 0(0) 0(0) 3(0) 1(1) 7(0) 0(0) 0(0) 0(0) 
+	2 -   Fit: 0.0111732 (10846 1 0 10663 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +14(1) 3(2) +3(3) +2(1) +7(2) 0(0) 1(2) 
 
-	3 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +4(0) +7(0) 0(0) 0(0) 4(3) +0(0) 0(0) 10(1) 0(0) 0(0) 0(0) 4(3) 0(0) 2(0) 
+	3 -   Fit: 0.0554908 (10846 5 2 10661 174)  Cat: (0 0) (0 0) (3 0.75) (0 0) (1 0.0116279) (1 0.025) 
+     0(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) +0(1) 5(3) 4(1) 0(0) +0(0) 
 
-	4 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) +0(0) 48(254) 0(0) 7(9) +2(0) 0(0) 0(0) 0(2) 0(0) 0(0) 0(0) 0(0) 4(1) 
+	4 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     1(0) 3(0) 0(0) 0(0) 0(0) +6(0) 0(0) 0(0) 0(0) +6(0) 0(0) 0(0) 3(0) +4(1) 
 
-	5 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 3(0) 440(154) 0(0) 0(0) +1(1) 0(0) 14(5) +4(2) 0(0) 0(0) 0(0) 0(0) 4(1) 
+	5 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     14(0) 0(0) 0(0) 0(0) 0(0) +1(2) 0(0) 0(0) 0(0) 5(3) 0(0) 0(1) +5(0) 4(1) 
 
-	6 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 0(0) 0(0) 0(0) 4(3) +2(0) 0(0) 0(0) +0(2) 0(0) 1(0) 0(0) 5(0) 1(1) 
+	6 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 21(11) +0(0) 2(1) 12(5) 0(0) 0(0) 0(0) 0(0) +6(0) 0(0) 
 
-	7 -   Fit: 0.0446928 (10925 4 0 10742 175)  Cat: (0 0) (3 0.0810811) (0 0) (1 0.142857) (0 0) (0 0) 
-     +1(0) 0(0) 0(0) 0(0) +2(15) +0(1) 0(0) +15(3) +3(3) +0(3) 0(0) 0(0) 0(0) 0(0) 
+	7 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     4(0) +0(0) 0(0) 0(0) +4(11) 1(0) 7(1) +0(0) 0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 
 
-	8 -   Fit: 0.357356 (10925 32 1 10741 147)  Cat: (0 0) (2 0.0540541) (0 0) (1 0.142857) (29 0.337209) (0 0) 
-     0(0) +7(0) 0(0) 0(0) +16(10) 0(0) 2(1) 0(0) 0(0) 0(0) 0(0) 0(0) 2(0) 0(0) 
+	8 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +5(0) 0(0) 0(0) +3(6) 0(0) 0(0) +6(3) 0(2) 1(3) 0(0) 0(0) 1(3) 3(3) 
 
-	9 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 0(0) 0(0) +7(0) 0(0) 0(0) +0(2) 0(0) 0(0) 0(0) 0(0) 4(1) 
+	9 -   Fit: 0.0335195 (10846 3 0 10663 176)  Cat: (0 0) (0 0) (0 0) (3 0.428571) (0 0) (0 0) 
+     +15(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(2) 10(4) +0(0) +0(0) 0(0) 0(0) +6(0) 0(0) 
 
-	10 -   Fit: 0.212104 (10925 19 1 10741 160)  Cat: (0 0) (0 0) (4 1) (0 0) (1 0.0116279) (14 0.35) 
-     0(0) 7(0) 0(0) 0(0) 4(3) +2(0) 1(3) 0(0) +0(0) 0(3) 5(3) 2(0) 0(0) 0(0) 
+	10 -   Fit: 0.0335195 (10846 3 0 10663 176)  Cat: (0 0) (0 0) (0 0) (3 0.428571) (0 0) (0 0) 
+     +15(0) 0(0) 162(2) 3(0) 0(0) 1(2) +0(0) 0(0) +2(2) +7(2) 4(1) 0(0) +0(0) 0(0) 
 
-	11 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 3(0) 440(154) 0(0) 0(0) 1(1) 0(0) +14(5) 4(2) 0(0) 0(0) 0(0) 0(0) 0(0) 
+	11 -   Fit: 0.0223463 (10846 2 0 10663 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
+     0(0) 0(0) 82(229) 0(0) +0(0) 0(0) 6(2) 0(0) +7(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	12 -   Fit: -0.000186205 (10925 0 1 10741 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +6(0) 0(0) 161(213) 0(0) 0(0) 0(0) 0(0) +0(0) 3(3) 7(3) 0(0) 6(0) 1(3) 0(0) 
+	12 -   Fit: 0.0111732 (10846 1 0 10663 178)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (1 0.025) 
+     0(0) +12(0) 0(0) 0(0) +16(15) 0(0) 0(0) 0(0) 0(0) 0(0) +2(0) 0(0) 0(0) +7(1) 
 
-	13 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) +3(0) 440(154) 0(0) 0(0) 1(1) 0(0) 14(5) 4(3) 0(3) 0(0) 0(0) 7(2) 0(0) 
+	13 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +14(0) 0(0) +83(16) +2(2) +1(2) +1(3) +7(0) 0(0) +1(2) 0(0) 0(0) 0(0) +2(3) 0(0) 
 
-	14 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) +7(0) 0(0) 0(0) 4(3) 3(1) 4(0) 5(5) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
+	14 -   Fit: 0.0223463 (10846 2 0 10663 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 25(2) 0(0) 0(0) 0(0) +4(3) 0(0) 7(1) 0(0) 0(0) +2(0) 
 
-	15 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +6(0) 3(0) 440(154) 0(0) 0(0) 1(1) 0(0) 14(5) +4(2) 0(0) 0(0) 0(0) 0(0) 0(0) 
+	15 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +4(0) +498(206) +6(2) 0(0) +6(1) 0(0) 0(0) 0(0) 0(0) +4(1) +4(0) 0(0) +0(1) 
 
-	16 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +4(0) +7(0) 0(0) 0(0) 4(3) +2(0) 0(0) +0(0) 0(2) 0(0) 0(0) 0(0) 0(0) 4(1) 
+	16 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +25(2) 0(0) 0(0) 0(0) +4(3) 0(0) +7(1) 0(0) 0(0) +2(1) 
 
-	17 -   Fit: 0.0780261 (10925 7 1 10741 172)  Cat: (0 0) (0 0) (3 0.75) (0 0) (1 0.0116279) (3 0.075) 
-     0(0) +7(0) 0(0) 0(0) 4(3) +3(1) 4(0) 5(5) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
+	17 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +5(0) 0(0) 0(0) +4(11) +1(0) +7(1) +0(0) 0(0) 0(0) 0(0) +7(3) 0(0) 0(0) 
 
-	18 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) 3(0) 440(154) 0(0) 0(0) 1(1) 0(0) 14(5) +4(3) 0(3) 0(0) 0(0) 7(2) 0(0) 
+	18 -   Fit: 0.0335195 (10846 3 0 10663 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +40(74) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +3(3) 0(0) +4(2) 0(0) 0(0) 
 
-	19 -   Fit: 0.0223463 (10925 2 0 10742 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
-     0(0) 3(0) 440(154) 0(0) 0(0) +1(1) 0(0) 14(5) +4(0) 0(0) 0(0) 0(0) +1(0) 0(0) 
+	19 -   Fit: 0.0223463 (10846 2 0 10663 177)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (2 0.05) 
+     0(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +3(0) +4(1) 
 
-	20 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +5(0) +15(0) 0(0) 0(0) +16(10) 0(0) +2(1) 0(0) 0(0) 0(0) 0(0) 0(0) +2(0) 0(0) 
+	20 -   Fit: 0.0111732 (10846 1 0 10663 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +14(1) +3(2) +3(3) +2(3) 0(0) 0(0) 0(0) 
 
-	21 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) +0(0) 0(0) 0(0) 4(3) +2(0) 0(0) 0(0) 0(2) 0(0) +0(0) 0(0) 0(0) 4(1) 
+	21 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +6(0) 0(0) 0(0) 0(0) +21(10) +5(1) 0(0) 0(0) +1(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	22 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +0(0) +7(0) 0(0) 0(0) 4(3) +2(0) 0(0) +0(0) 3(3) 7(3) 0(0) 6(0) 1(3) 0(0) 
+	22 -   Fit: 0.0111732 (10846 1 0 10663 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) +82(229) 0(0) 0(0) 0(0) +6(2) 0(0) +6(3) +5(2) +1(0) 0(0) +5(2) 0(0) 
 
-	23 -   Fit: 0.0445065 (10925 4 1 10741 175)  Cat: (0 0) (0 0) (3 0.75) (0 0) (1 0.0116279) (0 0) 
-     0(0) +7(0) 0(0) 0(0) 4(3) +2(0) 0(0) 0(0) 3(3) 7(3) +0(0) 6(0) 1(3) 0(0) 
+	23 -   Fit: 0.010798 (10846 1 2 10661 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) +13(0) 0(0) +0(0) 0(0) +1(1) +6(3) 0(0) 0(0) +4(3) 0(0) +6(2) 0(0) +1(0) 
 
-	24 -   Fit: 0 (10925 0 0 10742 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +0(0) 161(213) 0(0) 0(0) 0(0) 0(0) +0(0) 3(3) 7(3) 0(0) 6(0) 1(3) 0(0) 
+	24 -   Fit: 0.0223463 (10846 2 0 10663 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
+     +15(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(2) +7(2) +4(1) 0(0) 0(0) 0(0) 
 
-	25 -   Fit: 0.0668529 (10925 6 1 10741 173)  Cat: (0 0) (0 0) (3 0.75) (0 0) (1 0.0116279) (2 0.05) 
-     0(0) +7(0) 0(0) 0(0) 4(3) +2(0) 0(0) +0(0) 0(2) 0(0) 0(0) 0(0) 0(0) 4(1) 
+	25 -   Fit: 0 (10846 0 0 10663 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +4(0) 0(0) 0(0) 0(0) +3(6) 0(0) 0(0) +6(3) +0(2) +1(3) 0(0) 0(0) +1(3) +3(3) 
 
 
 Class 4:
-	1 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     7(0) 0(0) +340(0) 0(0) +20(5) 0(0) +0(0) 11(3) 0(0) 0(0) 0(2) 0(0) 5(0) 0(0) 
+	1 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 11(0) 0(0) 0(0) 0(0) +1(3) 0(0) +13(3) 0(0) 0(0) +4(2) 0(0) +3(0) 0(0) 
 
-	2 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +11(0) 0(0) +370(98) 0(0) +25(10) +6(0) +5(0) 0(0) +4(0) 0(0) 0(0) +3(3) 0(0) +7(0) 
+	2 -   Fit: 0.122905 (10886 11 0 10700 168)  Cat: (0 0) (9 0.243243) (0 0) (1 0.142857) (1 0.0116279) (0 0) 
+     0(0) 0(0) 100(167) 0(0) 0(0) +1(2) 0(0) +14(5) 0(0) 0(0) +0(0) 0(0) +3(3) 0(0) 
 
-	3 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +3(0) 0(0) +0(1) 0(0) 0(0) 0(0) 0(0) 0(0) +7(0) 0(0) 0(0) 0(0) +5(0) +0(0) 
+	3 -   Fit: 0.0109863 (10886 1 1 10699 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 236(8) 0(0) 0(0) 0(0) +0(2) 0(0) 0(0) +3(0) 0(0) 0(0) 0(0) +0(0) 
 
-	4 -   Fit: 0.0446928 (10728 4 0 10542 175)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (2 0.05) 
-     +9(0) 13(0) 0(0) 0(0) 0(0) 0(0) 4(3) 0(0) +0(1) 0(0) 7(3) 0(0) +5(2) +1(2) 
+	4 -   Fit: 0.0109863 (10886 1 1 10699 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 5(0) 0(0) 0(0) 19(0) 0(0) +6(0) 0(0) 0(0) +2(0) 0(0) 0(0) 0(1) +4(3) 
 
-	5 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) +14(0) 0(0) 0(0) 0(0) 2(3) +2(0) 0(0) +0(0) +4(0) +6(3) 0(0) +0(0) +2(0) 
+	5 -   Fit: 0.0445058 (10886 4 1 10699 175)  Cat: (0 0) (3 0.0810811) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 8(0) 0(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 2(2) 0(0) +4(1) +0(3) 4(0) 
 
-	6 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     12(0) +0(0) 0(0) 0(0) 8(7) 0(0) +2(2) 0(0) +2(0) +0(0) +5(1) 7(3) +3(2) +0(0) 
+	6 -   Fit: 0.0109863 (10886 1 1 10699 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     10(0) 0(0) 317(26) 2(1) 0(0) 0(0) +4(2) 0(0) 0(2) 0(0) 0(0) +7(2) 0(0) 0(0) 
 
-	7 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 12(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) +4(0) 0(0) +2(1) 
+	7 -   Fit: 0.0221594 (10886 2 1 10699 177)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (1 0.025) 
+     0(0) +9(0) +268(203) 0(0) 0(0) 0(0) +7(3) 0(0) 0(0) +0(1) +1(2) 0(0) +1(1) 0(0) 
 
-	8 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 12(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) +7(2) 0(0) +3(3) 
+	8 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (1 0.2) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) 0(0) 0(0) +0(0) 0(0) +0(0) 0(0) 7(7) 0(0) 0(0) 4(0) 0(0) 0(0) 0(0) 
 
-	9 -   Fit: 0.0221567 (10728 2 1 10541 177)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (1 0.025) 
-     0(0) 14(0) 359(137) 0(0) 0(0) 0(0) +6(2) 0(0) 0(0) 4(0) 3(0) +3(3) +0(0) 2(1) 
+	9 -   Fit: 0.0553052 (10886 5 3 10697 174)  Cat: (0 0) (0 0) (0 0) (5 0.714286) (0 0) (0 0) 
+     10(0) 0(0) +476(127) 0(0) 0(0) +0(0) 0(0) 0(0) 0(0) 4(2) 0(0) 0(0) 5(1) 0(0) 
 
-	10 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +6(0) +9(0) +104(105) 0(0) +31(1) +0(1) 0(0) +14(5) +0(1) 0(0) 0(0) 0(0) +2(3) 0(0) 
+	10 -   Fit: 0.0109863 (10886 1 1 10699 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +4(3) +10(5) 0(0) +0(1) 0(0) 0(0) 0(0) +6(1) 
 
-	11 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     +6(0) 0(0) 0(0) 0(0) 0(0) 2(3) +2(0) 0(0) 0(0) 4(0) +5(1) +0(0) 2(0) 1(0) 
+	11 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +8(0) +3(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +6(0) 0(0) +2(1) 0(0) 0(0) 
 
-	12 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     +7(0) 0(0) 341(166) 0(0) 1(11) 0(0) +4(3) 0(0) 0(2) 0(0) +0(0) +7(3) 3(2) 0(0) 
+	12 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (1 0.025) 
+     0(0) 3(0) 0(0) 6(0) 27(3) +4(0) 6(3) 0(0) 7(0) 0(0) +5(3) 3(2) 0(0) 0(0) 
 
-	13 -   Fit: 0 (10728 0 0 10542 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) +1(0) 0(0) 0(0) 0(0) +3(3) 0(0) +14(5) 0(0) +7(3) 0(0) 0(0) 0(0) 0(0) 
+	13 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +7(0) 0(0) 126(146) 0(0) 8(4) +6(3) 4(3) +9(6) 6(3) 0(0) 1(0) 0(0) 7(0) 0(0) 
 
-	14 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 1(3) 0(0) 0(0) +6(0) 0(0) 0(0) 0(0) 0(0) 3(1) 0(0) +3(2) 
+	14 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) 11(0) 0(0) 0(0) 0(0) +1(2) 5(3) +5(6) 5(3) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	15 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 14(0) 455(143) 0(0) +0(0) 2(2) 0(0) +7(6) 3(2) 0(0) +7(0) 0(0) 0(0) 3(2) 
+	15 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +10(0) +21(73) 0(0) +19(11) 0(0) 0(0) +2(0) 0(0) 0(0) +7(2) 0(0) +3(0) 0(0) 
 
-	16 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     +7(0) 0(0) +341(166) 0(0) +1(11) +0(0) +4(3) 0(0) +0(2) 0(0) 0(0) 0(0) +2(0) 0(0) 
+	16 -   Fit: 0.0335195 (10886 3 0 10700 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 8(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(2) 0(0) +4(0) 0(0) 0(0) 
 
-	17 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) +14(0) 0(0) 0(0) 0(0) +2(3) +2(0) 0(0) 0(0) +4(0) +5(1) +7(3) +3(2) 0(0) 
+	17 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) +100(167) 0(0) 0(0) +1(2) 0(0) +14(5) 0(0) 0(0) 0(0) 0(0) +3(0) 0(0) 
 
-	18 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) +14(0) 359(137) 0(0) 0(0) 0(0) +6(2) 0(0) 0(0) +4(0) +3(0) +3(3) +1(1) 0(0) 
+	18 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (1 0.025) 
+     +7(0) 0(0) +126(146) 0(0) +8(4) +6(2) +5(3) +5(6) +5(3) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	19 -   Fit: 0.0223463 (10728 2 0 10542 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
-     +3(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) 0(0) +7(3) 0(0) +5(2) +1(2) 
+	19 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +100(128) 0(0) 0(0) 0(0) 6(3) 0(0) 7(0) 0(0) +5(0) 3(2) 0(0) 0(0) 
 
-	20 -   Fit: 0.0670391 (10728 6 0 10542 173)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (1 0.0116279) (0 0) 
-     0(0) 0(0) 0(0) 1(3) 0(0) 0(0) 4(3) +15(5) 0(0) 4(0) +0(0) 1(1) 0(0) 0(0) 
+	20 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) 5(0) 0(0) 0(0) +19(0) 0(0) +6(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	21 -   Fit: 0.0331402 (10728 3 2 10540 176)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (2 0.0232558) (0 0) 
-     0(0) 0(0) 0(0) 0(0) +20(5) 0(0) 0(0) 11(3) 0(0) 0(0) +0(2) 0(0) 5(0) 0(0) 
+	21 -   Fit: 0.0111732 (10886 1 0 10700 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) +11(0) 0(0) 0(0) 0(0) +1(3) 0(0) +13(3) +0(0) 0(0) +4(2) 0(0) +3(3) 0(0) 
 
-	22 -   Fit: 0.0111732 (10728 1 0 10542 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) +12(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) +7(2) 0(0) +2(1) 
+	22 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +9(0) 0(0) +50(21) 0(0) +12(12) 1(0) 0(0) 0(0) 0(0) 0(0) 1(2) 0(0) +4(0) 4(2) 
 
-	23 -   Fit: 0.0223463 (10728 2 0 10542 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
-     +7(0) 0(0) +341(166) 0(0) +1(11) 0(0) 4(3) 0(0) +0(2) 0(0) +0(0) 0(0) 2(0) +1(0) 
+	23 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +1(3) +4(0) +1(3) +4(3) 0(0) 
 
-	24 -   Fit: 0.0670391 (10728 6 0 10542 173)  Cat: (0 0) (3 0.0810811) (0 0) (1 0.142857) (0 0) (2 0.05) 
-     0(0) 0(0) 0(0) 2(0) 0(0) 6(1) +0(0) 0(0) 2(1) 0(0) 0(0) +3(2) 0(0) +2(1) 
+	24 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +411(79) +5(2) 0(0) 0(0) +2(2) 0(0) +7(3) +1(2) 0(0) 0(0) +6(2) +0(3) 
 
-	25 -   Fit: 0.0335195 (10728 3 0 10542 176)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (2 0.05) 
-     +9(0) +13(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) 0(0) +5(0) 0(0) 
+	25 -   Fit: 0 (10886 0 0 10700 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) 0(0) +317(26) +2(1) 0(0) 0(0) +4(1) 0(0) +0(2) 0(0) 0(0) +7(3) 0(0) +4(0) 
 
 
 Class 5:
-	1 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	1 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     6(0) 6(0) 0(0) 0(0) +24(8) +5(0) 0(0) 0(0) +7(2) +1(2) 6(3) 0(0) 0(0) +7(1) 
 
-	2 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	2 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +26(10) +0(0) 5(3) 0(0) +4(0) +6(1) 0(0) 0(0) 0(0) +6(1) 
 
-	3 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(1) 
+	3 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 7(0) 0(0) 0(0) 0(0) 7(3) 5(0) 0(0) 0(0) 1(0) +0(0) 6(0) 0(0) +6(0) 
 
-	4 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	4 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +7(0) +342(57) +3(0) +11(13) +1(0) 0(0) +14(1) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	5 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	5 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +0(0) 0(0) 0(0) 0(0) 6(2) +3(1) 0(0) 0(0) 0(0) 0(2) 0(0) 0(0) 
 
-	6 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	6 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +4(0) +365(207) +3(0) 0(0) 0(0) 0(0) +11(3) 0(0) +6(3) 0(0) +1(0) 0(0) 0(0) 
 
-	7 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	7 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) 0(0) 0(0) +3(3) +1(10) 0(0) +4(1) 0(0) 0(0) 0(0) 0(0) 0(0) +2(2) 0(0) 
 
-	8 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(1) 
+	8 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) +470(16) +6(0) 0(0) 0(0) 0(0) +15(2) +4(2) +7(0) +1(3) 0(0) +5(3) 0(0) 
 
-	9 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(1) 
+	9 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +12(0) +13(0) 0(0) 0(0) 0(0) 0(0) +4(1) 4(2) 0(0) 0(0) 0(0) 0(0) 0(0) +3(1) 
 
-	10 -   Fit: 1.05028 (11001 94 0 10736 85)  Cat: (0 0) (21 0.567568) (0 0) (1 0.142857) (72 0.837209) (0 0) 
-     0(0) 14(0) 42(48) 0(0) 0(0) 0(0) 4(0) +5(3) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	10 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +0(0) +0(0) 0(0) 0(0) 28(15) 0(0) +0(0) 0(0) 0(0) 0(0) 6(2) 0(0) 0(0) +4(0) 
 
-	11 -   Fit: 1.02793 (11001 92 0 10736 87)  Cat: (0 0) (21 0.567568) (0 0) (1 0.142857) (70 0.813953) (0 0) 
-     0(0) 14(0) 42(48) 0(0) 0(0) 0(0) 4(0) +5(3) +0(0) 0(0) 5(2) 0(0) 5(1) 0(0) 
+	11 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     4(0) +1(0) 0(0) 0(0) 0(0) 0(0) +2(3) 0(0) 0(0) +1(3) 0(0) +6(0) +7(3) 0(0) 
 
-	12 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) +0(0) 0(0) 5(2) 0(0) 5(1) 0(0) 
+	12 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +0(0) 0(0) 3(1) 0(0) 0(0) +4(0) 0(0) +0(0) +5(1) 0(0) +3(0) +6(2) 0(0) 
 
-	13 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(0) +0(0) 
+	13 -   Fit: 0.0335195 (10782 3 0 10517 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 2(1) 1(7) 0(0) 0(0) 5(1) +4(0) +0(0) 0(0) 
 
-	14 -   Fit: 0.346369 (11001 31 0 10736 148)  Cat: (0 0) (3 0.0810811) (0 0) (1 0.142857) (27 0.313953) (0 0) 
-     0(0) 0(0) 0(0) 1(2) 0(0) 0(0) 0(0) +2(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	14 -   Fit: 0.0670391 (10782 6 0 10517 173)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (3 0.075) 
+     0(0) 0(0) 0(0) 0(1) 0(0) 4(1) 0(0) 0(0) 7(2) 0(0) 0(0) +0(0) +6(2) 0(0) 
 
-	15 -   Fit: 0.290503 (11001 26 0 10736 153)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (23 0.267442) (0 0) 
-     0(0) +2(0) 0(0) 0(0) 0(0) 0(1) 7(3) +2(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	15 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +28(15) 0(0) +0(0) 0(0) +0(0) 0(0) +6(2) 0(0) 0(0) +7(1) 
 
-	16 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	16 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +6(0) +6(0) 0(0) 0(0) +24(8) 0(0) +5(3) 0(0) +4(0) +6(1) 0(0) +0(0) 0(0) +6(1) 
 
-	17 -   Fit: 1.02793 (11001 92 0 10736 87)  Cat: (0 0) (21 0.567568) (0 0) (1 0.142857) (70 0.813953) (0 0) 
-     0(0) 14(0) 42(48) 0(0) 0(0) 0(0) 4(0) +5(3) +0(0) 0(0) 5(2) 0(0) 5(1) 0(1) 
+	17 -   Fit: 0.0111732 (10782 1 0 10517 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(1) +1(7) 0(0) 0(0) +5(1) +4(0) +6(2) 0(0) 
 
-	18 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	18 -   Fit: -0.000570536 (10782 0 3 10514 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) +0(1) 0(0) +4(1) 0(0) 0(0) +7(2) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	19 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	19 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +26(10) +5(0) 0(0) 0(0) +7(2) +1(2) +6(3) 0(0) 0(0) +7(1) 
 
-	20 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	20 -   Fit: -0.000570536 (10782 0 3 10514 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) +3(1) 0(0) 0(0) +6(3) 0(0) 0(0) +1(3) 0(0) +6(0) +7(3) 0(0) 
 
-	21 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	21 -   Fit: 0.335196 (10782 30 0 10517 149)  Cat: (0 0) (1 0.027027) (0 0) (1 0.142857) (28 0.325581) (0 0) 
+     +11(0) 0(0) +136(95) 0(0) 0(0) 0(0) 0(0) +3(1) 0(0) 0(0) 0(0) +0(2) 0(0) 0(0) 
 
-	22 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	22 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +12(0) +13(0) 0(0) 0(0) 0(0) 0(0) +4(1) +4(2) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
 
-	23 -   Fit: 1.02793 (11001 92 0 10736 87)  Cat: (0 0) (21 0.567568) (0 0) (1 0.142857) (70 0.813953) (0 0) 
-     0(0) 14(0) 42(48) 0(0) 0(0) 0(0) 4(0) +5(3) +0(0) 0(0) 5(2) 0(0) 5(1) 0(0) 
+	23 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) 0(0) +18(11) 0(0) 0(0) 0(0) +3(0) 0(0) +1(2) 0(0) +4(1) 0(0) 
 
-	24 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) 0(0) 0(0) 5(2) 0(0) 5(1) +0(0) 
+	24 -   Fit: 0.0217758 (10782 2 3 10514 177)  Cat: (0 0) (0 0) (0 0) (2 0.285714) (0 0) (0 0) 
+     +7(0) 0(0) 0(0) +1(1) 0(0) 0(0) +1(2) +12(2) +2(3) +5(0) +0(1) 0(0) 0(0) 0(0) 
 
-	25 -   Fit: 0.469274 (11001 42 0 10736 137)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (37 0.430233) (0 0) 
-     0(0) 0(0) 446(147) 0(0) 0(0) 0(0) 6(0) +6(0) +0(0) 0(0) 5(2) 0(0) 5(1) 0(0) 
+	25 -   Fit: 0 (10782 0 0 10517 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +4(0) +1(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 0(0) +5(1) 0(0) +3(0) +6(2) 0(0) 
 
 
 Class 6:
-	1 -   Fit: 0.0223463 (10842 2 0 10623 177)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (2 0.05) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) +2(1) 0(0) 
+	1 -   Fit: 0.0223463 (10831 2 0 10612 177)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (1 0.025) 
+     +9(0) 0(0) 0(0) 0(0) 0(0) 0(0) +3(3) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +7(1) 
 
-	2 -   Fit: 0.078024 (10842 7 1 10622 172)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (7 0.175) 
-     0(0) 10(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) +0(1) +0(0) 
+	2 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 149(152) 0(3) 31(6) 2(0) 0(0) 8(3) 0(0) +3(0) 0(0) 3(1) +3(1) 5(2) 
 
-	3 -   Fit: 0.0223463 (10842 2 0 10623 177)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (2 0.05) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) +2(0) 0(0) 
+	3 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     5(0) +0(0) 119(145) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 0(0) 1(2) +7(2) 0(0) 0(0) 
 
-	4 -   Fit: 0.290503 (10842 26 0 10623 153)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (26 0.65) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(2) 0(0) 0(0) +2(1) 0(0) 
+	4 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +0(0) 281(44) 2(3) 0(0) 1(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(0) 0(0) 0(0) 
 
-	5 -   Fit: 0 (10842 0 0 10623 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +504(249) 0(0) 0(0) +4(3) +3(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 
+	5 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) +9(0) +260(157) 0(0) +22(4) 0(0) +0(1) 0(0) +6(1) +1(0) 0(0) 0(0) 0(0) +4(0) 
 
-	6 -   Fit: 0.111732 (10842 10 0 10623 169)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (10 0.25) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(2) 0(0) 0(0) 1(3) +3(0) 
+	6 -   Fit: -0.00037694 (10831 0 2 10610 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) 0(0) 0(0) +3(1) 0(0) 0(0) +7(1) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +1(3) 
 
-	7 -   Fit: 0 (10842 0 0 10623 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 7(1) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 0(0) 0(0) +2(1) +0(0) 
+	7 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +0(0) 0(179) 0(0) +0(1) 0(0) 0(0) 14(3) 0(0) 2(0) 0(0) 2(2) 4(2) 0(0) 
 
-	8 -   Fit: 0 (10842 0 0 10623 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +117(184) 0(0) +31(4) 0(0) 0(0) +0(2) +6(1) +0(0) 0(0) 0(0) +7(2) 0(0) 
+	8 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     11(0) +1(0) 0(0) 1(3) +27(8) 7(3) 1(2) 0(0) 0(0) 0(0) 0(0) 0(1) 0(0) 0(0) 
 
-	9 -   Fit: 0.290503 (10842 26 0 10623 153)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (26 0.65) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(1) 0(0) 
+	9 -   Fit: 0.0111732 (10831 1 0 10612 178)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (1 0.025) 
+     0(0) 0(0) 149(152) 0(0) +0(0) +6(0) 0(0) 3(4) 0(0) 0(1) 0(1) 0(0) 3(1) 0(0) 
 
-	10 -   Fit: 0 (10842 0 0 10623 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +4(2) +3(2) +7(1) +6(2) 0(0) 
+	10 -   Fit: 0.0223463 (10831 2 0 10612 177)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (2 0.05) 
+     0(0) 0(0) 196(179) 0(0) +1(7) +7(2) 0(0) 0(0) 6(2) 1(0) 0(0) 0(0) 0(0) 0(0) 
 
-	11 -   Fit: 0.3797 (10842 34 1 10622 145)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (34 0.85) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 0(0) 0(0) 2(3) +2(2) 
+	11 -   Fit: 0.0109847 (10831 1 1 10611 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     15(0) 0(0) 0(0) 0(0) +0(0) +0(2) +7(2) 0(0) 0(0) 0(0) 0(0) 0(1) 0(0) 0(0) 
 
-	12 -   Fit: 0.3797 (10842 34 1 10622 145)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (34 0.85) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 3(2) 0(0) 0(0) +2(2) 
+	12 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     3(0) 0(0) 315(31) 1(2) +18(5) +6(3) +4(2) 0(0) 0(0) 4(0) 0(0) 0(0) 0(0) 0(0) 
 
-	13 -   Fit: 0.268156 (10842 24 0 10623 155)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (24 0.6) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +0(2) 0(0) 0(0) +2(0) 2(2) 
+	13 -   Fit: 0.122905 (10831 11 0 10612 168)  Cat: (0 0) (9 0.243243) (0 0) (1 0.142857) (1 0.0116279) (0 0) 
+     0(0) 0(0) 0(0) 0(0) 0(0) 4(2) 0(0) +14(5) 0(0) 0(0) 0(0) 0(0) 6(0) +0(0) 
 
-	14 -   Fit: 0.268156 (10842 24 0 10623 155)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (24 0.6) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 0(0) 0(0) +2(1) 0(0) 
+	14 -   Fit: 0.0558659 (10831 5 0 10612 174)  Cat: (0 0) (4 0.108108) (0 0) (1 0.142857) (0 0) (0 0) 
+     0(0) 0(0) 196(179) 0(0) 0(0) 6(0) 0(0) +3(0) 3(3) 0(0) 0(0) 0(0) 0(0) +0(0) 
 
-	15 -   Fit: 0.0111732 (10842 1 0 10623 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) +1(0) 0(0) 0(0) +1(0) 3(2) 0(0) +0(1) 0(0) 
+	15 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +0(0) +196(0) 0(0) 30(12) +0(0) 0(0) 0(0) 0(0) 3(0) 6(2) 6(0) 3(3) 2(0) 
 
-	16 -   Fit: 0.290503 (10842 26 0 10623 153)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (26 0.65) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(1) 0(0) 
+	16 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     11(0) 1(0) 0(0) 1(3) +27(9) 0(0) 0(0) 14(3) 0(0) 2(0) 0(0) +2(2) +4(2) 0(0) 
 
-	17 -   Fit: 0.301676 (10842 27 0 10623 152)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (26 0.65) 
-     5(0) +15(0) 0(0) 0(0) 0(0) 0(0) 0(0) +1(3) 0(0) 0(0) 0(0) 0(0) +2(1) 0(0) 
+	17 -   Fit: -0.00018847 (10831 0 1 10611 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     3(0) 0(0) +315(31) 1(2) +18(5) 4(2) 7(2) 0(0) 0(0) 0(0) 0(0) 0(1) 0(0) 0(0) 
 
-	18 -   Fit: 0.268156 (10842 24 0 10623 155)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (24 0.6) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(2) 0(0) 0(0) +2(0) 2(2) 
+	18 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     0(0) +4(0) 0(0) 0(0) 0(0) 0(0) +6(3) 0(0) +0(1) +2(2) +6(0) +5(0) +6(1) 0(0) 
 
-	19 -   Fit: 0 (10842 0 0 10623 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
-     0(0) 0(0) +351(189) 0(0) 0(0) +1(0) 0(0) 0(0) 0(0) +6(0) +7(1) +6(3) +1(0) 0(0) 
+	19 -   Fit: 0.0335195 (10831 3 0 10612 176)  Cat: (0 0) (3 0.0810811) (0 0) (0 0) (0 0) (0 0) 
+     +5(0) 0(0) +119(145) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +1(2) +7(2) 0(0) 0(0) 
 
-	20 -   Fit: 0.3797 (10842 34 1 10622 145)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (34 0.85) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 3(2) 0(0) 0(0) +2(3) 
+	20 -   Fit: 0.0335195 (10831 3 0 10612 176)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (3 0.075) 
+     0(0) 0(0) +196(179) 0(0) 0(0) +7(3) +1(2) 0(0) 0(0) 0(0) 0(0) +0(1) 0(0) 0(0) 
 
-	21 -   Fit: 0.41322 (10842 37 1 10622 142)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (37 0.925) 
-     0(0) +10(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +4(3) 0(0) 0(0) 0(0) 0(0) 
+	21 -   Fit: 0.0893855 (10831 8 0 10612 171)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (8 0.2) 
+     0(0) 0(0) 149(152) 0(0) +1(7) 7(2) 0(0) 0(0) 6(2) +1(0) 0(0) 0(0) +0(0) 0(0) 
 
-	22 -   Fit: 0.3797 (10842 34 1 10622 145)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (34 0.85) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 3(2) 0(0) 0(0) +2(2) 
+	22 -   Fit: 0 (10831 0 0 10612 179)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (0 0) 
+     +10(0) 0(0) 0(0) +5(2) 0(0) +1(1) +3(2) 0(0) 0(0) +6(3) +3(2) +1(0) +4(1) 0(0) 
 
-	23 -   Fit: 0.290503 (10842 26 0 10623 153)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (26 0.65) 
-     5(0) +15(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +2(1) 0(0) 
+	23 -   Fit: 0.0111732 (10831 1 0 10612 178)  Cat: (0 0) (0 0) (0 0) (1 0.142857) (0 0) (0 0) 
+     +15(0) 0(0) 0(0) 0(0) 0(0) +2(3) +4(2) 0(0) 0(0) +4(0) 0(0) 0(0) 0(0) 0(0) 
 
-	24 -   Fit: 0.3797 (10842 34 1 10622 145)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (34 0.85) 
-     0(0) 0(0) 0(0) 7(3) 0(0) 0(0) 0(0) 0(0) 0(0) +1(0) 0(0) 0(0) +2(3) 2(2) 
+	24 -   Fit: 0.0111732 (10831 1 0 10612 178)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (1 0.025) 
+     0(0) 0(0) 196(179) 0(0) 0(0) +6(0) 0(0) 3(4) 0(0) 0(1) 0(1) +0(0) 3(1) 0(0) 
 
-	25 -   Fit: 0.290503 (10842 26 0 10623 153)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (26 0.65) 
-     0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) 0(0) +0(2) 0(0) 0(0) +2(1) 0(0) 
+	25 -   Fit: 0.0223463 (10831 2 0 10612 177)  Cat: (0 0) (0 0) (0 0) (0 0) (0 0) (2 0.05) 
+     0(0) 0(0) 149(152) 0(0) 1(7) 7(2) 0(0) 0(0) 6(2) +1(0) +0(0) 3(1) 3(1) 5(2) 
 
 
 
