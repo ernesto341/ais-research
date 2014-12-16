@@ -1,5 +1,5 @@
-under the ais directory, make and run 'lifetime.xxxx'. this should result in a 'champions.abs' file being created.
 make all in the root (this) directory. the 'dhs' executable and the 'retrieve' exe under the retdir directory should have been created.
+under the ais directory and run 'lifetime.xxxx'. this should result in a 'champions.abs' file being created.
 run 'dhs' to begin capturing network traffic, then run 'retdir/retrieve' to start the retrieve component. analyzed traffic is logged in 'traffic.log'
 if you wish to update/change the antibody pool ('champions.abs'), run 'lifetime.xxxx'. send a SIGUSR1 signal to the retrieve process to initiate an update ('pkill -SIGUSR1 retrieve').
 updates are handeled by pausing processing of and queueing up incoming traffic while replacing champions pool, so nothing should be lost.

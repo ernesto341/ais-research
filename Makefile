@@ -8,11 +8,16 @@ CC              =  gcc $(CFLAGS) $(INCFLAGS)
 DHSFILES        =  $(LIB)/itoa.o $(LIB)/ipv6defrag.o $(LIB)/ipv4defrag.o $(LIB)/common.o $(LIB)/sfhash.o $(LIB)/tcpreassembly.o $(LIB)/libntoh.o $(LIB)/share.o
 RETFILES        =  $(LIB)/pull.o $(LIB)/antibody.o $(LIB)/random.o $(LIB)/import.o $(LIB)/itoa.o
 
-all: retrieve dump
+all: retrieve dump ais
 
 retrieve: rand ab itoa imp pull consumer
 
 dump: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
+
+ais: do_ais
+
+do_ais:
+	cd ais/ && make
 
 imp:
 	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-parameter
@@ -75,4 +80,5 @@ clean:
 	rm -f $(LIB)/*.gch
 	rm -f $(INC)/*.o
 	rm -f $(INC)/*.gch
+	cd ais/ && make clean
 
