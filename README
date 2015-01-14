@@ -1,6 +1,19 @@
-make all in the root (this) directory. the 'dhs' executable and the 'retrieve' exe under the retdir directory should have been created.
-under the ais directory and run 'lifetime.xxxx'. this should result in a 'champions.abs' file being created.
-run 'dhs' to begin capturing network traffic, then run 'retdir/retrieve' to start the retrieve component. analyzed traffic is logged in 'traffic.log'
-if you wish to update/change the antibody pool ('champions.abs'), run 'lifetime.xxxx'. send a SIGUSR1 signal to the retrieve process to initiate an update ('pkill -SIGUSR1 retrieve').
-updates are handeled by pausing processing of and queueing up incoming traffic while replacing champions pool, so nothing should be lost.
+Versions numbered.
+Current Stable Version: 0.2
+
+With version 0.2 and later, just run make to create all necessary binaries. Ver. 0.3 and later include a 'make veryclean' and a 'make clean' option, removing everything or just logs and dhs/retrieve binaries respectively.
+
+Setup:
+
+Run 'make veryclean', then 'make'.
+Run 'lifetime.25' (or whichever version desired) from the 'ais/' directory. 'champions.abs' should be created.
+
+Useage:
+
+Run 'dhs -i <interface>', optionally with ' 2> dhs.log &' to begin monitoring network traffic.
+Run 'retrieve' from the 'retdir/' directory, optionally with ' 2> ret.log &' to begin testing live traffic.
+Live traffic test results are stored in 'traffic.log'.
+To update the 'champions.abs' file with a new pool of antibodies, rerun 'lifetime.25' (or whichever version makes you happiest) from the 'ais/' directory. A new 'champions.abs' file will be created. After the new pool has been bred, send a SIGUSR1 signal to the 'retrieve' process. The new pool will be imported, replacing the old pool.
+To exit cleanly, kill the 'retrieve' process. All other processes will exit, cleaning up after themselves.
+
 
