@@ -235,7 +235,6 @@ __LIBNTOH_TCPRS_H__	inc/tcpreassembly.h	2;"	d
 __MY_RANDOM_H__	ais/random.h	2;"	d
 __UNKNOWN_WEB_H__	ais/unknownweb.h	2;"	d
 __WEB_DATA_H__	ais/webdata.h	2;"	d
-__buf	retdir/pull.cpp	/^        struct seminfo  *__buf; $/;"	m	union:_sem_u	typeref:struct:_sem_u::seminfo	file:
 __ipv4_free_flow	inc/ipv4defrag.c	/^inline static void __ipv4_free_flow ( pntoh_ipv4_session_t session , pntoh_ipv4_flow_t *flow , unsigned short reason )$/;"	f	file:
 __ipv4_free_session	inc/ipv4defrag.c	/^inline static void __ipv4_free_session ( pntoh_ipv4_session_t session )$/;"	f	file:
 __ipv6_free_flow	inc/ipv6defrag.c	/^inline static void __ipv6_free_flow ( pntoh_ipv6_session_t session , pntoh_ipv6_flow_t *flow , unsigned short reason )$/;"	f	file:
@@ -249,7 +248,6 @@ _ipv6_fragment_	inc/ipv6defrag.h	/^typedef struct _ipv6_fragment_$/;"	s
 _ipv6_session_	inc/ipv6defrag.h	/^typedef struct _ipv6_session_$/;"	s
 _keys	dhs.c	88;"	d	file:
 _ntoh_tcp_status_	inc/tcpreassembly.h	/^enum _ntoh_tcp_status_$/;"	g
-_sem_u	retdir/pull.cpp	/^union _sem_u$/;"	u	file:
 _tcp_segment_	inc/tcpreassembly.h	/^typedef struct _tcp_segment_$/;"	s
 _tcp_session_	inc/tcpreassembly.h	/^typedef struct _tcp_session_$/;"	s
 _tcp_stream_	inc/tcpreassembly.h	/^typedef struct _tcp_stream_$/;"	s
@@ -268,12 +266,10 @@ adjPos	ais/antibody.h	/^                void adjPos()      { pos++; }$/;"	f	clas
 alen	retdir/import.hpp	/^volatile static sig_atomic_t alen = 0;$/;"	v
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
 arr_size	retdir/import.cpp	/^unsigned int arr_size = 100;$/;"	v
-array	retdir/pull.cpp	/^        unsigned short  *array; $/;"	m	union:_sem_u	file:
 attack	retdir/pull.cpp	/^        int8_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
 avgFitness	ais/lifetime.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 avgFitness	ais/lifetime_nounknown.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 buf	inc/share.h	/^char buf[1024];$/;"	v
-buf	retdir/pull.cpp	/^        struct semid_ds *buf;   $/;"	m	union:_sem_u	typeref:struct:_sem_u::semid_ds	file:
 buildHeap	ais/heap.cpp	/^void AntibodyHeap::buildHeap() {$/;"	f	class:AntibodyHeap
 build_datagram	inc/ipv4defrag.c	/^inline static unsigned char *build_datagram ( pntoh_ipv4_session_t session , pntoh_ipv4_flow_t flow )$/;"	f	file:
 build_datagram	inc/ipv6defrag.c	/^inline static unsigned char *build_datagram ( pntoh_ipv6_session_t session , pntoh_ipv6_flow_t flow )$/;"	f	file:
@@ -300,7 +296,6 @@ data	dhs.c	/^        unsigned char *data;$/;"	m	struct:__anon1	file:
 data	inc/ipv4defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv4_fragment_
 data	inc/ipv6defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv6_fragment_
 data_len	dhs.c	/^        size_t data_len;$/;"	m	struct:__anon1	file:
-decTesting	retdir/pull.cpp	/^inline static void decTesting(void)$/;"	f	file:
 deleteMax	ais/heap.cpp	/^Antibody *AntibodyHeap::deleteMax() {$/;"	f	class:AntibodyHeap
 deleteRandom	ais/mass.cpp	/^Antibody *AntibodyMass::deleteRandom(int max) {$/;"	f	class:AntibodyMass
 delete_stream	inc/tcpreassembly.c	/^inline static void delete_stream ( pntoh_tcp_session_t session , pntoh_tcp_stream_t *stream , int reason , int extra )$/;"	f	file:
@@ -416,7 +411,6 @@ import_mgr_pid	retdir/pull.cpp	/^int32_t import_mgr_pid = -1;$/;"	v
 import_mgr_tid	retdir/pull.cpp	/^pthread_t import_mgr_tid;$/;"	v
 inCtr	dhs.c	/^inline static void inCtr(sig_atomic_t *** s)$/;"	f	file:
 inPos	retdir/pull.cpp	/^inline static void inPos(void)$/;"	f	file:
-incTesting	retdir/pull.cpp	/^inline static void incTesting(void)$/;"	f	file:
 init	inc/ipv4defrag.c	/^		unsigned short		init;$/;"	m	struct:__anon4	file:
 init	inc/ipv6defrag.c	/^		unsigned short	        init;$/;"	m	struct:__anon12	file:
 init	inc/tcpreassembly.c	/^        unsigned short		init;$/;"	m	struct:__anon11	file:
@@ -507,7 +501,6 @@ next	inc/tcpreassembly.h	/^    struct _tcp_session_ 	*next;$/;"	m	struct:_tcp_se
 nextGen	ais/lifetime.cpp	/^void nextGen(float accuracy[]) {$/;"	f
 nextGen	ais/lifetime_nounknown.cpp	/^void nextGen(float accuracy[]) {$/;"	f
 next_seq	inc/tcpreassembly.h	/^	unsigned long 		next_seq;$/;"	m	struct:__anon15
-nsems	retdir/pull.cpp	/^const static uint8_t nsems = 1;$/;"	v	file:
 ntoh_exit	inc/libntoh.c	/^void ntoh_exit ( void )$/;"	f
 ntoh_get_errdesc	inc/libntoh.c	/^const char* ntoh_get_errdesc ( unsigned int val )$/;"	f
 ntoh_get_reason	inc/libntoh.c	/^const char* ntoh_get_reason ( unsigned int val )$/;"	f
@@ -590,7 +583,6 @@ peer_info_t	dhs.c	/^} peer_info_t, *ppeer_info_t;$/;"	t	typeref:struct:__anon1	f
 pending_more_hdr_data	dhs.c	/^static uint8_t pending_more_hdr_data = 0;$/;"	v	file:
 phtable_t	inc/common.h	/^} htable_t , *phtable_t;$/;"	t	typeref:struct:__anon7
 phtnode_t	inc/common.h	/^} htnode_t , *phtnode_t;$/;"	t	typeref:struct:_hash_node_
-pipefd	retdir/pull.cpp	/^int pipefd[2];$/;"	v
 pipv4_dfcallback_t	inc/ipv4defrag.h	/^typedef void(*pipv4_dfcallback_t) ( pntoh_ipv4_flow_t , pntoh_ipv4_tuple4_t , unsigned char* , size_t , unsigned short );$/;"	t
 pipv4_flows_table_t	inc/ipv4defrag.h	/^typedef phtable_t pipv4_flows_table_t;$/;"	t
 pipv6_dfcallback_t	inc/ipv6defrag.h	/^typedef void(*pipv6_dfcallback_t) ( pntoh_ipv6_flow_t , pntoh_ipv6_tuple4_t , unsigned char* , size_t , unsigned short );$/;"	t
@@ -624,7 +616,7 @@ psmem_t	inc/snc.h	/^} smem_t, *psmem_t;$/;"	t	typeref:struct:__anon8
 psnc_t	inc/snc.h	/^} snc_t, *psnc_t;$/;"	t	typeref:struct:__anon10
 ptcprs_streams_table_t	inc/tcpreassembly.h	/^typedef phtable_t ptcprs_streams_table_t;$/;"	t
 ptest_param	retdir/pull.cpp	/^} test_param, *ptest_param;$/;"	t	typeref:struct:_test_param	file:
-pull	retdir/pull.cpp	/^void pull(Antibody ** pop, const int32_t pipefd)$/;"	f
+pull	retdir/pull.cpp	/^void pull(Antibody ** pop)$/;"	f
 queryClassification	ais/antibody.cpp	/^int Antibody::queryClassification() {$/;"	f	class:Antibody
 queryFalseNeg	ais/antibody.h	/^                int queryFalseNeg() { return false_neg; }$/;"	f	class:Antibody
 queryFalsePos	ais/antibody.h	/^                int queryFalsePos() { return false_pos; }$/;"	f	class:Antibody
@@ -648,13 +640,12 @@ resetTests	ais/antibody.cpp	/^void Antibody::resetTests() {$/;"	f	class:Antibody
 resizeChar	retdir/import.cpp	/^inline static void resizeChar(char ** a = 0, unsigned int * s = 0)$/;"	f	file:
 resizeHdr	dhs.c	/^inline static void resizeHdr(void)$/;"	f	file:
 results	ais/webdata.h	/^    int *results;  \/\/ for attack data, results counts number of antibodies$/;"	m	class:Webdata
+ret_pid	dhs.c	/^int32_t ret_pid = 0;$/;"	v
 retrieved_sigs	retdir/retrieve.cpp	/^volatile sig_atomic_t ** retrieved_sigs = NULL;$/;"	v
 retrieved_t5s	retdir/retrieve.cpp	/^volatile sig_atomic_t ** retrieved_t5s = NULL;$/;"	v
 retval_descriptions	inc/libntoh.c	/^static const char retval_descriptions[][48] =$/;"	v	file:
 sack	inc/tcpreassembly.h	/^	unsigned int 		sack;$/;"	m	struct:__anon15
 segments	inc/tcpreassembly.h	/^	pntoh_tcp_segment_t segments;$/;"	m	struct:__anon15
-sem_u	retdir/pull.cpp	/^} sem_u; $/;"	v	typeref:union:_sem_u
-semid	retdir/pull.cpp	/^int32_t semid = 0;$/;"	v
 send_ipv4_fragment	dhs.c	/^void send_ipv4_fragment ( struct ip *iphdr , pipv4_dfcallback_t callback )$/;"	f
 send_peer_segments	inc/tcpreassembly.c	/^inline static unsigned int send_peer_segments ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , unsigned int ack , unsigned short first , int extra, int who )$/;"	f	file:
 send_single_segment	inc/tcpreassembly.c	/^inline static void send_single_segment ( pntoh_tcp_session_t session , pntoh_tcp_stream_t stream , pntoh_tcp_peer_t origin , pntoh_tcp_peer_t destination , pntoh_tcp_segment_t segment , int reason , int extra )$/;"	f	file:
@@ -695,8 +686,6 @@ smem_t	inc/snc.h	/^} smem_t, *psmem_t;$/;"	t	typeref:struct:__anon8
 snc	dhs.c	/^snc_t snc;$/;"	v
 snc_t	inc/snc.h	/^} snc_t, *psnc_t;$/;"	t	typeref:struct:__anon10
 snum	retdir/pull.cpp	/^int32_t snum = 0;$/;"	v
-sops	retdir/pull.cpp	/^struct sembuf sops[sops_qty];$/;"	v	typeref:struct:sembuf
-sops_qty	retdir/pull.cpp	/^const static uint8_t sops_qty = 1;$/;"	v	file:
 source	inc/ipv4defrag.h	/^	unsigned int source;$/;"	m	struct:__anon2
 source	inc/ipv6defrag.h	/^	uint8_t source[16];$/;"	m	struct:__anon5
 source	inc/tcpreassembly.h	/^	unsigned int 	source;$/;"	m	struct:__anon14
@@ -772,7 +761,6 @@ unlock_access	inc/common.c	/^_HIDDEN void unlock_access ( pntoh_lock_t lock )$/;
 use	inc/libntoh.h	/^	int				use;$/;"	m	struct:__anon13
 user_data	inc/tcpreassembly.h	/^	void 					*user_data;$/;"	m	struct:_tcp_segment_
 val	inc/common.h	/^	void				*val;$/;"	m	struct:_hash_node_
-val	retdir/pull.cpp	/^        int  val;    $/;"	m	union:_sem_u	file:
 write_data	dhs.c	/^void write_data ( ppeer_info_t info )$/;"	f
 write_hdr_data	dhs.c	/^void write_hdr_data ( void )$/;"	f
 wscale	inc/tcpreassembly.h	/^	unsigned int 		wscale;$/;"	m	struct:__anon15

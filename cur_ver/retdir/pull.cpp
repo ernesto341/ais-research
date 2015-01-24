@@ -2,22 +2,9 @@
 
 using namespace std;
 
-union _sem_u
-{
-        int  val;    
-        struct semid_ds *buf;   
-        unsigned short  *array; 
-        struct seminfo  *__buf; 
-} sem_u; 
-
-int32_t semid = 0;
-const static uint8_t nsems = 1;
-const static uint8_t sops_qty = 1;
-struct sembuf sops[sops_qty];
-
 int status = 0;
 int32_t import_mgr_pid = -1;
-int pipefd[2];
+//int pipefd[2];
 
 volatile sig_atomic_t do_import = 0;
 
@@ -59,71 +46,44 @@ inline static void inPos(void)
         ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
 }
 
-inline static void incTesting(void)
-{
-        sops[0].sem_op = +1;
-        sops[0].sem_num = 0;
-        semop(semid, sops, 1);
-}
-
-inline static void decTesting(void)
-{
-        sops[0].sem_op = -1;
-        sops[0].sem_num = 0;
-        semop(semid, sops, 1);
-}
-
 /* v is a test_param *, ie ptest_param */
 void * testThread(void * v)
 {
-        if (v)
+        if (v != 000)
         {
                 /*
                    fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
                    fflush(stderr);
                    */
-                /* HERE - FIX THIS */
-                if (((int *)(((ptest_param)(v))->sig))[0] != -1)
+                pthread_mutex_lock(&champs_mutex);
+                for (int i = 0; i < class_count; i++)
                 {
-                        /*
-                           fprintf(stderr, "\n\t\t[T] --- testThread: Good Signature\n");
-                           fflush(stderr);
-                           */
-                        pthread_mutex_lock(&champs_mutex);
-                        for (int i = 0; i < class_count; i++)
+                        for (int j = 0; j < ab_count; j++)
                         {
-                                for (int j = 0; j < ab_count; j++)
+                                if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
-                                        if ((champs)[i][j].fitness() > MIN_FITNESS)
-                                        {
-                                                ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1));
-                                                /* DEBUG */
+                                        ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1));
+                                        /* DEBUG */
 
-                                                //fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
-                                                //fflush(stderr);
+                                        //fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
+                                        //fflush(stderr);
 
-                                                /* DEBUG */
-                                        }
+                                        /* DEBUG */
                                 }
                         }
-                        pthread_mutex_unlock(&champs_mutex);
+                }
+                pthread_mutex_unlock(&champs_mutex);
 
-                        fprintf(stderr, "\n\t\t[T] --- testThread: Something to log\n");
-                        fflush(stderr);
-                        pthread_mutex_lock(&log_mutex);
-                        log_queue.push(*(ptest_param)(v));
-                        pthread_mutex_unlock(&log_mutex);
-                }
-                else
-                {
-                        fprintf(stderr, "\n\t\t[T] --- testThread: Bad Signature\n");
-                        fflush(stderr);
-                }
+                fprintf(stderr, "\n\t\t[T] --- testThread: Something to log\n");
+                fflush(stderr);
+                pthread_mutex_lock(&log_mutex);
+                log_queue.push(*(ptest_param)(v));
+                pthread_mutex_unlock(&log_mutex);
                 ((ptest_param)v)->flag = DONE;
         }
         else
         {
-                cerr << "\n\t\t[T] --- Nothing passed to testThread !!!!!     HERE     !!!!!\n" << flush;
+                cerr << "\n\t\t[T] --- Nothing passed to testThread\n" << flush;
         }
 
         return ((void *)0);
@@ -151,7 +111,6 @@ void * Stats (void * v)
                 fprintf(stderr, "\n\t\t[r] --- Stats: func begin\n");
         }
         test_param tmp;
-        /* start while shm[flag] != done loop */
         while (!quit)
         {
                 pthread_mutex_lock(&log_mutex);
@@ -187,10 +146,9 @@ void * Stats (void * v)
                                 fout << endl;
                         }
                 }
-                /* unlock never blocks, so shouldn't matter */
                 pthread_mutex_unlock(&log_mutex);
         }
-        /* dump overall statistics to log file */
+        /* HERE - dump overall statistics to log file */
         return ((void *)0);
 }
 
@@ -207,23 +165,21 @@ inline static void Convert (char dst[t5TplLen], volatile sig_atomic_t src[t5TplL
 /* v is a test_param [MAX_THREADS] */
 void * testMgr (void * v)
 {
-        if (v)
+        if (v != 000)
         {
                 /* spawn log process */
                 if ((pthread_create(&(log_tid), NULL, Stats, (void *)0)) < 0)
                 {
                         perror("pthread_create()");
                 }
-                int i = 0;
+                int32_t i = 0;
                 /* while not done */
                 while (!quit)
                 {
                         i = 0;
                         /* check all necessary testing params */
-                        //testing = semctl(semid, 0, GETVAL);
                         while (i < testing)
                         {
-                                //testing = semctl(semid, 0, GETVAL);
                                 //cerr << "testMgr, i = " << i << ", testing = " << testing << endl << flush;
                                 //cerr << "flag = " << ((ptest_param)v)[i].flag << endl << flush;
                                 if (((ptest_param)v)[i].flag == START)
@@ -263,13 +219,8 @@ void * testMgr (void * v)
                                            }
                                            }
                                            */
-                                        //testing = semctl(semid, 0, GETVAL);
                                         //cerr << "about to decrement testing, testing = " << testing << "...\n" << flush;
-                                        //sops[0].sem_op = -1;
-                                        //sops[0].sem_num = 0;
-                                        //semop(semid, sops, 1);
                                         testing--;
-                                        //testing = semctl(semid, 0, GETVAL);
                                         //cerr << "testing decremented, testing = " << testing << "\n" << flush;
                                         ((ptest_param)v)[i].flag = COMPLETE;
                                 }
@@ -303,15 +254,16 @@ void * testMgr (void * v)
         return ((void *)0);
 }
 
-void pull(Antibody ** pop, const int32_t pipefd)
+//void pull(Antibody ** pop, const int32_t pipefd)
+void pull(Antibody ** pop)
 {
         if (pop == NULL)
         {
                 /* attempt to pull a population from file */
-                /* maybe fork and exec breed and train module regularly */
+                /* maybe fork and exec breed and train module automatically, regularly */
                 if ((champs = importChamps()) == 0)
                 {
-                        cerr << "Unable to get antibodies to test with, quitting\n" << flush;
+                        cerr << "Unable to get antibodies to test against\nMaybe try running lifetime first?\nQuitting\n" << flush;
                         shm[CTL][FLAGS] = CDONE;
                         return;
                 }
@@ -338,9 +290,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
                 champs = pop;
         }
 
-        /* setup champs update signal */
-        signal(SIGUSR1, &onDemandImport);
-
         /*
            if (DEBUG)
            {
@@ -359,29 +308,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
            }
            */
 
-        /* set up a timer to ensure this operation doesn't permanently lock up */
-        while (semid < 1)
-        {
-                semid = semget((rand() % 65530) + 1, nsems, IPC_CREAT | 0600);
-        }
-        if (semid < 0)
-        {
-                perror("semget()");
-                exit(-1);
-        }
-        sem_u.val = 0;
-        if (semctl(semid, 0, SETVAL, sem_u))
-        {
-                perror("semget(SETVAL): ");
-                exit(-1);
-        }
         uint32_t i = 0, j = 0;
-        while (i < sops_qty)
-        {
-                sops[i].sem_num = i;
-                sops[i].sem_flg = 0;
-                i++;
-        }
 
         i = 0;
         pthread_mutex_init(&champs_mutex, NULL);
@@ -394,17 +321,10 @@ void pull(Antibody ** pop, const int32_t pipefd)
         {
                 if (DEBUG)
                 {
-                        cerr << "Unable to open file for logging\n" << flush;
+                        cerr << "Unable to open file for logging traffic results\n" << flush;
                 }
         }
 
-        /* parent - retrieve loop */
-        /*
-           if (DEBUG)
-           {
-           fprintf(stderr, "\n\t\t[r] --- fork succeeded - parent\n");
-           }
-           */
         test_param params[MAX_THREADS];
         for (i = 0; i < MAX_THREADS; i++)
         {
@@ -416,32 +336,22 @@ void pull(Antibody ** pop, const int32_t pipefd)
         if ((pthread_create(&(test_mgr_tid), NULL, testMgr, (void *)(&(params)))) < 0)
         {
                 perror("pthread_create()");
+                /* HERE */
+                cleanup();
         }
-        /*
-           else
-           {
-           if (DEBUG)
-           {
-        // Retrieve
-        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
-        }
-        }
-        */
         testing = 0;
         if ((pthread_create(&(import_mgr_tid), NULL, importManager, (void *)(0))) < 0)
         {
                 perror("pthread_create()");
+                cerr << "Unable to start importManager\n";
+                import_mgr_tid = 0;
         }
-        /*
-           else
-           {
-           if (DEBUG)
-           {
-        // Retrieve
-        fprintf(stderr, "\n\t\t[r] --- pthread_create succeeded\n");
+
+        else
+        {
+                /* setup champs update signal */
+                signal(SIGUSR1, &onDemandImport);
         }
-        }
-        */
         /*
            if (DEBUG)
            {
@@ -455,7 +365,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
         {
-                /* only copy when dhs isn't writing and while there are pending headers to get - add mutex functionality?
+                /* only copy when dhs isn't writing and while there are pending headers to get
                 */
                 while (shm[CTL][PEND] > 0)
                 {
@@ -470,12 +380,7 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                 */
                                 shm[CTL][FLAGS] = CRING;
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS] == 1 ? (SIGQTY) : (shm[CTL][POS] - 1))], sizeof(sig_atomic_t) * fngPntLen);
-                                //                                memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS])], sizeof(sig_atomic_t) * fngPntLen);
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(sig_atomic_t) * t5TplLen);
-                                //                                memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS])-1], sizeof(sig_atomic_t) * t5TplLen);
-                                /* HERE - lock individual param structs before modification? */
-                                //if (testing < MAX_THREADS)
-                                //testing = semctl(semid, 0, GETVAL);
                                 if ((testing) < MAX_THREADS)
                                 {
                                         started = false;
@@ -488,9 +393,6 @@ void pull(Antibody ** pop, const int32_t pipefd)
                                                         /* convert sig_atomic_t to char */
                                                         Convert(params[j].tuple, retrieved_t5s[ct]);
                                                         /* these two lines signal the testMgr to spawn a testing thread */
-                                                        //sops[0].sem_op = +1;
-                                                        //sops[0].sem_num = 0;
-                                                        //semop(semid, sops, 1);
                                                         testing++;
                                                         params[j].flag = START;
                                                         started = true;
@@ -550,28 +452,28 @@ void pull(Antibody ** pop, const int32_t pipefd)
         }
         quit = true;
         /* signal dhs that retrieve is done */
-        if (shm)
+        if (shm != 000)
         {
                 shm[CTL][FLAGS] = CDONE;
         }
         /* join testMgr. since fork/logging is not a priority, make sure there is actually a child process before waiting for child process */
-        if ((pthread_join(import_mgr_tid, NULL)) < 0)
+        if (import_mgr_tid != 0)
         {
-                perror("pthread_join()");
-                /* HERE - cleanup and exit */
+                if ((pthread_join(import_mgr_tid, NULL)) < 0)
+                {
+                        perror("pthread_join()");
+                }
         }
         if ((pthread_join(test_mgr_tid, NULL)) < 0)
         {
                 perror("pthread_join()");
-                /* HERE - cleanup and exit */
         }
-        /*
-           delete champs;
-           pthread_mutex_destroy(&champs_mutex);
-           */
+
         cleanup();
 
         exit(EXIT_SUCCESS);
+
+        /* dummy return */
         return;
 }
 
@@ -580,11 +482,6 @@ void cleanup(void)
         delete champs;
         pthread_mutex_destroy(&champs_mutex);
         pthread_mutex_destroy(&log_mutex);
-        int32_t ret = semctl(semid, 0, IPC_RMID);
-        if (ret < 0)
-        {
-                perror("shmctl()");
-        }
         /* close log file */
         fout.close();
 }

@@ -1,7 +1,7 @@
 Versions numbered.
-Current Stable Version: 0.2
+Current Stable Version: 0.3
 
-With version 0.2 and later, just run make to create all necessary binaries. Ver. 0.3 and later include a 'make veryclean' and a 'make clean' option, removing everything or just logs and dhs/retrieve binaries respectively.
+With version 0.2 and later, just run make to create all necessary binaries. Ver. 0.3 and later includes a 'make veryclean' and a 'make clean' option, removing all binaries, antibody files, and logs, or just logs and dhs/retrieve binaries, respectively.
 
 Setup:
 
@@ -10,10 +10,10 @@ Run 'lifetime.25' (or whichever version desired) from the 'ais/' directory. 'cha
 
 Useage:
 
-Run 'dhs -i <interface>', optionally with ' 2> dhs.log &' to begin monitoring network traffic.
-Run 'retrieve' from the 'retdir/' directory, optionally with ' 2> ret.log &' to begin testing live traffic.
+Run 'dhs -i <interface>', optionally with ' 2> dhs.log &', to begin monitoring network traffic and testing live traffic (w/ver. >= 0.3).
+PRIOR TO VER 0.3: Run 'retrieve' from the 'retdir/' directory, optionally with ' 2> ret.log &', to begin testing live traffic.
 Live traffic test results are stored in 'traffic.log'.
 To update the 'champions.abs' file with a new pool of antibodies, rerun 'lifetime.25' (or whichever version makes you happiest) from the 'ais/' directory. A new 'champions.abs' file will be created. After the new pool has been bred, send a SIGUSR1 signal to the 'retrieve' process. The new pool will be imported, replacing the old pool.
-To exit cleanly, kill the 'retrieve' process. All other processes will exit, cleaning up after themselves.
+To exit cleanly, kill the 'dhs' process for version 0.3 and later, or the 'retrieve' process for earlier versions. All other processes will exit, cleaning up after themselves.
 
 

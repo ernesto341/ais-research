@@ -95,6 +95,7 @@ char * tmp = 0;
 sig_atomic_t * t5Convert;
 static uint8_t pending_more_hdr_data = 0;
 int32_t fd = 0;
+int32_t ret_pid = 0;
 
 uint32_t i = 0;
 
@@ -116,6 +117,9 @@ void shandler ( int sign )
         signal( SIGTERM, &shandler );
         signal( SIGSEGV, &shandler );
 
+        snc.smem.shm[CTL][FLAGS] = PDONE;
+        kill(ret_pid, SIGINT);
+
         uint32_t len = 0;
         if (DEBUG)
         {
@@ -131,7 +135,6 @@ void shandler ( int sign )
                 len += 19;
                 write(2, buf, len);
         }
-        snc.smem.shm[CTL][FLAGS] = PDONE;
 
         freeMem(&snc);
 
@@ -1330,88 +1333,104 @@ int main (int argc , char *argv[])
 
         initMem(&snc);
 
-        if ((t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen)) < (sig_atomic_t *)0)
+        /* fork and exec retrieve in retdir */
+
+        char *null_args[] = {NULL};
+        char *null_envp[] = {NULL};
+        if ((ret_pid = fork()) == 0) /* child */
         {
-                write(2, "\n\t[e] --- Unable to allocate sufficient memory\n", 47);
-                fflush(stderr);
-                _exit(-1);
+                if (execve((char *)"./retdir/retrieve\0", null_args, null_envp) < 0)
+                {
+                        perror("execve()");
+                        shandler(-1);
+                }
         }
-
-        ntoh_init ();
-
-        if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
+        else
         {
+
+                if ((t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen)) < (sig_atomic_t *)0)
+                {
+                        write(2, "\n\t[e] --- Unable to allocate sufficient memory\n", 47);
+                        fflush(stderr);
+                        _exit(-1);
+                }
+
+                ntoh_init ();
+
+                if ( ! (tcp_session = ntoh_tcp_new_session ( 0 , 0 , &error ) ) )
+                {
+                        if (DEBUG)
+                        {
+                                fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
+                        }
+                        exit ( -5 );
+                }
+
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error %d creating TCP session: %s" , error , ntoh_get_errdesc ( error ) );
+                        fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
                 }
-                exit ( -5 );
-        }
 
-        if (DEBUG)
-        {
-                fprintf ( stderr , "\n[i] Max. TCP streams allowed: %d" , ntoh_tcp_get_size ( tcp_session ) );
-        }
+                if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
+                {
+                        ntoh_tcp_free_session ( tcp_session );
+                        if (DEBUG)
+                        {
+                                fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
+                        }
+                        exit ( -6 );
+                }
 
-        if ( ! (ipv4_session = ntoh_ipv4_new_session ( 0 , 0 , &error )) )
-        {
-                ntoh_tcp_free_session ( tcp_session );
                 if (DEBUG)
                 {
-                        fprintf ( stderr , "\n[e] Error %d creating IPv4 session: %s" , error , ntoh_get_errdesc ( error ) );
+                        fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
+
+                        fflush(stderr);
                 }
-                exit ( -6 );
-        }
 
-        if (DEBUG)
-        {
-                fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
-
-                fflush(stderr);
-        }
-
-        /* capture starts */
-        /* accept signal from consumer to quit */
-        while ( ( packet = pcap_next( handle, &header ) ) != 0 && snc.smem.shm[CTL][FLAGS] != CDONE)
-        {
-                /* get packet headers */
-                ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
-                if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
+                /* capture starts */
+                /* accept signal from consumer to quit */
+                while ( ( packet = pcap_next( handle, &header ) ) != 0 && snc.smem.shm[CTL][FLAGS] != CDONE)
                 {
-                        continue;
+                        /* get packet headers */
+                        ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
+                        if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
+                        {
+                                continue;
+                        }
+
+                        /* it is an IPv4 fragment */
+                        if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
+                        {
+                                send_ipv4_fragment ( ip , &ipv4_callback );
+                        }
+                        /* or a TCP segment */
+                        else if ( ip->ip_p == IPPROTO_TCP )
+                        {
+                                send_tcp_segment ( ip , &tcp_callback );
+                        }
+                }
+                if (snc.smem.shm[CTL][FLAGS] == CDONE)
+                {
+                        shandler( 0 );
                 }
 
-                /* it is an IPv4 fragment */
-                if ( NTOH_IPV4_IS_FRAGMENT(ip->ip_off) )
+                tcps = ntoh_tcp_count_streams( tcp_session );
+                ipf = ntoh_ipv4_count_flows ( ipv4_session );
+
+                /* no streams left */
+                if ( ipf + tcps > 0 )
                 {
-                        send_ipv4_fragment ( ip , &ipv4_callback );
+                        if (DEBUG)
+                        {
+                                fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
+                                pause();
+                        }
                 }
-                /* or a TCP segment */
-                else if ( ip->ip_p == IPPROTO_TCP )
-                {
-                        send_tcp_segment ( ip , &tcp_callback );
-                }
-        }
-        if (snc.smem.shm[CTL][FLAGS] == CDONE)
-        {
+
                 shandler( 0 );
+
         }
-
-        tcps = ntoh_tcp_count_streams( tcp_session );
-        ipf = ntoh_ipv4_count_flows ( ipv4_session );
-
-        /* no streams left */
-        if ( ipf + tcps > 0 )
-        {
-                if (DEBUG)
-                {
-                        fprintf( stderr, "\n\n[+] There are currently %i stored TCP stream(s) and %i IPv4 flow(s). You can wait for them to get closed or press CTRL+C\n" , tcps , ipf );
-                        pause();
-                }
-        }
-
-        shandler( 0 );
-
         //dummy return, should never be called
         return (0);
 }
