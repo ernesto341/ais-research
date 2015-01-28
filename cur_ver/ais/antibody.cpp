@@ -108,7 +108,7 @@ void Antibody::calcCategory(int c, int total) {
 
 // Check if expressed attributes match given input
 // Returns 1 if matches, 0 if not matches
-int Antibody::match(int *test, const int & debug)
+int Antibody::match(int *test, const int & debug, string * buf)
 {
         tests++;
         if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND]))
@@ -117,6 +117,7 @@ int Antibody::match(int *test, const int & debug)
                 {
                         cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
                         cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
+                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n";
                 }
                 return (0);
         }
@@ -126,6 +127,7 @@ int Antibody::match(int *test, const int & debug)
                 {
                         cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
                         cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
+                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n";
                 }
                 return (0);
         }
@@ -142,6 +144,7 @@ int Antibody::match(int *test, const int & debug)
                         {
                                 cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
                                 cout << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
+                                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n";
                         }
                         return (1);  // Over max antibody match, assume is attack
                 }
@@ -151,6 +154,7 @@ int Antibody::match(int *test, const int & debug)
                         {
                                 cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
                                 cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
+                                *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n";
                         }
                         return (0);
                 }
@@ -159,6 +163,7 @@ int Antibody::match(int *test, const int & debug)
         {
                 cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
                 cout << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
+                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n";
         }
         return (1);
 }

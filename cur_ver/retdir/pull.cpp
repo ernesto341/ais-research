@@ -36,6 +36,7 @@ typedef struct _test_param
         char tuple[t5TplLen]; // t5 tuple
         volatile sig_atomic_t flag; // signal to thread to start testing
         int8_t attack; // whether or not the tested signature was determined to be an attack
+        string debug_buf;
 } test_param, *ptest_param;
 
 queue<test_param> log_queue;
@@ -62,7 +63,7 @@ void * testThread(void * v)
                         {
                                 if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
-                                        ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1));
+                                        ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1, &(((ptest_param)v)->debug_buf)));
                                         /* DEBUG */
 
                                         //fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
@@ -132,7 +133,6 @@ void * Stats (void * v)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << endl;
                         }
                         else
                         {
@@ -143,8 +143,12 @@ void * Stats (void * v)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << endl;
                         }
+                        if (DEBUG)
+                        {
+                                tmp.debug_buf.length() > 1 ? (fout << endl << "Debuging Info from Antibody::Match(): " << tmp.debug_buf << endl) : (fout << endl << "No Debugging Info Returned from Antibody::Match().");
+                        }
+                        fout << endl;
                 }
                 pthread_mutex_unlock(&log_mutex);
         }

@@ -2,6 +2,8 @@
 
 using namespace std;
 
+struct stat buf;
+
 void onDemandImport (int sign)
 {
         if (DEBUG)
@@ -37,6 +39,12 @@ inline static void resizeChar(char ** a = 0, unsigned int * s = 0)
 }
 
 unsigned int arr_size = 100;
+static bool checked = false;
+
+inline static bool Exists (const char * n)
+{
+        return((bool)(stat(n, &buf) == 0));
+}
 
 Antibody ** importChamps (char * fin)
 {
@@ -44,7 +52,10 @@ Antibody ** importChamps (char * fin)
         {
                 fin = (char *)"./ais/champions.abs\0";
         }
-        cerr << "importChamps: filename = " << fin << endl << flush;
+        if (DEBUG)
+        {
+                cerr << "importChamps: filename = " << fin << endl << flush;
+        }
         ifstream in(fin);
         if (in.fail())
         {
@@ -53,8 +64,21 @@ Antibody ** importChamps (char * fin)
                 ifstream in(fin);
                 if (in.fail())
                 {
-                        cerr << "Unable to open champs file\n" << flush;
-                        return (0);
+                        cerr << "Unable to open champs file\nAttempting to generate...\n" << flush;
+                        /* HERE */
+                        if (!checked)
+                        {
+                                system(Exists((const char *)("./../ais/lifetime.25\0")) ? (char *)("cd ./../ais/ && ./lifetime.25 && cd ../retdir/\0") : (Exists((const char *)("./ais/lifetime.25\0")) ? (char *)("cd ./ais/ && ./lifetime.25 && cd ../\0") : (char *)("")));
+                                checked = true;
+                                //while(!Exists((const char *)("./../ais/champions.abs\0")) && !Exists((const char *)("./ais/champions.abs\0")));
+
+                                return(importChamps((char *)(0)));
+                        }
+                        else
+                        {
+                                cerr << "Unable to generate champs file. Aborting.\n" << flush;
+                                return (0);
+                        }
                 }
         }
         char * data = 0;

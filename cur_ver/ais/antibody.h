@@ -63,7 +63,7 @@ class Antibody {
                 Antibody(int *, int *, int *);  // Antibody w/ given attributes
                 Antibody(Antibody &);
 
-                int match(int *, const int & debug = 0);    // Returns 1 = attack, 0 = normal
+                int match(int *, const int & debug = 0, string * buf = NULL);    // Returns 1 = attack, 0 = normal
                 float fitness(int cl = -1);
                 void mate(Antibody *, Antibody **, Antibody **);
                 void mutate();

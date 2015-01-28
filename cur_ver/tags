@@ -43,7 +43,7 @@ Copy	ais/lifetime.cpp	/^void Copy(const int & c = 0)$/;"	f
 Copy	retdir/pull.cpp	/^inline static void Copy(test_param & d, test_param s)$/;"	f	file:
 DEBUG	dhs.c	70;"	d	file:
 DEBUG	inc/share.c	10;"	d	file:
-DEBUG	retdir/import.hpp	16;"	d
+DEBUG	retdir/import.hpp	17;"	d
 DEBUG	retdir/mem.hpp	11;"	d
 DEBUG	retdir/pull.hpp	17;"	d
 DEBUG	retdir/retrieve.cpp	10;"	d	file:
@@ -67,6 +67,8 @@ DEFAULT_TIMEOUT_DELAY	inc/tcpreassembly.h	270;"	d
 DHSFILES	Makefile	/^DHSFILES        =  $(LIB)\/itoa.o $(LIB)\/ipv6defrag.o $(LIB)\/ipv4defrag.o $(LIB)\/common.o $(LIB)\/sfhash.o $(LIB)\/tcpreassembly.o $(LIB)\/libntoh.o $(LIB)\/share.o$/;"	m
 DONE	retdir/pull.hpp	38;"	d
 Dump	ais/lifetime.cpp	/^void Dump (const Antibody c[CLASS_COUNT][MAX_ANTIBODIES])$/;"	f
+Exists	retdir/import.cpp	/^inline static bool Exists (const char * n)$/;"	f	file:
+Exists	retdir/test.cpp	/^inline bool Exists (const char ** name)$/;"	f
 FLAGS	inc/globals.h	/^static const uint8_t FLAGS = 2;$/;"	v
 FLAGS	retdir/retglobals.h	/^static const uint8_t FLAGS = 2;$/;"	v
 FORWARD	ais/antibody.h	/^                static const int FORWARD = 11;    \/\/ Number of \/\/ chars in request$/;"	m	class:Antibody
@@ -270,6 +272,8 @@ attack	retdir/pull.cpp	/^        int8_t attack; \/\/ whether or not the tested s
 avgFitness	ais/lifetime.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 avgFitness	ais/lifetime_nounknown.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 buf	inc/share.h	/^char buf[1024];$/;"	v
+buf	retdir/import.cpp	/^struct stat buf;$/;"	v	typeref:struct:stat
+buffer	retdir/test.cpp	/^struct stat buffer;$/;"	v	typeref:struct:stat
 buildHeap	ais/heap.cpp	/^void AntibodyHeap::buildHeap() {$/;"	f	class:AntibodyHeap
 build_datagram	inc/ipv4defrag.c	/^inline static unsigned char *build_datagram ( pntoh_ipv4_session_t session , pntoh_ipv4_flow_t flow )$/;"	f	file:
 build_datagram	inc/ipv6defrag.c	/^inline static unsigned char *build_datagram ( pntoh_ipv6_session_t session , pntoh_ipv6_flow_t flow )$/;"	f	file:
@@ -280,6 +284,7 @@ champs	ais/lifetime.cpp	/^Antibody champs[CLASS_COUNT][MAX_ANTIBODIES];$/;"	v
 champs	retdir/pull.cpp	/^Antibody ** champs;$/;"	v
 champs_mutex	retdir/pull.cpp	/^pthread_mutex_t champs_mutex;$/;"	v
 check_timeout	inc/tcpreassembly.h	/^enum check_timeout$/;"	g
+checked	retdir/import.cpp	/^static bool checked = false;$/;"	v	file:
 child_pid	retdir/pull.cpp	/^int32_t child_pid = -1;$/;"	v
 cksum	inc/ipv4defrag.c	/^inline static unsigned short cksum(unsigned short *buf, int nwords)$/;"	f	file:
 class_count	retdir/import.hpp	/^volatile static sig_atomic_t class_count = 0;$/;"	v
@@ -296,6 +301,7 @@ data	dhs.c	/^        unsigned char *data;$/;"	m	struct:__anon1	file:
 data	inc/ipv4defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv4_fragment_
 data	inc/ipv6defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv6_fragment_
 data_len	dhs.c	/^        size_t data_len;$/;"	m	struct:__anon1	file:
+debug_buf	retdir/pull.cpp	/^        string debug_buf;$/;"	m	struct:_test_param	file:
 deleteMax	ais/heap.cpp	/^Antibody *AntibodyHeap::deleteMax() {$/;"	f	class:AntibodyHeap
 deleteRandom	ais/mass.cpp	/^Antibody *AntibodyMass::deleteRandom(int max) {$/;"	f	class:AntibodyMass
 delete_stream	inc/tcpreassembly.c	/^inline static void delete_stream ( pntoh_tcp_session_t session , pntoh_tcp_stream_t *stream , int reason , int extra )$/;"	f	file:
@@ -470,7 +476,8 @@ main	ais/lifetime.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	ais/lifetime_nounknown.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	dhs.c	/^int main (int argc , char *argv[])$/;"	f
 main	retdir/retrieve.cpp	/^int main (void)$/;"	f
-match	ais/antibody.cpp	/^int Antibody::match(int *test, const int & debug)$/;"	f	class:Antibody
+main	retdir/test.cpp	/^int main(void)$/;"	f
+match	ais/antibody.cpp	/^int Antibody::match(int *test, const int & debug, string * buf)$/;"	f	class:Antibody
 mate	ais/antibody.cpp	/^void Antibody::mate(Antibody *m, Antibody **c1, Antibody **c2) {$/;"	f	class:Antibody
 max	ais/antibody.h	/^                int max[ALEN];       \/\/ Maximum values for each attribute$/;"	m	class:Antibody
 max_flows	inc/ipv4defrag.h	/^	sem_t 					max_flows;$/;"	m	struct:_ipv4_session_
