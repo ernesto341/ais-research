@@ -31,6 +31,7 @@ CLASS_LABELS	ais/antibody.h	/^const char CLASS_LABELS[CLASS_COUNT][15] = { "info
 CMD	tester.hpp	/^static const char CMD[] = "curl ";$/;"	v
 COMMAND	ais/antibody.h	/^                static const int COMMAND = 0;     \/\/ HTTP command (GET, POST, HEAD, other)$/;"	m	class:Antibody
 COMPLETE	retdir/pull.hpp	40;"	d
+CP	Makefile	/^CP              =  g++ $(CFLAGS) $(INCFLAGS)$/;"	m
 CPAREN	ais/antibody.h	/^                static const int CPAREN = 10;     \/\/ Number of ) chars in request$/;"	m	class:Antibody
 CREAD	inc/globals.h	/^static const uint8_t CREAD = 5;$/;"	v
 CREAD	retdir/retglobals.h	/^static const uint8_t CREAD = 5;$/;"	v
