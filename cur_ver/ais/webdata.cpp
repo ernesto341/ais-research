@@ -213,8 +213,8 @@ void Webdata::test(Antibody **a, int s, int f, int cl) {
 
         labelAccuracy[cl] = (classTotal > 0) ? ((float)classDetected/classTotal) : 0;
 
-        cout << left << setw(15) << CLASS_LABELS[cl] << setw(15) << labelAccuracy[cl];
-        cout << setw(7) << classDetected << setw(7) << classTotal << endl;
+        cerr << left << setw(15) << CLASS_LABELS[cl] << setw(15) << labelAccuracy[cl];
+        cerr << setw(7) << classDetected << setw(7) << classTotal << endl;
 }
 
 // This function returns the percentage of mislabelled data.

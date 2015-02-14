@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
   if(argc > 4) PR_XOVER = atof(argv[4]);
   if(argc > 5) BAD_THRESHOLD = atof(argv[5]);
 
-  cout << "Vars: " << MAX_ROUNDS << " " << PR_MUTATION << endl;
+  cerr << "Vars: " << MAX_ROUNDS << " " << PR_MUTATION << endl;
 
   float classAccuracy[MAX_RUNS][MAX_ROUNDS][CLASS_COUNT];
   float averageAccuracy[MAX_ROUNDS][CLASS_COUNT];
@@ -126,7 +126,7 @@ int main(int argc, char *argv[]) {
         << PR_XOVER << "_" << PR_MUTATION << ends;
   fout.open(f);
 
-  cout << f << endl;
+  cerr << f << endl;
 
   fname2 << "res/details." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
          << PR_XOVER << "_" << PR_MUTATION << ends;
@@ -185,13 +185,13 @@ int main(int argc, char *argv[]) {
 #ifdef OUTPUT_INFO
     fout << "Population " << setw(5) << r << endl;
 #endif
-    cout << "Population " << setw(5) << r << endl;
+    cerr << "Population " << setw(5) << r << endl;
     for(int i = 0; i < MAX_ROUNDS; i++) {
       if(i == MAX_ROUNDS - 1) logNeg = 1;
 
-      cout << "Generation " << i << endl;
-      cout << left << setw(15) << "Class" << setw(10) << "Percent";
-      cout << left << setw(7) << "Detect" << setw(7) << "Total" << endl;
+      cerr << "Generation " << i << endl;
+      cerr << left << setw(15) << "Class" << setw(10) << "Percent";
+      cerr << left << setw(7) << "Detect" << setw(7) << "Total" << endl;
 
 #ifdef OUTPUT_INFO
 #ifdef VERBOSE_OUTPUT
@@ -228,45 +228,45 @@ int main(int argc, char *argv[]) {
 #endif
   }
   for(int r = 0; r < MAX_RUNS; r++) {
-    cout << "Overall classification stats for Population " << r << endl;
-    cout << left << setw(5) << "Gen";
+    cerr << "Overall classification stats for Population " << r << endl;
+    cerr << left << setw(5) << "Gen";
     for(int c = 0; c < CLASS_COUNT; c++) {
-      cout << left << setw(10) << CLASS_LABELS[c];
+      cerr << left << setw(10) << CLASS_LABELS[c];
     }
-    cout << endl;
+    cerr << endl;
     for(int i = 0; i < MAX_ROUNDS; i++) {
-      cout << setw(5) << i;
+      cerr << setw(5) << i;
       for(int c = 0; c < CLASS_COUNT; c++) {
-        cout << setw(10) << classAccuracy[r][i][c];
+        cerr << setw(10) << classAccuracy[r][i][c];
       }
-      cout << endl;
+      cerr << endl;
     }
   }
-  cout << "Average accuracy over all populations.\n";
-  cout << left << setw(5) << "Gen";
+  cerr << "Average accuracy over all populations.\n";
+  cerr << left << setw(5) << "Gen";
   for(int c = 0; c < CLASS_COUNT; c++) {
-    cout << left << setw(10) << CLASS_LABELS[c];
+    cerr << left << setw(10) << CLASS_LABELS[c];
   }
-  cout << endl;
+  cerr << endl;
   for(int i = 0; i < MAX_ROUNDS; i++) {
-    cout << setw(5) << i;
+    cerr << setw(5) << i;
     for(int j = 0; j < CLASS_COUNT; j++) {
-      cout << setw(10) << averageAccuracy[i][j] / MAX_RUNS;
+      cerr << setw(10) << averageAccuracy[i][j] / MAX_RUNS;
     }
-    cout << endl;
+    cerr << endl;
   }
-  cout << "Best accuracy over all populations.\n";
-  cout << left << setw(5) << "Gen";
+  cerr << "Best accuracy over all populations.\n";
+  cerr << left << setw(5) << "Gen";
   for(int c = 0; c < CLASS_COUNT; c++) {
-    cout << left << setw(10) << CLASS_LABELS[c];
+    cerr << left << setw(10) << CLASS_LABELS[c];
   }
-  cout << endl;
+  cerr << endl;
   for(int i = 0; i < MAX_ROUNDS; i++) {
-    cout << setw(5) << i;
+    cerr << setw(5) << i;
     for(int j = 0; j < CLASS_COUNT; j++) {
-      cout << setw(10) << bestAccuracy[i][j];
+      cerr << setw(10) << bestAccuracy[i][j];
     }
-    cout << endl;
+    cerr << endl;
   }
 #ifdef OUTPUT_INFO
   fout.close();
@@ -300,7 +300,7 @@ void generateAntibody(int i, int j) {
     pop[i][j] = NULL;
   }
   if(pop[i][j] == NULL) {
-    cout << "Allocation failure. Try with a smaller population size.\n";
+    cerr << "Allocation failure. Try with a smaller population size.\n";
     exit(1);
   }
 }
