@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sys/stat.h>
 
 #include <retglobals.h>
 #include <itoa.h>

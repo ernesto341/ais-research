@@ -28,8 +28,10 @@ CFLAGS	Makefile	/^CFLAGS          =  -Wall -Wextra -ggdb -O2 -lpthread$/;"	m
 CFLAGS	ais/Makefile	/^CFLAGS = -g -Wno-deprecated$/;"	m
 CLASS_COUNT	ais/antibody.h	/^const int CLASS_COUNT = 6;$/;"	v
 CLASS_LABELS	ais/antibody.h	/^const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };$/;"	v
+CMD	tester.hpp	/^static const char CMD[] = "curl ";$/;"	v
 COMMAND	ais/antibody.h	/^                static const int COMMAND = 0;     \/\/ HTTP command (GET, POST, HEAD, other)$/;"	m	class:Antibody
 COMPLETE	retdir/pull.hpp	40;"	d
+CP	Makefile	/^CP              =  g++ $(CFLAGS) $(INCFLAGS)$/;"	m
 CPAREN	ais/antibody.h	/^                static const int CPAREN = 10;     \/\/ Number of ) chars in request$/;"	m	class:Antibody
 CREAD	inc/globals.h	/^static const uint8_t CREAD = 5;$/;"	v
 CREAD	retdir/retglobals.h	/^static const uint8_t CREAD = 5;$/;"	v
@@ -75,10 +77,12 @@ FORWARD	ais/antibody.h	/^                static const int FORWARD = 11;    \/\/ 
 GT	ais/antibody.h	/^                static const int GT = 13;         \/\/ Number of > chars in request$/;"	m	class:Antibody
 INC	Makefile	/^INC             =  .\/inc$/;"	m
 INCFLAGS	Makefile	/^INCFLAGS        =  -I $(INC) -I $(RET) -I \/usr\/include -I \/usr\/local\/include -I $(AIS)$/;"	m
+INFILE	tester.hpp	/^const char * INFILE = ".\/ais\/attack\\0";$/;"	v
 IS_FINWAIT2	inc/tcpreassembly.c	254;"	d	file:
 IS_SET	inc/ipv4defrag.c	47;"	d	file:
 IS_SET	inc/ipv6defrag.c	48;"	d	file:
 IS_TIMEWAIT	inc/tcpreassembly.c	46;"	d	file:
+KILL	tester.hpp	/^static const char KILL[] = "pkill curl\\0";$/;"	v
 LENGTH	ais/antibody.h	/^                static const int LENGTH = 2;      \/\/ Length of request$/;"	m	class:Antibody
 LIB	Makefile	/^LIB             =  .\/lib$/;"	m
 LOG	retdir/pull.hpp	39;"	d
@@ -202,6 +206,7 @@ SIGQTY	inc/globals.h	/^static const uint32_t SIGQTY = 5;$/;"	v
 SIGQTY	retdir/retglobals.h	/^static const uint32_t SIGQTY = 5;$/;"	v
 START	retdir/pull.hpp	36;"	d
 Stats	retdir/pull.cpp	/^void * Stats (void * v)$/;"	f
+TARGET	tester.hpp	2;"	d
 TEST_UNKNOWN	ais/lifetime_nounknown.cpp	14;"	d	file:
 TRAIN_AGREE	ais/lifetime.cpp	/^int TRAIN_AGREE = 3;          \/\/ Number that must agree to mark attack$/;"	v
 TRAIN_AGREE	ais/lifetime_nounknown.cpp	/^int TRAIN_AGREE = 3;          \/\/ Number that must agree to mark attack$/;"	v
@@ -213,12 +218,15 @@ VERSION	inc/libntoh.c	39;"	d	file:
 WORKING	retdir/pull.hpp	37;"	d
 Webdata	ais/webdata.cpp	/^Webdata::Webdata(char *inf, int f) {$/;"	f	class:Webdata
 Webdata	ais/webdata.h	/^class Webdata {$/;"	c
+_CMD	tester.hpp	10;"	d
 _CONTAINS_H_	inc/contains.h	15;"	d
 _GLOBALS_H_	inc/globals.h	4;"	d
 _GLOBALS_H_	retdir/retglobals.h	4;"	d
 _HIDDEN	inc/common.h	35;"	d
 _IMPORT_HPP_	retdir/import.hpp	2;"	d
+_INFILE	tester.hpp	5;"	d
 _ITOA_H_	inc/itoa.h	5;"	d
+_KILL	tester.hpp	15;"	d
 _LINUX_SFHASH_H	inc/sfhash.h	2;"	d
 _SHARE_H_	inc/share.h	8;"	d
 _SNC_H_	inc/snc.h	2;"	d
@@ -333,6 +341,7 @@ falsePosCnt	ais/lifetime_nounknown.cpp	/^int falsePosCnt[CLASS_COUNT];$/;"	v
 false_neg	ais/antibody.h	/^                int false_neg;       \/\/ Number of attacks labeled as normal$/;"	m	class:Antibody
 false_pos	ais/antibody.h	/^                int false_pos;       \/\/ Number of normal requests labeled as attacks$/;"	m	class:Antibody
 fd	dhs.c	/^int32_t fd = 0;$/;"	v
+fib	tester.cpp	/^int fib (int n)$/;"	f
 files	ais/webdata.h	/^    char **files;$/;"	m	class:Webdata
 final_iphdr	inc/ipv4defrag.h	/^	struct ip 				*final_iphdr;$/;"	m	struct:__anon3	typeref:struct:__anon3::ip
 final_iphdr	inc/ipv6defrag.h	/^	struct ip6_hdr			*final_iphdr;$/;"	m	struct:__anon6	typeref:struct:__anon6::ip6_hdr
@@ -379,6 +388,7 @@ generic_write_data	dhs.c	/^void generic_write_data ( void * data )$/;"	f
 get16bits	inc/sfhash.c	4;"	d	file:
 getDstPrt	dhs.c	/^inline uint32_t getDstPrt(const char * path)$/;"	f
 getSrcPrt	dhs.c	/^inline uint32_t getSrcPrt(const char * path)$/;"	f
+getUris	tester.cpp	/^string * getUris(istream & in_file, string *& data, int &uri_size)$/;"	f
 get_peer_info	dhs.c	/^ppeer_info_t get_peer_info ( unsigned char *payload , size_t payload_len , pntoh_tcp_tuple5_t tuple )$/;"	f
 get_proto_description	dhs.c	/^inline char *get_proto_description ( unsigned short proto )$/;"	f
 get_tcp_options	inc/tcpreassembly.c	/^inline static void get_tcp_options ( pntoh_tcp_peer_t peer , struct tcphdr *tcp , size_t tcp_len )$/;"	f	file:
@@ -477,6 +487,7 @@ main	ais/lifetime_nounknown.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	dhs.c	/^int main (int argc , char *argv[])$/;"	f
 main	retdir/retrieve.cpp	/^int main (void)$/;"	f
 main	retdir/test.cpp	/^int main(void)$/;"	f
+main	tester.cpp	/^int main (int argc, char *argv[], char *envp[])$/;"	f
 match	ais/antibody.cpp	/^int Antibody::match(int *test, const int & debug, string * buf)$/;"	f	class:Antibody
 mate	ais/antibody.cpp	/^void Antibody::mate(Antibody *m, Antibody **c1, Antibody **c2) {$/;"	f	class:Antibody
 max	ais/antibody.h	/^                int max[ALEN];       \/\/ Maximum values for each attribute$/;"	m	class:Antibody
@@ -644,6 +655,7 @@ receive	inc/tcpreassembly.h	/^	unsigned short 		receive;$/;"	m	struct:__anon15
 reset	ais/unknownweb.cpp	/^void unknownWeb::reset() {$/;"	f	class:unknownWeb
 resetStats	ais/webdata.cpp	/^void Webdata::resetStats() {$/;"	f	class:Webdata
 resetTests	ais/antibody.cpp	/^void Antibody::resetTests() {$/;"	f	class:Antibody
+resize	tester.cpp	/^inline static bool resize(string *& s, int &l)$/;"	f	file:
 resizeChar	retdir/import.cpp	/^inline static void resizeChar(char ** a = 0, unsigned int * s = 0)$/;"	f	file:
 resizeHdr	dhs.c	/^inline static void resizeHdr(void)$/;"	f	file:
 results	ais/webdata.h	/^    int *results;  \/\/ for attack data, results counts number of antibodies$/;"	m	class:Webdata

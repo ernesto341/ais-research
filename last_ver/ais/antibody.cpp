@@ -108,17 +108,64 @@ void Antibody::calcCategory(int c, int total) {
 
 // Check if expressed attributes match given input
 // Returns 1 if matches, 0 if not matches
-int Antibody::match(int *test) {
+int Antibody::match(int *test, const int & debug, string * buf)
+{
         tests++;
-        if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND])) return 0;
-        if(flags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])) return 0;
-        for(int i = LENGTH; i < ALEN; i++) {
-                if(!flags[i]) continue;
-                int overf = (int)pow(2.0, (double)max[i]) + (int)pow(2.0, max[i] - 1.0) - 2;
-                if(test[i] > overf) return 1;  // Over max antibody match, assume is attack
-                if(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i])) return 0;
+        if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND]))
+        {
+                if (debug == 1)
+                {
+                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
+                        cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
+                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n";
+                }
+                return (0);
         }
-        return 1;
+        if(flags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL]))
+        {
+                if (debug == 1)
+                {
+                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
+                        cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
+                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n";
+                }
+                return (0);
+        }
+        for(int i = LENGTH; i < ALEN; i++)
+        {
+                if(!flags[i])
+                {
+                        continue;
+                }
+                int overf = (int)pow(2.0, (double)max[i]) + (int)pow(2.0, max[i] - 1.0) - 2;
+                if (test[i] > overf)
+                {
+                        if (debug == 1)
+                        {
+                                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
+                                cout << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
+                                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n";
+                        }
+                        return (1);  // Over max antibody match, assume is attack
+                }
+                if (test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))
+                {
+                        if (debug == 1)
+                        {
+                                cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
+                                cout << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
+                                *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n";
+                        }
+                        return (0);
+                }
+        }
+        if (debug == 1)
+        {
+                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
+                cout << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
+                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n";
+        }
+        return (1);
 }
 
 // Fitness is a combination of correct positives (match == 1),

@@ -61,6 +61,9 @@ share:
 prod: /usr/local/lib/libpcap.a
 	$(CC) -o dhs dhs.c /usr/local/lib/libpcap.a $(DHSFILES)
 
+veryclean: clean
+	cd ais/ && make clean
+
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
@@ -80,5 +83,4 @@ clean:
 	rm -f $(LIB)/*.gch
 	rm -f $(INC)/*.o
 	rm -f $(INC)/*.gch
-	cd ais/ && make clean
 

@@ -28,72 +28,81 @@ inline void dShmids(psnc_t snc)
 
 inline void fData(psnc_t snc)
 {
-        if (hdr_data)
+        if (hdr_data != 000)
         {
+                memset(hdr_data,'0', hdr_size);
+                memset(hdr_data,'1', hdr_size);
+                memset(hdr_data,'\0', hdr_size);
                 free(hdr_data);
+                hdr_data = 000;
         }
         uint32_t i = 0;
-        if (snc->mem.sigs && snc->mem.t5s)
+        if (snc->mem.sigs != 000)
         {
                 while (i < (SIGQTY + 1))
                 {
-                        if (i < (SIGQTY))
-                        {
-                                free(snc->mem.t5s[i]);
-                        }
+                        memset(snc->mem.sigs[i], '0', fngPntLen);
+                        memset(snc->mem.sigs[i], '1', fngPntLen);
+                        memset(snc->mem.sigs[i], '\0', fngPntLen);
                         free(snc->mem.sigs[i]);
+                        snc->mem.sigs[i] = 000;
                         i++;
                 }
                 free(snc->mem.sigs);
+                snc->mem.sigs = 000;
         }
-        else if (snc->mem.sigs)
-        {
-                while (i < (SIGQTY + 1))
-                {
-                        free(snc->mem.sigs[i++]);
-                }
-                free(snc->mem.sigs);
-        }
-        else if (snc->mem.t5s)
+        i = 0;
+        if (snc->mem.t5s != 000)
         {
                 while (i < SIGQTY)
                 {
-                        free(snc->mem.t5s[i++]);
+                        memset(snc->mem.t5s[i], '0', t5TplLen);
+                        memset(snc->mem.t5s[i], '1', t5TplLen);
+                        memset(snc->mem.t5s[i], '\0', t5TplLen);
+                        free(snc->mem.t5s[i]);
+                        snc->mem.t5s[i] = 000;
+                        i++;
                 }
                 free(snc->mem.t5s);
+                snc->mem.t5s = 000;
         }
 }
 
 inline void fShms(psnc_t snc)
 {
-        if (snc->smem.t5shm)
+        if (snc->smem.t5shm != 000)
         {
                 free(snc->smem.t5shm);
+                snc->smem.t5shm = 000;
         }
-        if (snc->smem.shm)
+        if (snc->smem.shm != 000)
         {
                 free(snc->smem.shm);
+                snc->smem.shm = 000;
         }
 }
 
 inline void fShmids(psnc_t snc)
 {
-        if (snc->smem.t5shmid)
+        if (snc->smem.t5shmid != 000)
         {
+                *(snc->smem.t5shmid) = 0;
                 free(snc->smem.t5shmid);
+                snc->smem.t5shmid = 000;
         }
-        if (snc->smem.shmid)
+        if (snc->smem.shmid != 000)
         {
+                *(snc->smem.shmid) = 0;
                 free(snc->smem.shmid);
+                snc->smem.shmid = 000;
         }
 }
 
 void freeMem (psnc_t snc)
 {
-        if (snc)
+        if (snc != 000)
         {
                 dShmids(snc);
-
                 fShmids(snc);
                 fShms(snc);
                 fData(snc);

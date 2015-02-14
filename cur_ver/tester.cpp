@@ -121,9 +121,9 @@ int main (int argc, char *argv[], char *envp[])
                 }
                 uris[i].insert(0, TARGET);
                 uris[i].insert(0, CMD);
-                uris[i].append(" &");
+                uris[i].append("\" 2>> cmd_errs.log &");
 
-                cout << "Command " << i+1 << ": " << uris[i] << endl << endl << flush;
+                cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
                 system(uris[i].c_str());
                 fib(35);
                 system(KILL);

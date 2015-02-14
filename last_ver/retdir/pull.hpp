@@ -53,5 +53,6 @@ extern volatile sig_atomic_t ** retrieved_t5s;
 extern sig_atomic_t ct;
 extern sig_atomic_t local_pos;
 
-void pull(Antibody ** pop = NULL, const int32_t pipefd = -1);
+//void pull(Antibody ** pop = NULL, const int32_t pipefd = -1);
+void pull(Antibody ** pop = NULL);
 

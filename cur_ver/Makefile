@@ -5,34 +5,40 @@ INCFLAGS        =  -I $(INC) -I $(RET) -I /usr/include -I /usr/local/include -I 
 LIB             =  ./lib
 CFLAGS          =  -Wall -Wextra -ggdb -O2 -lpthread
 CC              =  gcc $(CFLAGS) $(INCFLAGS)
+CP              =  g++ $(CFLAGS) $(INCFLAGS)
 DHSFILES        =  $(LIB)/itoa.o $(LIB)/ipv6defrag.o $(LIB)/ipv4defrag.o $(LIB)/common.o $(LIB)/sfhash.o $(LIB)/tcpreassembly.o $(LIB)/libntoh.o $(LIB)/share.o
 RETFILES        =  $(LIB)/pull.o $(LIB)/antibody.o $(LIB)/random.o $(LIB)/import.o $(LIB)/itoa.o
 
-all: retrieve dump ais
+all: retrieve dump ais test_module
 
 retrieve: rand ab itoa imp pull consumer
 
 dump: tcpreassembly libntoh sfhash common 4d 6d itoa share prod
+
+test_module: testify
 
 ais: do_ais
 
 do_ais:
 	cd ais/ && make
 
+testify:
+	g++ $(CFLAGS) tester.cpp -o tester
+
 imp:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-parameter
+	$(CP) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-parameter
 
 pull:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-parameter
+	$(CP) -c -o $(LIB)/pull.o $(RET)/pull.cpp -Wno-unused-parameter
 
 ab:
-	g++ $(INCFLAGS) $(CFLAGS) -c -o $(LIB)/antibody.o $(AIS)/antibody.cpp
+	$(CP) -c -o $(LIB)/antibody.o $(AIS)/antibody.cpp
 
 rand:
-	g++ $(INCFLAGS) $(CLFAGS) -c -o $(LIB)/random.o $(AIS)/random.cpp
+	$(CP) -c -o $(LIB)/random.o $(AIS)/random.cpp
 
 consumer:
-	g++ $(INCFLAGS) $(CFLAGS) $(RET)/retrieve.cpp -o $(RET)/retrieve $(RETFILES)
+	$(CP) $(RET)/retrieve.cpp -o $(RET)/retrieve $(RETFILES)
 
 itoa:
 	$(CC) -o $(LIB)/itoa.o -c $(INC)/itoa.c
@@ -68,6 +74,7 @@ clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
 	rm -f *.log
+	rm -f *.dat
 	rm -f *.o
 	rm -f *.gch
 	rm -f err
@@ -76,6 +83,7 @@ clean:
 	rm -f core
 	rm -f ret
 	rm -f dhs
+	rm -f tester
 	rm -f $(RET)/retrieve
 	rm -f $(RET)/*.gch
 	rm -f $(RET)/*.o

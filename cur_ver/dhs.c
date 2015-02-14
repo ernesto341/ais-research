@@ -43,7 +43,7 @@
  *
  */
 
-
+#include <math.h>
 #include <getopt.h>
 
 #include <sys/types.h>
@@ -427,25 +427,42 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 
         if (DEBUG)
         {
-                strcpy (buf, "\n\t-----\tHEADER BEGIN\t-----\n");
-                write (2, buf, 27);
+                strcpy (buf, "\n\n\t-----\tHEADER BEGIN\t-----\n\n");
+                write (2, buf, 29);
                 while (i < dataLen)
                 {
                         write(2, (const char *)(&(curPcktData[i++])), 1);
                         fflush(stderr);
                 }
-                strcpy (buf, "\n\t------\tHEADER END\t------\n");
+                strcpy (buf, "\n\n\t------\tHEADER END\t------\n\n");
                 write (2, buf, 27);
                 fflush(stderr);
         }
 
+        char * tmp_hdr = (char *)curPcktData;
+        char * cmd_str;
+        char * uri_str;
+        char * ver_str;
+        cmd_str = strtok(tmp_hdr, (const char *)" ");
+
+        uri_str = strtok(NULL, (const char *)" ");
+
+        ver_str = strtok(NULL, (const char *)" \r\n");
+
         i = 0;
 
-        int32_t cmd = 8;
-        int32_t cmdSet = 0;
-        int32_t proto = 8;
-        int32_t protoSet = 0;
-        uint32_t len = dataLen;   //calculated during parsing
+        int32_t cmd = strstr((const char *)cmd_str, (const char *)"GET") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)cmd_str, (const char *)"POST") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)cmd_str, (const char *)"HEAD") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
+        /* 
+         *  NEW VERSION ?????
+        int32_t proto = strstr((const char *)ver_str, (const char *)"0.9") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.0") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)ver_str, (const char *)"1.1") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
+        */
+
+        /* 
+         * OLD VERSION
+         */
+        int32_t proto = strstr((const char *)ver_str, (const char *)"0.9") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.0") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.1") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
+
+        uint32_t len = (uint32_t)strlen(uri_str);
         int32_t var = 0;
         int32_t pcnt = 0;
         int32_t apos = 0;
@@ -469,124 +486,10 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
                 shandler(0);
         }
 
-        target = (unsigned char *)curPcktData;
+        target = (unsigned char *)uri_str;
+
         for(;(*target != '\n' && *target != '\r') && i < len; i++)
         {
-                if(protoSet == 0 && (*target == 48 || *target == 49))             //proto
-                {
-                        target++;
-                        if(*target == 46)                              //http version 
-                        {
-                                target++;
-                                if(*target == 48)
-                                {
-                                        proto = 2;
-                                        protoSet = 1;
-                                }
-                                else if(*target == 57)
-                                {
-                                        proto = 1;
-                                        protoSet = 1;
-                                }
-                                else if(*target == 49)
-                                {
-                                        proto = 4;
-                                        protoSet = 1;
-                                }
-                                else
-                                {
-                                        target--;
-                                        target--;
-                                }
-                        }  
-
-                        else
-                        {
-                                target--;
-                        }
-                }
-
-                if(cmdSet == 0 && *target == 71)                  //cmd get
-                {
-                        target++;
-                        if(*target == 69)
-                        {
-                                target++;
-                                if(*target == 84)
-                                {
-                                        cmd = 1;
-                                        cmdSet = 1;
-                                }
-                                else
-                                {
-                                        target--;
-                                }
-                        }
-                        else
-                        {
-                                target--;
-                        }
-                }
-
-                if(*target == 72 && cmdSet == 0)                  //cmd head
-                {
-                        target++;
-                        if(*target == 69)
-                        {
-                                target++;
-                                if(*target == 65)
-                                {
-                                        target++;
-                                        if(*target == 68)
-                                        {
-                                                cmd = 4;
-                                                cmdSet = 1;
-                                        }
-                                        else
-                                        {
-                                                target--;
-                                        }
-                                }
-                                else
-                                {
-                                        target--;
-                                }
-                        }
-                        else
-                        {
-                                target--;
-                        }
-                }
-                if(*target == 80 && cmdSet == 0)                  //cmd post
-                {
-                        target++;
-                        if(*target == 79)
-                        {
-                                target++;
-                                if(*target == 83)
-                                {
-                                        target++;
-                                        if(*target == 84)
-                                        {
-                                                cmd = 2;
-                                                cmdSet = 1;
-                                        }
-                                        else
-                                        {
-                                                target--;
-                                        }
-                                }
-                                else
-                                {
-                                        target--;
-                                }
-                        }
-                        else
-                        {
-                                target--;
-                        }
-                }
-
                 if(*target == 46)                    //.. counter
                 {
                         target++;
@@ -669,7 +572,12 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         /*FINGER PRINT EXPLANATION:
          * array of integers, each slot contains a specified number (integer) that represents the character count 
          *INDEX 0               HTTP command    GET = 1         POST = 2        HEAD = 4        OTHER = 8
+
+         --->>>  MODIFY ORIGINAL VERSION HERE  <<<---
+         --->>>         ORIGINAL VERSION       <<<---
          *INDEX 1               HTTP PROTOCOL   0.9 = 1         1.0 = 1         1.1 = 4         OTHER = 8       
+         --->>>    NEW VERSION - NOT IN USE    <<<---
+         *INDEX 1               HTTP PROTOCOL   0.9 = 1         1.0 = 2         1.1 = 4         OTHER = 8       
          *INDEX 2               LENGTH          # OF CHARS              
          *INDEX 3               VARIABLES       # OF INPUT
          *INDEX 4               PERCENT         # OF %
@@ -697,6 +605,21 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         fngPnt[11] = fwrd;
         fngPnt[12] = lt;
         fngPnt[13] = gt;
+
+        i = 0;
+        if (DEBUG)
+        {
+                strcpy (buf, "\n\n\t-----\tSIGNATURE BEGIN\t-----\n\n");
+                write (2, buf, 32);
+                while (i < 14)
+                {
+                        fprintf(stderr, "%d ", fngPnt[i++]);
+                        fflush(stderr);
+                }
+                strcpy (buf, "\n\n\t------\tSIGNATURE END\t------\n\n");
+                write (2, buf, 30);
+                fflush(stderr);
+        }
 
         return (fngPnt);
 }
@@ -727,6 +650,12 @@ inline static void resizeHdr(void)
  */
 uint8_t extractHttpHdr (const char * udata)
 {
+        if (DEBUG)
+        {
+                fprintf(stderr, "\nextractHttpHeader got udata:\n\taddr: %p\n\tdata: %s\n\n", &udata, (char *)udata);
+                fprintf(stderr, "\npending_more_hdr_data = %d\n", pending_more_hdr_data);
+                fflush(stderr);
+        }
         uint32_t j = 0;
         if (pending_more_hdr_data != 0)
         {
@@ -746,6 +675,7 @@ uint8_t extractHttpHdr (const char * udata)
         }
         uint8_t eoh = 1;
         uint32_t data_len = strlen((const char *)udata);
+        i = 0;
         while (i < data_len && eoh != 0)
         {
                 hdr_data[j++] = udata[i++];
@@ -938,6 +868,11 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
                 //if (Contains((char *)payload, "HTTP") && (Contains((char *)payload, "GET") || Contains((char *)payload, "POST") || Contains((char *)payload, "HEAD")))
                 if (ntohs(tcpt5.dport) == 80)
                 {
+                        if (DEBUG)
+                        {
+                                fprintf(stderr, "\ncalling extractHttpHeader with payload:\n\taddr: %p\n\tdata: %s\n\n", &payload, (char *)payload);
+                                fflush(stderr);
+                        }
                         pending_more_hdr_data = extractHttpHdr((const char *)(payload));
                         if (pending_more_hdr_data == 0)
                         {
@@ -1181,7 +1116,7 @@ int main (int argc , char *argv[])
         {
                 sprintf(buf, "\n[+] Usage: %s <options>\n", argv[0]);
                 write(2, buf, strlen(buf));
-                write(2, "\n+ Options:", 11);      // 28
+                write(2, "\n+ Options:", 11);
                 write(2, "\n\t-i | --iface <val> -----> Interface to read packets from", 58);
                 write(2, "\n\t-f | --file <val> ------> File path to read packets from", 58);
                 write(2, "\n\t-F | --filter <val> ----> Capture filter (must contain \"tcp\" or \"ip\")", 71);
@@ -1337,7 +1272,7 @@ int main (int argc , char *argv[])
 
         char *null_args[] = {NULL};
         char *null_envp[] = {NULL};
-        
+
         if ((ret_pid = fork()) == 0) /* child */
         {
                 if (execve((char *)"./retdir/retrieve\0", null_args, null_envp) < 0)
@@ -1393,9 +1328,6 @@ int main (int argc , char *argv[])
                 /* accept signal from consumer to quit */
                 while ( ( packet = pcap_next( handle, &header ) ) != 0 && snc.smem.shm[CTL][FLAGS] != CDONE)
                 {
-                        static int pc = 0;
-                        fprintf(stdout, "Packet %d\n", ++pc);
-                        fflush(stdout);
                         /* get packet headers */
                         ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
                         if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
