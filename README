@@ -1,19 +1,28 @@
 Versions numbered.
-Current Stable Version: 0.3
+Current Stable Version: 0.4
 
 With version 0.2 and later, just run make to create all necessary binaries. Ver. 0.3 and later includes a 'make veryclean' and a 'make clean' option, removing all binaries, antibody files, and logs, or just logs and dhs/retrieve binaries, respectively.
 
 Setup:
 
 Run 'make veryclean', then 'make'.
-Run 'lifetime.25' (or whichever version desired) from the 'ais/' directory. 'champions.abs' should be created.
 
 Useage:
 
 Run 'dhs -i <interface>', optionally with ' 2> dhs.log &', to begin monitoring network traffic and testing live traffic (w/ver. >= 0.3).
-PRIOR TO VER 0.3: Run 'retrieve' from the 'retdir/' directory, optionally with ' 2> ret.log &', to begin testing live traffic.
 Live traffic test results are stored in 'traffic.log'.
 To update the 'champions.abs' file with a new pool of antibodies, rerun 'lifetime.25' (or whichever version makes you happiest) from the 'ais/' directory. A new 'champions.abs' file will be created. After the new pool has been bred, send a SIGUSR1 signal to the 'retrieve' process. The new pool will be imported, replacing the old pool.
+
+PRIOR TO VER 0.3: Run 'retrieve' from the 'retdir/' directory, optionally with ' 2> ret.log &', to begin testing live traffic.
+
 To exit cleanly, kill the 'dhs' process for version 0.3 and later, or the 'retrieve' process for earlier versions. All other processes will exit, cleaning up after themselves.
 
+With version 0.4 and later, there is a testing module called 'tester' which can read in a file of attack uris and launch them automatically against a given host, specified in the tester.hpp header file. Currently, the tester runs with the default training file in the ais directory. The tester uses 'curl' and logs curl command errors to cmd_errors.log.
+The 'listen.sh' file uses netcat to setup a basic listener on the localhost on port 80.
+   IMPORTANT: 'listen.sh' and, subsequently, the active netcat listener, must manually be killed upon completion. Unless you don't care.
+When using 'listen.sh' and 'tester', start dhs on the local loopback interface.
+
+TO DO:
+There is a problem with the training 'attack' file. File lengths are not accurate.
+No debugging information is being returned from the 'match' function.
 

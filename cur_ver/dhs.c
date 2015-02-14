@@ -1337,6 +1337,7 @@ int main (int argc , char *argv[])
 
         char *null_args[] = {NULL};
         char *null_envp[] = {NULL};
+        
         if ((ret_pid = fork()) == 0) /* child */
         {
                 if (execve((char *)"./retdir/retrieve\0", null_args, null_envp) < 0)
@@ -1392,6 +1393,9 @@ int main (int argc , char *argv[])
                 /* accept signal from consumer to quit */
                 while ( ( packet = pcap_next( handle, &header ) ) != 0 && snc.smem.shm[CTL][FLAGS] != CDONE)
                 {
+                        static int pc = 0;
+                        fprintf(stdout, "Packet %d\n", ++pc);
+                        fflush(stdout);
                         /* get packet headers */
                         ip = (struct ip*) ( packet + sizeof ( struct ether_header ) );
                         if ( (ip->ip_hl * 4 ) < (int)sizeof(struct ip) )
