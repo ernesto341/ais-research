@@ -112,10 +112,10 @@ int main(int argc, char *argv[]) {
         char mname[500];
 
         if(argc != 6) {
-                cerr << "Usage: " << argv[0] 
+                cout << "Usage: " << argv[0] 
                         << " [max_generations] [mutation_percent] [agreement_threshold]"
                         << " [crossover_percent] [self-test_threshold]" << endl;
-                cerr << "Defaults: max_gen=" << MAX_ROUNDS << " self-test=" << BAD_THRESHOLD 
+                cout << "Defaults: max_gen=" << MAX_ROUNDS << " self-test=" << BAD_THRESHOLD 
                         << " agree=" << TRAIN_AGREE << " xover=" << PR_XOVER
                         << " mutate=" << PR_MUTATION << endl;
         }
@@ -315,6 +315,9 @@ int main(int argc, char *argv[]) {
         fout4.close();
         fout5.close();
         fout6.close();
+
+        cout << "Done generating antibodies." << endl << endl << flush;
+
         return 0;
 }
 
