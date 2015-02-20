@@ -137,7 +137,7 @@ int main (int argc, char *argv[], char *envp[])
                 uris[i].append("\"");
 
                 cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
-                curl_easy_setopt(curl, CURLOPT_URL, uris[i].c_str);
+                curl_easy_setopt(curl, CURLOPT_URL, uris[i].c_str());
                 res = curl_easy_perform(curl);
                 if (res != CURLE_OK)
                 {
