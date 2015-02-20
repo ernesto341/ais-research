@@ -23,7 +23,7 @@ do_ais:
 	cd ais/ && make
 
 testify:
-	g++ $(CFLAGS) tester.cpp -o tester
+	g++ $(CFLAGS) tester.cpp -o tester -lcurl
 
 imp:
 	$(CP) -c -o $(LIB)/import.o $(RET)/import.cpp -Wno-unused-parameter

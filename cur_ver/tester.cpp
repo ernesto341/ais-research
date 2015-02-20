@@ -4,6 +4,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <fstream>
+#include <curl/curl.h>
 
 #include "tester.hpp"
 
@@ -107,6 +108,19 @@ int main (int argc, char *argv[], char *envp[])
         string * uris = 000;
         int uri_qty = 0;
         int i = 0;
+        CURL *curl;
+        CURLcode res;
+        curl = curl_easy_init();
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        curl_easy_setopt(curl, CURLOPT_FRESH_CONNECT, 1);
+        curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1);
+        curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1);
+        if (!curl)
+        {
+                fprintf(stderr, "Unable to get curl handle\n");
+                fflush(stderr);
+                exit(EXIT_FAILURE);
+        }
         if (getUris(in_file, uris, uri_qty) == 000)
         {
                 cerr << "Couldn't get uris from file\n" << flush;
@@ -120,14 +134,18 @@ int main (int argc, char *argv[], char *envp[])
                         uris[i].insert(0, "/");
                 }
                 uris[i].insert(0, TARGET);
-                uris[i].insert(0, CMD);
-                uris[i].append("\" 2>> cmd_errs.log &");
+                uris[i].append("\"");
 
                 cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
-                system(uris[i].c_str());
-                fib(35);
-                system(KILL);
+                curl_easy_setopt(curl, CURLOPT_URL, uris[i].c_str);
+                res = curl_easy_perform(curl);
+                if (res != CURLE_OK)
+                {
+                        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+                        fflush(stderr);
+                }
         }
+        curl_easy_cleanup(curl);
 
         return (0);
 }
