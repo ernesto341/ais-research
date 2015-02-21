@@ -61,13 +61,13 @@ void * testThread(void * v)
                 {
                         for (int j = 0; j < ab_count; j++)
                         {
-                                if ((champs)[i][j].fitness() > MIN_FITNESS)
+                                //if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
                                         ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1, &(((ptest_param)v)->debug_buf)));
                                         /* DEBUG */
 
-                                        //fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
-                                        //fflush(stderr);
+                                        fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
+                                        fflush(stderr);
 
                                         /* DEBUG */
                                 }

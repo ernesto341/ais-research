@@ -410,6 +410,18 @@ void write_data ( ppeer_info_t info )
 }
 
 /**
+ * @brief Convert a number from a HTTP request from %dd to ascii value
+ */
+inline static int percentNumberConverter(const char * s)
+{
+        if (s == 000 || s[0] != '%' || !isdigit(s[1]) || !isdigit(s[2]))
+        {
+                return (-1);
+        }
+        return (atoi(&(s[1])));
+}
+
+/**
  * @brief Create the firnger print from a HTTP header
  */
 int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
@@ -454,8 +466,8 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         int32_t cmd = strstr((const char *)cmd_str, (const char *)"GET") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)cmd_str, (const char *)"POST") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)cmd_str, (const char *)"HEAD") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
         /* 
          *  NEW VERSION ?????
-        int32_t proto = strstr((const char *)ver_str, (const char *)"0.9") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.0") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)ver_str, (const char *)"1.1") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
-        */
+         int32_t proto = strstr((const char *)ver_str, (const char *)"0.9") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.0") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)ver_str, (const char *)"1.1") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
+         */
 
         /* 
          * OLD VERSION
@@ -463,6 +475,8 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         int32_t proto = strstr((const char *)ver_str, (const char *)"0.9") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.0") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)ver_str, (const char *)"1.1") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
 
         uint32_t len = (uint32_t)strlen(uri_str);
+        fprintf(stderr, "In pcktFingerPrint, got uri_str length as %d\n", len);
+        fflush(stderr);
         int32_t var = 0;
         int32_t pcnt = 0;
         int32_t apos = 0;
@@ -475,6 +489,8 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         int32_t lt = 0;
         int32_t gt = 0;
         int32_t qstnmrk = 0;
+        /* Not currently used in fingerprint */
+        int32_t dblqte = 0;
         unsigned char *target = 0;
         int32_t *fngPnt = malloc(sizeof(int32_t) * fngPntLen);
         if (fngPnt == 0)
@@ -487,32 +503,45 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
         }
 
         target = (unsigned char *)uri_str;
+        const unsigned char * end = (const unsigned char *)(uri_str + (sizeof(char) * (len-1)));
+        if (DEBUG)
+        {
+                fprintf(stderr, "Got first char: %c\ngot last char:  %c\n", *target, *end);
+                fflush(stderr);
+        }
+        unsigned char * sub = (unsigned char *)malloc(sizeof(char) * 4);
+        memset(sub, 0, 4);
+        int converted = 0;
 
         for(;(*target != '\n' && *target != '\r') && i < len; i++)
         {
                 if(*target == 46)                    //.. counter
                 {
-                        target++;
-                        if(*target == 46)
+                        if (++target <= end)
                         {
-                                cdot++;
-                        }
-                        else
-                        {
-                                target--;
+                                if(*target == 46)
+                                {
+                                        ++cdot;
+                                }
+                                else
+                                {
+                                        --target;
+                                }
                         }
                 }
 
                 if(*target == 47)
                 {                       // // counter
-                        target++;
-                        if(*target == 47)
+                        if (++target <= end)
                         {
-                                fwrd++;
-                        }
-                        else
-                        {
-                                target--;
+                                if(*target == 47)
+                                {
+                                        fwrd++;
+                                }
+                                else
+                                {
+                                        target--;
+                                }
                         }
                 }
 
@@ -524,11 +553,31 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
                 else if(*target == 37)
                 {                        //percent counter
                         pcnt++;
+                        if (target + 2 <= end)
+                        {
+                                strncpy((char *)sub, (const char *)target, 3);
+                                converted = percentNumberConverter((const char *)sub);
+                                if (converted == (int)'"')
+                                {
+                                        ++dblqte;
+                                }
+                                else if (converted == (int)'\'')
+                                {
+                                        ++apos;
+                                }
+                                ++target;
+                                ++target;
+                        }
                 }
 
                 else if (qstnmrk == 1 && *target == 38) //variable counter
                 {
                         var++;
+                }
+
+                else if(*target == '"')
+                {                        // double quote counter
+                        dblqte++;
                 }
 
                 else if(*target == 39)
@@ -619,6 +668,11 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
                 strcpy (buf, "\n\n\t------\tSIGNATURE END\t------\n\n");
                 write (2, buf, 30);
                 fflush(stderr);
+        }
+
+        if (sub)
+        {
+                free(sub);
         }
 
         return (fngPnt);

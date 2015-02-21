@@ -91,4 +91,5 @@ clean:
 	rm -f $(LIB)/*.gch
 	rm -f $(INC)/*.o
 	rm -f $(INC)/*.gch
+	rm -f ./a.out
 
