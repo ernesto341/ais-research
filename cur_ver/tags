@@ -4,6 +4,7 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AGREE	retdir/pull.hpp	20;"	d
 AIS	Makefile	/^AIS             =  .\/ais$/;"	m
 ALEN	ais/antibody.h	/^const int ALEN = 14;$/;"	v
 ALL	ais/lifetime.cpp	61;"	d	file:
@@ -30,7 +31,7 @@ CLASS_COUNT	ais/antibody.h	/^const int CLASS_COUNT = 6;$/;"	v
 CLASS_LABELS	ais/antibody.h	/^const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };$/;"	v
 CMD	tester.hpp	/^static const char CMD[] = "curl ";$/;"	v
 COMMAND	ais/antibody.h	/^                static const int COMMAND = 0;     \/\/ HTTP command (GET, POST, HEAD, other)$/;"	m	class:Antibody
-COMPLETE	retdir/pull.hpp	40;"	d
+COMPLETE	retdir/pull.hpp	43;"	d
 CP	Makefile	/^CP              =  g++ $(CFLAGS) $(INCFLAGS)$/;"	m
 CPAREN	ais/antibody.h	/^                static const int CPAREN = 10;     \/\/ Number of ) chars in request$/;"	m	class:Antibody
 CREAD	inc/globals.h	/^static const uint8_t CREAD = 5;$/;"	v
@@ -47,7 +48,7 @@ DEBUG	dhs.c	70;"	d	file:
 DEBUG	inc/share.c	10;"	d	file:
 DEBUG	retdir/import.hpp	17;"	d
 DEBUG	retdir/mem.hpp	11;"	d
-DEBUG	retdir/pull.hpp	17;"	d
+DEBUG	retdir/pull.hpp	18;"	d
 DEBUG	retdir/retrieve.cpp	10;"	d	file:
 DEBUGG	inc/contains.h	20;"	d
 DEFAULT_IPV4_FRAGMENT_TIMEOUT	inc/ipv4defrag.h	123;"	d
@@ -67,7 +68,7 @@ DEFAULT_TCP_SYN_RETRIES	inc/tcpreassembly.h	230;"	d
 DEFAULT_TCP_TIMEWAIT_TIMEOUT	inc/tcpreassembly.h	260;"	d
 DEFAULT_TIMEOUT_DELAY	inc/tcpreassembly.h	270;"	d
 DHSFILES	Makefile	/^DHSFILES        =  $(LIB)\/itoa.o $(LIB)\/ipv6defrag.o $(LIB)\/ipv4defrag.o $(LIB)\/common.o $(LIB)\/sfhash.o $(LIB)\/tcpreassembly.o $(LIB)\/libntoh.o $(LIB)\/share.o$/;"	m
-DONE	retdir/pull.hpp	38;"	d
+DONE	retdir/pull.hpp	41;"	d
 Dump	ais/lifetime.cpp	/^void Dump (const Antibody c[CLASS_COUNT][MAX_ANTIBODIES])$/;"	f
 Exists	retdir/import.cpp	/^inline static bool Exists (const char * n)$/;"	f	file:
 Exists	retdir/test.cpp	/^inline bool Exists (const char ** name)$/;"	f
@@ -85,8 +86,8 @@ IS_TIMEWAIT	inc/tcpreassembly.c	46;"	d	file:
 KILL	tester.hpp	/^static const char KILL[] = "pkill curl\\0";$/;"	v
 LENGTH	ais/antibody.h	/^                static const int LENGTH = 2;      \/\/ Length of request$/;"	m	class:Antibody
 LIB	Makefile	/^LIB             =  .\/lib$/;"	m
-LOG	retdir/pull.hpp	39;"	d
-LOG_LEVEL	retdir/pull.hpp	24;"	d
+LOG	retdir/pull.hpp	42;"	d
+LOG_LEVEL	retdir/pull.hpp	27;"	d
 LT	ais/antibody.h	/^                static const int LT = 12;         \/\/ Number of < chars in request$/;"	m	class:Antibody
 MAX_ANTIBODIES	ais/lifetime.cpp	21;"	d	file:
 MAX_ANTIBODIES	ais/lifetime_nounknown.cpp	22;"	d	file:
@@ -97,8 +98,8 @@ MAX_ROUNDS	ais/lifetime.cpp	/^int MAX_ROUNDS = 10;          \/\/ Maximum number 
 MAX_ROUNDS	ais/lifetime_nounknown.cpp	/^int MAX_ROUNDS = 10;          \/\/ Maximum number of generations$/;"	v
 MAX_RUNS	ais/lifetime.cpp	17;"	d	file:
 MAX_RUNS	ais/lifetime_nounknown.cpp	18;"	d	file:
-MAX_THREADS	retdir/pull.hpp	32;"	d
-MIN_FITNESS	retdir/pull.hpp	28;"	d
+MAX_THREADS	retdir/pull.hpp	35;"	d
+MIN_FITNESS	retdir/pull.hpp	31;"	d
 MIN_IPV4_FRAGMENT_LENGTH	inc/ipv4defrag.h	113;"	d
 MIN_IPV6_FRAGMENT_LENGTH	inc/ipv6defrag.h	116;"	d
 NTOH_CHECK_TCP_ESTABLISHED_TIMEOUT	inc/tcpreassembly.h	/^    NTOH_CHECK_TCP_ESTABLISHED_TIMEOUT = (1 << 2),$/;"	e	enum:check_timeout
@@ -200,22 +201,22 @@ RECV_SERVER	dhs.c	73;"	d	file:
 RET	Makefile	/^RET             =  .\/retdir$/;"	m
 RETFILES	Makefile	/^RETFILES        =  $(LIB)\/pull.o $(LIB)\/antibody.o $(LIB)\/random.o $(LIB)\/import.o $(LIB)\/itoa.o$/;"	m
 SIGBUF	retdir/mem.hpp	14;"	d
-SIGBUF	retdir/pull.hpp	20;"	d
+SIGBUF	retdir/pull.hpp	23;"	d
 SIGBUF	retdir/retrieve.cpp	13;"	d	file:
 SIGQTY	inc/globals.h	/^static const uint32_t SIGQTY = 5;$/;"	v
 SIGQTY	retdir/retglobals.h	/^static const uint32_t SIGQTY = 5;$/;"	v
-START	retdir/pull.hpp	36;"	d
+START	retdir/pull.hpp	39;"	d
 Stats	retdir/pull.cpp	/^void * Stats (void * v)$/;"	f
 TARGET	tester.hpp	2;"	d
 TEST_UNKNOWN	ais/lifetime_nounknown.cpp	14;"	d	file:
 TRAIN_AGREE	ais/lifetime.cpp	/^int TRAIN_AGREE = 3;          \/\/ Number that must agree to mark attack$/;"	v
 TRAIN_AGREE	ais/lifetime_nounknown.cpp	/^int TRAIN_AGREE = 3;          \/\/ Number that must agree to mark attack$/;"	v
-UNUSED	retdir/pull.hpp	35;"	d
+UNUSED	retdir/pull.hpp	38;"	d
 VARIABLES	ais/antibody.h	/^                static const int VARIABLES = 3;   \/\/ Number of input variables$/;"	m	class:Antibody
 VERBOSE_OUTPUT	ais/lifetime.cpp	13;"	d	file:
 VERBOSE_OUTPUT	ais/lifetime_nounknown.cpp	13;"	d	file:
 VERSION	inc/libntoh.c	39;"	d	file:
-WORKING	retdir/pull.hpp	37;"	d
+WORKING	retdir/pull.hpp	40;"	d
 Webdata	ais/webdata.cpp	/^Webdata::Webdata(char *inf, int f) {$/;"	f	class:Webdata
 Webdata	ais/webdata.h	/^class Webdata {$/;"	c
 _CMD	tester.hpp	10;"	d
@@ -265,7 +266,7 @@ _test_param	retdir/pull.cpp	/^typedef struct _test_param$/;"	s	file:
 a	ais/antibody.h	/^                int a[ALEN];         \/\/ Attributes, indexed by const ints above$/;"	m	class:Antibody
 aShmids	inc/share.c	/^inline void aShmids(psnc_t snc)$/;"	f
 aShmids	retdir/mem.hpp	/^inline void aShmids(void)$/;"	f
-ab_count	retdir/import.hpp	/^volatile static sig_atomic_t ab_count = 0;$/;"	v
+ab_count	retdir/pull.cpp	/^volatile sig_atomic_t ab_count = 0;$/;"	v
 ack	inc/tcpreassembly.h	/^	unsigned long 			ack;$/;"	m	struct:_tcp_segment_
 addr	inc/tcpreassembly.h	/^	unsigned int 		addr;$/;"	m	struct:__anon15
 adjCategory	ais/antibody.h	/^                void adjCategory(int i) { if(i > -1) cat[i]++; }$/;"	f	class:Antibody
@@ -273,10 +274,10 @@ adjFalseNeg	ais/antibody.h	/^                void adjFalseNeg() { false_neg++; }
 adjFalsePos	ais/antibody.h	/^                void adjFalsePos() { false_pos++; }$/;"	f	class:Antibody
 adjNeg	ais/antibody.h	/^                void adjNeg()      { neg++; }$/;"	f	class:Antibody
 adjPos	ais/antibody.h	/^                void adjPos()      { pos++; }$/;"	f	class:Antibody
-alen	retdir/import.hpp	/^volatile static sig_atomic_t alen = 0;$/;"	v
+alen	retdir/pull.cpp	/^volatile sig_atomic_t alen = 0;$/;"	v
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
 arr_size	retdir/import.cpp	/^unsigned int arr_size = 100;$/;"	v
-attack	retdir/pull.cpp	/^        int8_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
+attack	retdir/pull.cpp	/^        uint32_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
 avgFitness	ais/lifetime.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 avgFitness	ais/lifetime_nounknown.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 buf	inc/share.h	/^char buf[1024];$/;"	v
@@ -295,7 +296,7 @@ check_timeout	inc/tcpreassembly.h	/^enum check_timeout$/;"	g
 checked	retdir/import.cpp	/^static bool checked = false;$/;"	v	file:
 child_pid	retdir/pull.cpp	/^int32_t child_pid = -1;$/;"	v
 cksum	inc/ipv4defrag.c	/^inline static unsigned short cksum(unsigned short *buf, int nwords)$/;"	f	file:
-class_count	retdir/import.hpp	/^volatile static sig_atomic_t class_count = 0;$/;"	v
+class_count	retdir/pull.cpp	/^volatile sig_atomic_t class_count = 0;$/;"	v
 cleanup	retdir/pull.cpp	/^void cleanup(void)$/;"	f
 client	inc/tcpreassembly.h	/^	ntoh_tcp_peer_t 	client;$/;"	m	struct:_tcp_stream_
 closedby	inc/tcpreassembly.h	/^	unsigned short 		closedby;$/;"	m	struct:_tcp_stream_
@@ -309,6 +310,7 @@ data	dhs.c	/^        unsigned char *data;$/;"	m	struct:__anon1	file:
 data	inc/ipv4defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv4_fragment_
 data	inc/ipv6defrag.h	/^	unsigned char 			*data;$/;"	m	struct:_ipv6_fragment_
 data_len	dhs.c	/^        size_t data_len;$/;"	m	struct:__anon1	file:
+debug_buf	ais/antibody.h	/^                string debug_buf;$/;"	m	class:Antibody
 debug_buf	retdir/pull.cpp	/^        string debug_buf;$/;"	m	struct:_test_param	file:
 deleteMax	ais/heap.cpp	/^Antibody *AntibodyHeap::deleteMax() {$/;"	f	class:AntibodyHeap
 deleteRandom	ais/mass.cpp	/^Antibody *AntibodyMass::deleteRandom(int max) {$/;"	f	class:AntibodyMass
@@ -316,6 +318,7 @@ delete_stream	inc/tcpreassembly.c	/^inline static void delete_stream ( pntoh_tcp
 destination	inc/ipv4defrag.h	/^	unsigned int destination;$/;"	m	struct:__anon2
 destination	inc/ipv6defrag.h	/^	uint8_t destination[16];$/;"	m	struct:__anon5
 destination	inc/tcpreassembly.h	/^	unsigned int 	destination;$/;"	m	struct:__anon14
+doMatch	retdir/pull.cpp	/^int doMatch(Antibody a, int *test)$/;"	f
 do_import	retdir/pull.cpp	/^volatile sig_atomic_t do_import = 0;$/;"	v
 dport	inc/tcpreassembly.h	/^	unsigned short 	dport;$/;"	m	struct:__anon14
 dump	ais/antibody.cpp	/^string Antibody::dump (void)$/;"	f	class:Antibody
@@ -386,7 +389,11 @@ generateAntibody	ais/lifetime.cpp	/^void generateAntibody(int i, int j) {$/;"	f
 generateAntibody	ais/lifetime_nounknown.cpp	/^void generateAntibody(int i, int j) {$/;"	f
 generic_write_data	dhs.c	/^void generic_write_data ( void * data )$/;"	f
 get16bits	inc/sfhash.c	4;"	d	file:
+getAttr	ais/antibody.h	/^                inline int getAttr(const int i = -1) { return (i > 0 && i < ALEN ? a[i] : -1); }$/;"	f	class:Antibody
 getDstPrt	dhs.c	/^inline uint32_t getDstPrt(const char * path)$/;"	f
+getFlag	ais/antibody.h	/^                inline int getFlag(const int i = -1) { return (i > 0 && i < ALEN ? flags[i] : -1); }$/;"	f	class:Antibody
+getMax	ais/antibody.h	/^                inline int getMax(const int i = -1) { return (i > 0 && i < ALEN ? max[i] : -1); }$/;"	f	class:Antibody
+getOff	ais/antibody.h	/^                inline int getOff(const int i = -1) { return (i > 0 && i < ALEN ? offset[i] : -1); }$/;"	f	class:Antibody
 getSrcPrt	dhs.c	/^inline uint32_t getSrcPrt(const char * path)$/;"	f
 getUris	tester.cpp	/^string * getUris(istream & in_file, string *& data, int &uri_size)$/;"	f
 get_peer_info	dhs.c	/^ppeer_info_t get_peer_info ( unsigned char *payload , size_t payload_len , pntoh_tcp_tuple5_t tuple )$/;"	f
@@ -427,6 +434,7 @@ import_mgr_pid	retdir/pull.cpp	/^int32_t import_mgr_pid = -1;$/;"	v
 import_mgr_tid	retdir/pull.cpp	/^pthread_t import_mgr_tid;$/;"	v
 inCtr	dhs.c	/^inline static void inCtr(sig_atomic_t *** s)$/;"	f	file:
 inPos	retdir/pull.cpp	/^inline static void inPos(void)$/;"	f	file:
+incTests	ais/antibody.h	/^                inline void incTests(const int ct = 1) { this->tests += ct; }$/;"	f	class:Antibody
 init	inc/ipv4defrag.c	/^		unsigned short		init;$/;"	m	struct:__anon4	file:
 init	inc/ipv6defrag.c	/^		unsigned short	        init;$/;"	m	struct:__anon12	file:
 init	inc/tcpreassembly.c	/^        unsigned short		init;$/;"	m	struct:__anon11	file:
@@ -488,7 +496,8 @@ main	dhs.c	/^int main (int argc , char *argv[])$/;"	f
 main	retdir/retrieve.cpp	/^int main (void)$/;"	f
 main	retdir/test.cpp	/^int main(void)$/;"	f
 main	tester.cpp	/^int main (int argc, char *argv[], char *envp[])$/;"	f
-match	ais/antibody.cpp	/^int Antibody::match(int *test, const int & debug, string * buf)$/;"	f	class:Antibody
+match	ais/antibody.cpp	/^int Antibody::match(int *test)$/;"	f	class:Antibody
+match_debug	ais/antibody.cpp	/^int Antibody::match_debug(int *test)$/;"	f	class:Antibody
 mate	ais/antibody.cpp	/^void Antibody::mate(Antibody *m, Antibody **c1, Antibody **c2) {$/;"	f	class:Antibody
 max	ais/antibody.h	/^                int max[ALEN];       \/\/ Maximum values for each attribute$/;"	m	class:Antibody
 max_flows	inc/ipv4defrag.h	/^	sem_t 					max_flows;$/;"	m	struct:_ipv4_session_
@@ -599,6 +608,7 @@ pcktFingerPrint	dhs.c	/^int * pcktFingerPrint(const unsigned char * curPcktData,
 pcond	inc/libntoh.h	/^	pthread_cond_t	pcond;$/;"	m	struct:__anon13
 peer_info_t	dhs.c	/^} peer_info_t, *ppeer_info_t;$/;"	t	typeref:struct:__anon1	file:
 pending_more_hdr_data	dhs.c	/^static uint8_t pending_more_hdr_data = 0;$/;"	v	file:
+percentNumberConverter	dhs.c	/^inline static int percentNumberConverter(const char * s)$/;"	f	file:
 phtable_t	inc/common.h	/^} htable_t , *phtable_t;$/;"	t	typeref:struct:__anon7
 phtnode_t	inc/common.h	/^} htnode_t , *phtnode_t;$/;"	t	typeref:struct:_hash_node_
 pipv4_dfcallback_t	inc/ipv4defrag.h	/^typedef void(*pipv4_dfcallback_t) ( pntoh_ipv4_flow_t , pntoh_ipv4_tuple4_t , unsigned char* , size_t , unsigned short );$/;"	t

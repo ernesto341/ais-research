@@ -1,5 +1,5 @@
 Versions numbered.
-Current Stable Version: 0.4
+Current Stable Version: 0.5
 
 With version 0.2 and later, just run make to create all necessary binaries. Ver. 0.3 and later includes a 'make veryclean' and a 'make clean' option, removing all binaries, antibody files, and logs, or just logs and dhs/retrieve binaries, respectively.
 
@@ -23,6 +23,5 @@ The 'listen.sh' file uses netcat to setup a basic listener on the localhost on p
 When using 'listen.sh' and 'tester', start dhs on the local loopback interface.
 
 TO DO:
-There is a problem with the training 'attack' file. File lengths are not accurate.
-No debugging information is being returned from the 'match' function.
+Return which type of attack has been identified and how many antibodies identified an attack
 
