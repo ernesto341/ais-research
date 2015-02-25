@@ -103,7 +103,7 @@ int main (int argc, char *argv[], char *envp[])
                 exit(EXIT_FAILURE);
         }
 
-        cout << "Opened file with filename " << filename << endl << flush;
+        cerr << "Opened file with filename " << filename << endl << flush;
 
         string * uris = 000;
         int uri_qty = 0;
@@ -134,7 +134,7 @@ int main (int argc, char *argv[], char *envp[])
                         uris[i].insert(0, "/");
                 }
                 uris[i].insert(0, TARGET);
-                uris[i].append("\"");
+                //uris[i].append("\"");
 
                 cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
                 curl_easy_setopt(curl, CURLOPT_URL, uris[i].c_str());
