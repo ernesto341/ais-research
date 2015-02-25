@@ -27,6 +27,9 @@ pthread_mutex_t champs_mutex;
 pthread_mutex_t log_mutex;
 
 volatile static sig_atomic_t testing = 0;
+volatile sig_atomic_t alen = 0;
+volatile sig_atomic_t class_count = 0;
+volatile sig_atomic_t ab_count = 0;
 
 typedef struct _test_param
 {
@@ -35,7 +38,7 @@ typedef struct _test_param
         uint32_t sig[fngPntLen]; // signature to be tested
         char tuple[t5TplLen]; // t5 tuple
         volatile sig_atomic_t flag; // signal to thread to start testing
-        int8_t attack; // whether or not the tested signature was determined to be an attack
+        uint32_t attack; // whether or not the tested signature was determined to be an attack
         string debug_buf;
 } test_param, *ptest_param;
 
@@ -45,6 +48,79 @@ inline static void inPos(void)
 {
         ((local_pos))++;
         ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
+}
+// Check if expressed attributes match given input
+// Returns 1 if matches, 0 if not matches
+int doMatch(Antibody a, int *test)
+{
+        ofstream of;
+        of.open((const char *)"./match.log\0", ios_base::app | ios_base::ate | ios_base::out);
+        int do_log = 0;
+        if (of.good())
+                do_log = 1;
+        a.incTests();
+        if (do_log == 1)
+                of << endl << __DATE__ << " " << __TIME__<< endl << endl << flush;
+        if(a.getFlag(a.COMMAND) && !(a.getAttr(a.COMMAND) & test[a.COMMAND]))
+        {
+                if (do_log == 1)
+                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << endl << flush;
+                if (do_log == 1)
+                {
+                        of.close();
+                        do_log = 0;
+                }
+                return (0);
+        }
+        if(a.getFlag(a.PROTOCOL) && !(a.getAttr(a.PROTOCOL) & test[a.PROTOCOL]))
+        {
+                if (do_log == 1)
+                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << endl << flush;
+                if (do_log == 1)
+                {
+                        of.close();
+                        do_log = 0;
+                }
+                return (0);
+        }
+        for(int i = a.LENGTH; i < ALEN; i++)
+        {
+                if(!a.getFlag(i))
+                {
+                        continue;
+                }
+                int overf = (int)pow(2.0, (double)a.getMax(i)) + (int)pow(2.0, (double)a.getMax(i) - 1.0) - 2;
+                if (test[i] > overf)
+                {
+                        if (do_log == 1)
+                                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << endl << flush;
+                        if (do_log == 1)
+                        {
+                                of.close();
+                                do_log = 0;
+                        }
+                        return (1);  // Over max antibody match, assume is attack
+                }
+                if (test[i] < (a.getAttr(i) - a.getOff(i)) || test[i] > (a.getAttr(i) + a.getOff(i)))
+                {
+                        if (do_log == 1)
+                                of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << endl << flush;
+                        if (do_log == 1)
+                        {
+                                of.close();
+                                do_log = 0;
+                        }
+                        return (0);
+                }
+        }
+        if (do_log == 1)
+                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << endl << flush;
+        if (do_log == 1)
+        {
+                of.close();
+                do_log = 0;
+        }
+        return (1);
 }
 
 /* v is a test_param *, ie ptest_param */
@@ -57,19 +133,19 @@ void * testThread(void * v)
                    fflush(stderr);
                    */
                 pthread_mutex_lock(&champs_mutex);
+                (((ptest_param)v)->debug_buf) = "";
+                /* DEBUG */
+                ((ptest_param)v)->attack = 0;
                 for (int i = 0; i < class_count; i++)
                 {
                         for (int j = 0; j < ab_count; j++)
                         {
                                 //if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
-                                        ((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match((int *)(((ptest_param)v)->sig), 1, &(((ptest_param)v)->debug_buf)));
-                                        /* DEBUG */
-
-                                        fprintf(stderr, "match returned %d\n", ((ptest_param)v)->attack);
+                                        fprintf(stderr, "\n\tAbout to call doMatch\n\n");
                                         fflush(stderr);
-
-                                        /* DEBUG */
+                                        ((ptest_param)v)->attack += (doMatch( (champs[i][j]) , (int *)(((ptest_param)v)->sig) ));
+                                        //((ptest_param)v)->attack = (uint8_t)((champs)[i][j].match_debug((int *)(((ptest_param)v)->sig)));
                                 }
                         }
                 }
@@ -124,7 +200,7 @@ void * Stats (void * v)
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
-                        if (tmp.attack == 1)
+                        if (tmp.attack >= AGREE)
                         {
                                 fout << "[A] --- Attack Identified:" << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
@@ -146,7 +222,8 @@ void * Stats (void * v)
                         }
                         if (DEBUG)
                         {
-                                tmp.debug_buf.length() > 1 ? (fout << endl << "Debuging Info from Antibody::Match(): " << tmp.debug_buf << endl) : (fout << endl << "No Debugging Info Returned from Antibody::Match().");
+                                tmp.debug_buf.length() > 1 ? (fout << endl << "Debuging Info from Antibody::Match(): " << (tmp.debug_buf) << endl) : (fout << endl << "No Debugging Info Returned from Antibody::Match().");
+                                //fout << endl << "Debuging Info from Antibody::Match(): " << tmp.debug_buf << endl << flush;
                         }
                         fout << endl;
                 }
@@ -334,6 +411,7 @@ void pull(Antibody ** pop)
         {
                 params[i].flag = UNUSED;
                 params[i].tnum = i;
+                //                params[i].debug_buf = new string;
         }
         /* start testMgr with &params[] */
         /* HERE - cleanup and exit */
@@ -471,6 +549,10 @@ void pull(Antibody ** pop)
         if ((pthread_join(test_mgr_tid, NULL)) < 0)
         {
                 perror("pthread_join()");
+        }
+        for (i = 0; i < MAX_THREADS; i++)
+        {
+                //                delete(params[i].debug_buf);
         }
 
         cleanup();

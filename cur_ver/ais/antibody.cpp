@@ -106,28 +106,66 @@ void Antibody::calcCategory(int c, int total) {
         catPerc[c] = (float)cat[c] / (float)total;
 }
 
-// Check if expressed attributes match given input
-// Returns 1 if matches, 0 if not matches
-int Antibody::match(int *test, const int & debug, string * buf)
+int Antibody::match(int *test)
 {
         tests++;
         if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND]))
         {
-                if (debug == 1)
+                return (0);
+        }
+        if(flags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL]))
+        {
+                return (0);
+        }
+        for(int i = LENGTH; i < ALEN; i++)
+        {
+                if(!flags[i])
                 {
-                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
-                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << flush;
-                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n";
+                        continue;
+                }
+                int overf = (int)pow(2.0, (double)max[i]) + (int)pow(2.0, max[i] - 1.0) - 2;
+                if (test[i] > overf)
+                {
+                        return (1);  // Over max antibody match, assume is attack
+                }
+                if (test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))
+                {
+                        return (0);
+                }
+        }
+        return (1);
+}
+// Check if expressed attributes match given input
+// Returns 1 if matches, 0 if not matches
+int Antibody::match_debug(int *test)
+{
+        ofstream of;
+        of.open((const char *)"./match.log\0", ios_base::app | ios_base::ate | ios_base::out);
+        int do_log = 0;
+        if (of.good())
+                do_log = 1;
+        tests++;
+        if (do_log == 1)
+                of << endl << __DATE__  << __TIME__<< endl << endl << flush;
+        if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND]))
+        {
+                if (do_log == 1)
+                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << endl << flush;
+                if (do_log == 1)
+                {
+                        of.close();
+                        do_log = 0;
                 }
                 return (0);
         }
         if(flags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL]))
         {
-                if (debug == 1)
+                if (do_log == 1)
+                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << endl << flush;
+                if (do_log == 1)
                 {
-                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
-                        cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << flush;
-                        *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n";
+                        of.close();
+                        do_log = 0;
                 }
                 return (0);
         }
@@ -140,30 +178,33 @@ int Antibody::match(int *test, const int & debug, string * buf)
                 int overf = (int)pow(2.0, (double)max[i]) + (int)pow(2.0, max[i] - 1.0) - 2;
                 if (test[i] > overf)
                 {
-                        if (debug == 1)
+                        if (do_log == 1)
+                                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << endl << flush;
+                        if (do_log == 1)
                         {
-                                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
-                                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << flush;
-                                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n";
+                                of.close();
+                                do_log = 0;
                         }
                         return (1);  // Over max antibody match, assume is attack
                 }
                 if (test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))
                 {
-                        if (debug == 1)
+                        if (do_log == 1)
+                                of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << endl << flush;
+                        if (do_log == 1)
                         {
-                                cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
-                                cerr << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << flush;
-                                *buf = "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n";
+                                of.close();
+                                do_log = 0;
                         }
                         return (0);
                 }
         }
-        if (debug == 1)
+        if (do_log == 1)
+                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << endl << flush;
+        if (do_log == 1)
         {
-                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
-                cerr << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << flush;
-                *buf = "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n";
+                of.close();
+                do_log = 0;
         }
         return (1);
 }

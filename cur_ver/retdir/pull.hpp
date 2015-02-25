@@ -3,6 +3,7 @@
 #include <sys/sem.h>
 #include <queue>
 #include <list>
+#include <cmath>
 #include <iomanip>
 #include <fstream>
 
@@ -15,6 +16,8 @@
 using namespace std;
 
 #define DEBUG 1
+
+#define AGREE 3
 
 #ifndef SIGBUF
 #define SIGBUF 50

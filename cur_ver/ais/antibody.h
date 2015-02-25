@@ -4,6 +4,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <fstream>
 using namespace std;
 
 // HTTP request antibody.
@@ -24,7 +25,7 @@ const int CLASS_COUNT = 6;
 const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };
 
 class Antibody {
-        private:
+        public:
                 static const int COMMAND = 0;     // HTTP command (GET, POST, HEAD, other)
                 static const int PROTOCOL = 1;    // HTTP protocol (0.9, 1.0, 1.1, other)
                 static const int LENGTH = 2;      // Length of request
@@ -39,6 +40,7 @@ class Antibody {
                 static const int FORWARD = 11;    // Number of // chars in request
                 static const int LT = 12;         // Number of < chars in request
                 static const int GT = 13;         // Number of > chars in request
+        private:
 
                 // Antibody characteristics
                 int flags[ALEN];     // Is this attribute being expressed in this antibody?
@@ -59,14 +61,22 @@ class Antibody {
                 void setMax();       // Initialize the max values
                 void randomInit();   // Randomize the attribute/offset values
         public:
+                string debug_buf;
                 Antibody();                     // Create a random antibody
                 Antibody(int *, int *, int *);  // Antibody w/ given attributes
                 Antibody(Antibody &);
 
-                int match(int *, const int & debug = 0, string * buf = NULL);    // Returns 1 = attack, 0 = normal
+                int match_debug(int *);    // Returns 1 = attack, 0 = normal
+                int match(int *);    // Returns 1 = attack, 0 = normal
                 float fitness(int cl = -1);
                 void mate(Antibody *, Antibody **, Antibody **);
                 void mutate();
+
+                inline int getFlag(const int i = -1) { return (i > 0 && i < ALEN ? flags[i] : -1); }
+                inline int getAttr(const int i = -1) { return (i > 0 && i < ALEN ? a[i] : -1); }
+                inline int getMax(const int i = -1) { return (i > 0 && i < ALEN ? max[i] : -1); }
+                inline int getOff(const int i = -1) { return (i > 0 && i < ALEN ? offset[i] : -1); }
+                inline void incTests(const int ct = 1) { this->tests += ct; }
 
                 int queryTests()    { return tests; }
                 int queryPos()      { return pos; }
