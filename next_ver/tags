@@ -277,8 +277,7 @@ adjPos	ais/antibody.h	/^                void adjPos()      { pos++; }$/;"	f	clas
 alen	retdir/pull.cpp	/^volatile sig_atomic_t alen = 0;$/;"	v
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
 arr_size	retdir/import.cpp	/^unsigned int arr_size = 100;$/;"	v
-attack	retdir/pull.cpp	/^        uint32_t attack; \/\/ whether or not the tested signature was determined to be an attack and which CLASS_LABEL it is$/;"	m	struct:_test_param	file:
-attack_count	retdir/pull.cpp	/^        uint32_t attack_count; \/\/ how many antibodies identified this signature as an attack$/;"	m	struct:_test_param	file:
+attack	retdir/pull.cpp	/^        uint32_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
 avgFitness	ais/lifetime.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 avgFitness	ais/lifetime_nounknown.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 buf	inc/share.h	/^char buf[1024];$/;"	v
@@ -319,7 +318,7 @@ delete_stream	inc/tcpreassembly.c	/^inline static void delete_stream ( pntoh_tcp
 destination	inc/ipv4defrag.h	/^	unsigned int destination;$/;"	m	struct:__anon2
 destination	inc/ipv6defrag.h	/^	uint8_t destination[16];$/;"	m	struct:__anon5
 destination	inc/tcpreassembly.h	/^	unsigned int 	destination;$/;"	m	struct:__anon14
-doMatch	retdir/pull.cpp	/^inline int doMatch(Antibody a, int *test)$/;"	f
+doMatch	retdir/pull.cpp	/^int doMatch(Antibody a, int *test)$/;"	f
 do_import	retdir/pull.cpp	/^volatile sig_atomic_t do_import = 0;$/;"	v
 dport	inc/tcpreassembly.h	/^	unsigned short 	dport;$/;"	m	struct:__anon14
 dump	ais/antibody.cpp	/^string Antibody::dump (void)$/;"	f	class:Antibody

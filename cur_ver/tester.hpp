@@ -1,9 +1,14 @@
 #pragma once
 #define TARGET "http://localhost:80"
 
-#ifndef _INFILE
-#define _INFILE
-const char * INFILE = "./ais/attack\0";
+#ifndef _NORMALFILE
+#define _NORMALFILE
+const char * NORMALFILE = "./ais/normal\0";
+#endif
+
+#ifndef _ATTACKFILE
+#define _ATTACKFILE
+const char * ATTACKFILE = "./ais/attack\0";
 #endif
 
 #ifndef _CMD

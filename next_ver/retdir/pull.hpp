@@ -17,7 +17,7 @@ using namespace std;
 
 #define DEBUG 1
 
-#define AGREE 3
+#define AGREE 7
 
 #ifndef SIGBUF
 #define SIGBUF 50

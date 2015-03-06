@@ -38,8 +38,8 @@ typedef struct _test_param
         uint32_t sig[fngPntLen]; // signature to be tested
         char tuple[t5TplLen]; // t5 tuple
         volatile sig_atomic_t flag; // signal to thread to start testing
-        uint32_t attack; // whether or not the tested signature was determined to be an attack and which CLASS_LABEL it is
-        uint32_t attack_count; // how many antibodies identified this signature as an attack
+        uint32_t attack; // whether or not the tested signature was determined to be an attack
+        uint32_t attack_count; // how many antibodies returned attack
         string debug_buf;
 } test_param, *ptest_param;
 
@@ -51,35 +51,37 @@ inline static void inPos(void)
         ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
 }
 // Check if expressed attributes match given input
-// Returns ab classification or 99 if matches, 0 if not matches
-inline int doMatch(Antibody a, int *test)
+// Returns 1 if matches, 0 if not matches
+int doMatch(Antibody a, int *test)
 {
         a.incTests();
         if(a.getFlag(a.COMMAND) && !(a.getAttr(a.COMMAND) & test[a.COMMAND]))
         {
-                return (0);
+                return (class_count + 1);
         }
         if(a.getFlag(a.PROTOCOL) && !(a.getAttr(a.PROTOCOL) & test[a.PROTOCOL]))
         {
-                return (0);
+                return (class_count + 1);
         }
         for(int i = a.LENGTH; i < ALEN; i++)
         {
                 if(!a.getFlag(i))
                 {
+                        cerr << "!a.getFlag(" << i << "), continue\n" << flush;
                         continue;
                 }
                 int overf = (int)pow(2.0, (double)a.getMax(i)) + (int)pow(2.0, (double)a.getMax(i) - 1.0) - 2;
                 if (test[i] > overf)
                 {
-                        return (a.queryClassification());  // Over max antibody match, assume is attack
+                        return (1);  // Over max antibody match, assume is attack
                 }
                 if (test[i] < (a.getAttr(i) - a.getOff(i)) || test[i] > (a.getAttr(i) + a.getOff(i)))
                 {
-                        return (0);
+                        return (class_count + 1);
                 }
         }
-        return (99);
+        cerr << "returning default case\n" << flush;
+        return (class_count); // unknown attack - default case
 }
 
 /* v is a test_param *, ie ptest_param */
@@ -91,15 +93,17 @@ void * testThread(void * v)
                    fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
                    fflush(stderr);
                    */
-                int32_t attack_types[CLASS_COUNT+1];
-                for (int i = 0; i < CLASS_COUNT + 1; i++)
+                int tmp = 0, max = 0;
+                int attacks[class_count + 2];
+                for (int i = 0; i < class_count + 2; i++)
                 {
-                        attack_types[i] = 0;
+                        attacks[i] = 0;
                 }
-                int tmp = 0;
-                pthread_mutex_lock(&champs_mutex);
                 ((ptest_param)v)->attack = 0;
                 ((ptest_param)v)->attack_count = 0;
+
+                pthread_mutex_lock(&champs_mutex);
+
                 for (int i = 0; i < class_count; i++)
                 {
                         for (int j = 0; j < ab_count; j++)
@@ -107,34 +111,27 @@ void * testThread(void * v)
                                 //if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
                                         tmp = (doMatch( (champs[i][j]) , (int *)(((ptest_param)v)->sig) ));
-                                        if (tmp > 0)
-                                        {
-                                                ((ptest_param)v)->attack_count += 1;
-                                                attack_types[ tmp != 99 ? tmp : CLASS_COUNT ] += 1;
-                                        }
+                                        ((ptest_param)v)->attack_count += 1;
+                                        attacks[tmp] += 1;
                                 }
                         }
                 }
+
                 pthread_mutex_unlock(&champs_mutex);
 
-                if (((ptest_param)v)->attack_count >= AGREE)
+                tmp = attacks[0];
+                for (int i = 1; i < class_count + 1; i++)
                 {
-                        int max = -1, max_pos = 0;
-                        for (int i = 0; i < CLASS_COUNT; i++)
+                        if (tmp < attacks[i])
                         {
-                                if (attack_types[i] > max)
-                                {
-                                        max = attack_types[i];
-                                        max_pos = i;
-                                }
+                                tmp = attacks[i];
+                                max = i;
                         }
-                        if (attack_types[CLASS_COUNT] > max)
-                        {
-                                //max_pos = 99;
-                        }
-                        ((ptest_param)v)->attack = max_pos;
                 }
+                ((ptest_param)v)->attack = max;
 
+                fprintf(stderr, "\n\t\t[T] --- testThread: Something to log\n");
+                fflush(stderr);
                 pthread_mutex_lock(&log_mutex);
                 log_queue.push(*(ptest_param)(v));
                 pthread_mutex_unlock(&log_mutex);
@@ -150,7 +147,9 @@ void * testThread(void * v)
 
 inline static void Copy(test_param & d, test_param s)
 {
+        d.debug_buf = s.debug_buf;
         d.attack = s.attack;
+        d.attack_count = s.attack_count;
         unsigned int x = 0;
         for (x = 0; x < t5TplLen; x++)
         {
@@ -182,32 +181,28 @@ void * Stats (void * v)
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
-                        if (tmp.attack >= AGREE)
+                        if (tmp.attack_count >= AGREE)
                         {
-                                fout << "[A] --- Attack Identified:" << endl;
-                                fout << "\t" << "Attack Type Signaled: " << (tmp.attack != 99 ? CLASS_LABELS[tmp.attack] : "UNKNOWN") << endl;
+                                fout << "[A] --- Attack Identified --- [A]" << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << "\n\t" << "Number of Antibodies Signaling Attack: " << tmp.attack_count << endl;
+                                fout << "\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
+                                fout << "\tAttack Type: " << ((int)tmp.attack < class_count ? CLASS_LABELS[tmp.attack] : "Unknown") << " (" << tmp.attack << ")" << endl;
                         }
                         else
                         {
-                                fout << "[N] --- Normal Traffic ---" << endl;
+                                fout << "[N] --- Normal Traffic --- [N]" << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << "\n\t" << "Number of Antibodies Signaling Attack: " << tmp.attack_count << endl;
-                        }
-                        if (DEBUG)
-                        {
-                                //tmp.debug_buf.length() > 1 ? (fout << endl << "Debuging Info from Antibody::Match(): " << (tmp.debug_buf) << endl) : (fout << endl << "No Debugging Info Returned from Antibody::Match().");
+                                fout << endl;
                         }
                         fout << endl;
                 }

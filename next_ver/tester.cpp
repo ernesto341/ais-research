@@ -85,7 +85,7 @@ int main (int argc, char *argv[], char *envp[])
         }
 
         ifstream in_file;
-        string filename = INFILE;
+        string filename = ATTACKFILE;
 
         if (argc >= 2)
         {
@@ -93,7 +93,7 @@ int main (int argc, char *argv[], char *envp[])
                 in_file.open(filename.c_str());
                 if (in_file.fail())
                 {
-                        filename = INFILE;
+                        filename = ATTACKFILE;
                 }
         }
         in_file.open(filename.c_str());

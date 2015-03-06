@@ -220,11 +220,6 @@ void * Stats (void * v)
                                         fout << tmp.sig[i] << " ";
                                 }
                         }
-                        if (DEBUG)
-                        {
-                                tmp.debug_buf.length() > 1 ? (fout << endl << "Debuging Info from Antibody::Match(): " << (tmp.debug_buf) << endl) : (fout << endl << "No Debugging Info Returned from Antibody::Match().");
-                                //fout << endl << "Debuging Info from Antibody::Match(): " << tmp.debug_buf << endl << flush;
-                        }
                         fout << endl;
                 }
                 pthread_mutex_unlock(&log_mutex);
