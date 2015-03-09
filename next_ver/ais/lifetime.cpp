@@ -207,10 +207,6 @@ int main(int argc, char *argv[]) {
 
         for(int r = 0; r < MAX_RUNS; r++) {
                 initialGen();
-                if (r == 0)
-                {
-                        Copy(ALL);
-                }
                 fout << "Population " << setw(5) << r << endl;
                 cerr << "Population " << setw(5) << r << endl;
                 for(int i = 0; i < MAX_ROUNDS; i++) {
@@ -229,6 +225,10 @@ int main(int argc, char *argv[]) {
                         fout6 << setw(3) << i;
                         testSelf();
                         train();
+                        if (r == 0)
+                        {
+                                Copy(ALL);
+                        }
                         for(int c = 0; c < CLASS_COUNT; c++) {
                                 classAccuracy[r][i][c] = attack.labelAccuracy[c];
                                 averageAccuracy[i][c] += attack.labelAccuracy[c];
@@ -291,14 +291,16 @@ int main(int argc, char *argv[]) {
                 cerr << endl;
         }
         cerr << endl << "Champions population statistics:\n";
-        cerr << endl;
         for(int i = 0; i < CLASS_COUNT; i++)
         {
-                cerr << "Class " << i+1 << ":\n";
                 for(int j = 0; j < MAX_ANTIBODIES; j++)
                 {
-                        cerr << "\t" << j+1 << " - ";
                         cerr << champs[i][j];
+                        cerr << "\n\tAccuracy: ";
+                        for (int k = 0; k < CLASS_COUNT; k++)
+                        {
+                                cerr << champs[i][j].getCatCount(k) << " / " << champs[i][j].getCatTotal(k) << " = " << champs[i][j].getCatPerc(k) << ", ";
+                        }
                         cerr << endl;
                 }
                 cerr << endl;

@@ -73,7 +73,8 @@ int doMatch(Antibody a, int *test)
                 int overf = (int)pow(2.0, (double)a.getMax(i)) + (int)pow(2.0, (double)a.getMax(i) - 1.0) - 2;
                 if (test[i] > overf)
                 {
-                        return (1);  // Over max antibody match, assume is attack
+                        cerr << "Actually signaling attack, classification of AB: " << a.queryClassification() << endl << flush;
+                        return (a.queryClassification());  // Over max antibody match, attack
                 }
                 if (test[i] < (a.getAttr(i) - a.getOff(i)) || test[i] > (a.getAttr(i) + a.getOff(i)))
                 {
@@ -82,6 +83,7 @@ int doMatch(Antibody a, int *test)
         }
         cerr << "returning default case\n" << flush;
         return (class_count); // unknown attack - default case
+        return (class_count + 1); // not attack - default case
 }
 
 /* v is a test_param *, ie ptest_param */
@@ -93,7 +95,7 @@ void * testThread(void * v)
                    fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
                    fflush(stderr);
                    */
-                int tmp = 0, max = 0;
+                int tmp = 0, max = 0, c = 0;
                 int attacks[class_count + 2];
                 for (int i = 0; i < class_count + 2; i++)
                 {
@@ -110,8 +112,21 @@ void * testThread(void * v)
                         {
                                 //if ((champs)[i][j].fitness() > MIN_FITNESS)
                                 {
+                                        c = champs[i][j].queryClassification();
+                                        cerr << "Testing with a(n) " << ((c >= 0 && c < class_count) ? CLASS_LABELS[c] : "Unknown Type") << " antibody" << flush;
+                                        cerr << " with fitness: " << champs[i][j].fitness() << endl << flush;
+                                        cerr << "Category Percentages and Counts:\n";
+                                        for (int k = 0; k < class_count; k++)
+                                        {
+                                                cerr << "\t" << k << ": " << champs[i][j].getCatCount(k) << " / " << champs[i][j].getCatTotal(k) << " = " << champs[i][j].getCatPerc(k) << endl << flush;
+                                        }
+                                        cerr << endl << flush;
                                         tmp = (doMatch( (champs[i][j]) , (int *)(((ptest_param)v)->sig) ));
-                                        ((ptest_param)v)->attack_count += 1;
+                                        cerr << "\tReturned " << CLASS_LABELS[tmp] << endl << flush;
+                                        if (tmp != class_count + 1)
+                                        {
+                                                ((ptest_param)v)->attack_count += 1;
+                                        }
                                         attacks[tmp] += 1;
                                 }
                         }
@@ -190,8 +205,8 @@ void * Stats (void * v)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << "\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
-                                fout << "\tAttack Type: " << ((int)tmp.attack < class_count ? CLASS_LABELS[tmp.attack] : "Unknown") << " (" << tmp.attack << ")" << endl;
+                                fout << "\n\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
+                                fout << "\tAttack Type: " << CLASS_LABELS[tmp.attack] << " (" << tmp.attack << ")" << endl;
                         }
                         else
                         {
@@ -203,6 +218,7 @@ void * Stats (void * v)
                                         fout << tmp.sig[i] << " ";
                                 }
                                 fout << endl;
+                                fout << "\n\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
                         }
                         fout << endl;
                 }

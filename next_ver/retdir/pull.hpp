@@ -17,7 +17,7 @@ using namespace std;
 
 #define DEBUG 1
 
-#define AGREE 7
+#define AGREE 3
 
 #ifndef SIGBUF
 #define SIGBUF 50
@@ -28,7 +28,7 @@ using namespace std;
 #endif
 
 #ifndef MIN_FITNESS
-#define MIN_FITNESS 70
+#define MIN_FITNESS .30
 #endif
 
 #ifndef MAX_THREADS

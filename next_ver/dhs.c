@@ -409,16 +409,84 @@ void write_data ( ppeer_info_t info )
         return;
 }
 
+inline static int inAtoF(const char in)
+{
+        char c = tolower(in);
+        if (c >= 'a' && c <= 'f')
+        {
+                return (1);
+        }
+        return (0);
+}
+
+inline static int hexConvert(const char * in)
+{
+        if (!in || in[0] != '%' || strlen(in) < 3)
+        {
+                return ('\0');
+        }
+        if (isdigit(in[1]))
+        {
+                /* dd */
+                if (isdigit(in[2]))
+                {
+                        return ((16 * (in[1] - 48)) + (in[2] - 48));
+                }
+                /* dc */
+                return ((16 * (in[1] - 48)) + (toupper(in[2]) - 55));
+        }
+        /* cd */
+        if (isdigit(in[2]))
+        {
+                return (16 * (toupper(in[1]) - 55) + (in[2] - 48));
+        }
+        /* cc */
+        return (16 * (toupper(in[1]) - 55) + (toupper(in[2]) - 55));
+}
+
 /**
- * @brief Convert a number from a HTTP request from %dd to ascii value
+ * @brief Convert a number from a HTTP request from %dd (in decimal) to ascii value
  */
 inline static int percentNumberConverter(const char * s)
 {
-        if (s == 000 || s[0] != '%' || !isdigit(s[1]) || !isdigit(s[2]))
+        /* idiot check */
+        if (s == 000 || s[0] != '%')
         {
                 return (-1);
         }
-        return (atoi(&(s[1])));
+        /* check for hex representation first */
+        uint32_t size = strlen(s);
+        if (size > 2)
+        {
+                /* definitely hex digit, but outside of regular ascii table */
+                if ( (inAtoF(s[1]) != 0 && inAtoF(s[2]) != 0) )
+                {
+                        return (hexConvert(s));
+                }
+                /* hex digit in regular ascii table (0-7) */
+                else if ( (s[1] < 56 && s[1] > 47) && (inAtoF(s[2]) != 0) )
+                {
+                        return (hexConvert(s));
+                }
+                /* hex digit outside of regular ascii table */
+                else if ( isdigit(s[1]) && (inAtoF(s[2]) != 0) )
+                {
+                        return (hexConvert(s));
+                }
+                /* hex digit, outside of regular ascii table */
+                else if ( (inAtoF(s[1]) != 0 && isdigit(s[2])) )
+                {
+                        return (hexConvert(s));
+                }
+        }
+
+        /* otherwise, either one or two digits, in which case, return atoi, */
+        if (isdigit(s[1]))
+        {
+                return (atoi(&(s[1])));
+        }
+        /* or one hex digit, return hex conversion */
+        return (toupper(s[1]) - 55);
 }
 
 /**
@@ -564,6 +632,34 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
                                 else if (converted == (int)'\'')
                                 {
                                         ++apos;
+                                }
+                                else if (converted == 43)
+                                {
+                                        ++plus;
+                                }
+                                else if (converted == 43)
+                                {
+                                        ++oparen;
+                                }
+                                else if (converted == 38)
+                                {
+                                        ++var;
+                                }
+                                else if (converted == 41)
+                                {
+                                        ++cparen;
+                                }
+                                else if (converted == 62)
+                                {
+                                        ++gt;
+                                }
+                                else if (converted == 60)
+                                {
+                                        ++lt;
+                                }
+                                else if (converted == 92)
+                                {
+                                        ++bckslsh;
                                 }
                                 ++target;
                                 ++target;

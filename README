@@ -24,4 +24,5 @@ When using 'listen.sh' and 'tester', start dhs on the local loopback interface.
 
 TO DO:
 Return which type of attack has been identified and how many antibodies identified an attack
+maybe continue breeding generations until fitness reaches min level?
 

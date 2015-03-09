@@ -248,6 +248,31 @@ Antibody ** importChamps (char * fin)
                                 pop[i][j].setCat(k, tmp);
                                 k++;
                         }
+                        /* use a tab to delimit totals */
+                        while (data[l] != 9)
+                        {
+                                l++;
+                        }
+                        k = 0;
+                        while (k < class_count)
+                        {
+                                begin = l;
+                                tmp = atoi(&data[begin]);
+                                l++;
+                                /* spaces between values */
+                                while (data[l] != 32)
+                                {
+                                        l++;
+                                }
+                                cerr << "Precalc percent: " << pop[i][j].getCatPerc(k) << endl << flush;
+                                cerr << "Got total count: " << tmp << endl << flush;
+                                pop[i][j].setCatTotal(k, tmp);
+                                /* figure percentages */
+                                pop[i][j].calcCategory(k, tmp);
+                                cerr << "Postcalc percent: " << pop[i][j].getCatPerc(k) << endl << endl << flush;
+                                k++;
+                        }
+                        /* newline, end of line */
                         while (data[l] != 10)
                         {
                                 l++;
@@ -257,6 +282,8 @@ Antibody ** importChamps (char * fin)
                 }
                 i++;
         }
+
+
         cerr << endl << flush;
 
         /* Excessive output

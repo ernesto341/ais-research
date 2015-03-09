@@ -137,6 +137,7 @@ void Webdata::test(Antibody *a, int f, int cl) {
         // Now normalize the classification counts from a count to a percentage
         for(int i = 0; i < CLASS_COUNT; i++) {
                 a->calcCategory(i, labelCount[i]);
+                a->setCatTotal(i, labelCount[i]);
         }
 }
 
@@ -186,6 +187,7 @@ void Webdata::test(Antibody **a, int s, int f, int cl) {
         for(int j = 0; j < s; j++) {
                 for(int k = 0; k < CLASS_COUNT; k++) {
                         a[j]->calcCategory(k, labelCount[k]);
+                        a[j]->setCatTotal(k, labelCount[k]);
                 }
         }
 

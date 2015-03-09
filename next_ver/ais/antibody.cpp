@@ -106,6 +106,8 @@ void Antibody::calcCategory(int c, int total) {
         catPerc[c] = (float)cat[c] / (float)total;
 }
 
+// Check if expressed attributes match given input
+// Returns 1 if matches, 0 if not matches
 int Antibody::match(int *test)
 {
         tests++;
@@ -132,79 +134,6 @@ int Antibody::match(int *test)
                 {
                         return (0);
                 }
-        }
-        return (1);
-}
-// Check if expressed attributes match given input
-// Returns 1 if matches, 0 if not matches
-int Antibody::match_debug(int *test)
-{
-        ofstream of;
-        of.open((const char *)"./match.log\0", ios_base::app | ios_base::ate | ios_base::out);
-        int do_log = 0;
-        if (of.good())
-                do_log = 1;
-        tests++;
-        if (do_log == 1)
-                of << endl << __DATE__  << __TIME__<< endl << endl << flush;
-        if(flags[COMMAND] && !(a[COMMAND] & test[COMMAND]))
-        {
-                if (do_log == 1)
-                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[COMMAND] && !(a[COMMAND] & test[COMMAND])\n" << endl << flush;
-                if (do_log == 1)
-                {
-                        of.close();
-                        do_log = 0;
-                }
-                return (0);
-        }
-        if(flags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL]))
-        {
-                if (do_log == 1)
-                        of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\tflags[PROTOCOL] && !(a[PROTOCOL] & test[PROTOCOL])\n" << endl << flush;
-                if (do_log == 1)
-                {
-                        of.close();
-                        do_log = 0;
-                }
-                return (0);
-        }
-        for(int i = LENGTH; i < ALEN; i++)
-        {
-                if(!flags[i])
-                {
-                        continue;
-                }
-                int overf = (int)pow(2.0, (double)max[i]) + (int)pow(2.0, max[i] - 1.0) - 2;
-                if (test[i] > overf)
-                {
-                        if (do_log == 1)
-                                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\ttest[i] > overf\n" << endl << flush;
-                        if (do_log == 1)
-                        {
-                                of.close();
-                                do_log = 0;
-                        }
-                        return (1);  // Over max antibody match, assume is attack
-                }
-                if (test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))
-                {
-                        if (do_log == 1)
-                                of << "\n\tantibody::match returning 0 ( - NORMAL - )\n\t\t(test[i] < (a[i] - offset[i]) || test[i] > (a[i] + offset[i]))\n" << endl << flush;
-                        if (do_log == 1)
-                        {
-                                of.close();
-                                do_log = 0;
-                        }
-                        return (0);
-                }
-        }
-        if (do_log == 1)
-                of << "\n\tantibody::match returning 1 ( - ATTACK - )\n\t\tDefault Case\n" << endl << flush;
-        if (do_log == 1)
-        {
-                of.close();
-                do_log = 0;
         }
         return (1);
 }
@@ -438,6 +367,12 @@ string Antibody::dump (void)
                 s << (int)(this->cat[i]);  // Count of matches in each classification category
                 /* semicolons to indicate CLASS_COUNT */
                 s << "; ";
+        }
+        s << "\t";
+        for(int i = 0; i < CLASS_COUNT; i++)
+        {
+                s << (int)(this->catTotal[i]);  // Count of total tests in each classification category
+                s << " ";
         }
         s << "\n";
 
