@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
 #include <string.h>
 #include <stdint.h>
 #include <fstream>
@@ -86,6 +88,7 @@ int main (int argc, char *argv[], char *envp[])
 
         ifstream in_file;
         string filename = NORMALFILE;
+        /*
 
         if (argc >= 2)
         {
@@ -129,6 +132,7 @@ int main (int argc, char *argv[], char *envp[])
                 system(uris[i].c_str());
                 fib(30);
         }
+        */
         if (argc >= 3)
         {
                 filename = argv[2];
@@ -156,6 +160,7 @@ int main (int argc, char *argv[], char *envp[])
                 exit(EXIT_FAILURE);
         }
         in_file.close();
+        int ret_pid[uri_qty];
         for (i = 0; i < uri_qty; i++)
         {
                 if (uris[i][0] != '/')
@@ -169,13 +174,15 @@ int main (int argc, char *argv[], char *envp[])
                 uris[i].insert(0, "iceweasel ");
                 /* HERE - fork and execve */
                 /* child */
-                system(uris[i].c_str());
-                /* parent 
-                 * fib(40);
-                 * kill(child);
-                 */
-
-                fib(30);
+                if ((ret_pid[i] = fork()) == 0) /* child */
+                {
+                        system(uris[i].c_str());
+                }
+                else /* parent */
+                {
+                        fib(40);
+                        kill (ret_pid[i], SIGKILL);
+                }
         }
 
         return (0);

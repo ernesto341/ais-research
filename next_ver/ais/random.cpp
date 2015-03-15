@@ -3,19 +3,32 @@
 #include <iostream>
 #include <cstdlib>
 #include "random.h"
+
+static bool SEEDED = false;
+
 using namespace std;
 
 int randomInt(int bound) {
-  double r;
+        double r;
+        if (!SEEDED)
+        {
+                srandom(time(NULL));
+                SEEDED = true;
+        }
 
-  r = random() / ((double)RAND_MAX + 1);
-  return (int)(r * bound);
+        r = random() / ((double)RAND_MAX + 1);
+        return (int)(r * bound);
 }
 
 float randomCoin() {
-  float r;
+        float r;
+        if (!SEEDED)
+        {
+                srandom(time(NULL));
+                SEEDED = true;
+        }
 
-  r = random() / ((float)RAND_MAX + 1);
-  return r;
+        r = random() / ((float)RAND_MAX + 1);
+        return r;
 }
 

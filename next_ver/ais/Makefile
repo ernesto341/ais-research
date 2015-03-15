@@ -41,4 +41,4 @@ random.o:	random.h random.cpp
 	g++ $(CFLAGS) -c random.cpp
 
 clean:	
-	rm -f *.o lifetime a.out core lifetime.25 lifetime.50 lifetime.75 lifetime.125 lifetime.250 lifetime.500 lifetime.1000 champions.abs *.*_*_*.*_*.
+	rm -f *.o lifetime a.out core lifetime.25 lifetime.50 lifetime.75 lifetime.125 lifetime.250 lifetime.500 lifetime.1000 champions.abs *.*_*_*.*_*. Champions_Report.html
