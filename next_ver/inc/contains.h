@@ -11,17 +11,14 @@
  *
  */
 
-#ifndef _CONTAINS_H_
-#define _CONTAINS_H_
+#ifndef __CONTAINS_H__
+#define __CONTAINS_H__
 
-#pragma once
-
-#ifndef DEBUGG
-#define DEBUGG 0
+#ifndef DEBUG
+#define DEBUG 0
 #endif
 
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 
@@ -29,9 +26,10 @@ char * Contains (char * str, char * pattern)
 {
         if (str == NULL || pattern == NULL)
         {
-                if (DEBUGG)
+                if (DEBUG == 1)
                 {
-                        printf("In Contains, str or pattern are NULL\r\n");
+                        fprintf(stderr, "In Contains, str or pattern are NULL\r\n");
+                        fflush(stderr);
                 }
                 return (NULL);
         }
@@ -39,32 +37,36 @@ char * Contains (char * str, char * pattern)
         uint32_t pattern_len = strlen(pattern);
         if (&(str[0]) == &(pattern[0]) && str_len == pattern_len)
         {
-                if (DEBUGG)
+                if (DEBUG == 1)
                 {
-                        printf("In Contains, str == pattern\r\n");
+                        fprintf(stderr, "In Contains, str == pattern\r\n");
+                        fflush(stderr);
                 }
                 return (str);
         }
         if (pattern_len < 1)
         {
-                if (DEBUGG)
+                if (DEBUG == 1)
                 {
-                        printf("In Contains, pattern_len < 1\r\n");
+                        fprintf(stderr, "In Contains, pattern_len < 1\r\n");
+                        fflush(stderr);
                 }
                 return (NULL);
         }
         if (str_len < pattern_len)
         {
-                if (DEBUGG)
+                if (DEBUG == 1)
                 {
-                        printf("In Contains, str_len < pattern_len\r\n");
+                        fprintf(stderr, "In Contains, str_len < pattern_len\r\n");
+                        fflush(stderr);
                 }
                 return (NULL);
         }
-        if (DEBUGG)
+        if (DEBUG == 1)
         {
-                printf("\r\nIn Contains\r\ngot str = %s, pattern = %s\r\n", str, pattern);
-                printf("str_len = %d, pattern_len = %d\r\n", str_len, pattern_len);
+                fprintf(stderr, "\r\nIn Contains\r\ngot str = %s, pattern = %s\r\n", str, pattern);
+                fprintf(stderr, "str_len = %d, pattern_len = %d\r\n", str_len, pattern_len);
+                fflush(stderr);
         }
         uint32_t i = 0, j = 0, k = 1;
         uint8_t good = 0;
@@ -82,22 +84,25 @@ char * Contains (char * str, char * pattern)
                 return (NULL);
         }
         /* only check up to max len */
-        if (DEBUGG)
+        if (DEBUG == 1)
         {
-                printf("\r\nabout to enter outer while loop with the following confitions:\r\n\r\nwhile ( i < %d )\r\ni starting at %d\r\n", str_len-pattern_len, i);
+                fprintf(stderr, "\r\nabout to enter outer while loop with the following confitions:\r\n\r\nwhile ( i < %d )\r\ni starting at %d\r\n", str_len-pattern_len, i);
+                fflush(stderr);
         }
         while (i < str_len-pattern_len+1)
         {
                 /* check first and last chars for match */
-                if (DEBUGG)
+                if (DEBUG == 1)
                 {
-                        printf("first if test: str[%d] ^ pattern[%d] == 0\r\n\t%c ^ %c == 0: %s\r\n", i, 0, str[i], pattern[0], (((str[i]) ^ (pattern[0])) == 0) ? "TRUE" : "FALSE");
+                        fprintf(stderr, "first if test: str[%d] ^ pattern[%d] == 0\r\n\t%c ^ %c == 0: %s\r\n", i, 0, str[i], pattern[0], (((str[i]) ^ (pattern[0])) == 0) ? "TRUE" : "FALSE");
+                        fflush(stderr);
                 }
                 if (((str[i]) ^ (pattern[0])) == 0)
                 {
-                        if (DEBUGG)
+                        if (DEBUG == 1)
                         {
-                                printf("second if test: %c ^ %c == 0: %s\r\n", str[i + pattern_len-1], pattern[pattern_len-1], (((str[i + pattern_len-1]) ^ (pattern[pattern_len-1])) == 0) ? "TRUE" : "FALSE");
+                                fprintf(stderr, "second if test: %c ^ %c == 0: %s\r\n", str[i + pattern_len-1], pattern[pattern_len-1], (((str[i + pattern_len-1]) ^ (pattern[pattern_len-1])) == 0) ? "TRUE" : "FALSE");
+                                fflush(stderr);
                         }
                         if (((str[i + pattern_len-1]) ^ (pattern[pattern_len-1])) == 0)
                         {
@@ -109,9 +114,10 @@ char * Contains (char * str, char * pattern)
                                 good = 0;
                                 while (j-i < pattern_len-2 && good == 0)
                                 {
-                                        if (DEBUGG)
+                                        if (DEBUG == 1)
                                         {
-                                                printf("inside inner while loop\r\ntest: !((((str[%d]) | (str[%d])) ^ ((pattern[%d]) | (pattern[%d]))) == 0)\r\n\t((%c | %c) ^ (%c | %c)) == 0: %s\r\n", j, j+1, k, k+1, str[j], str[j+1], pattern[k], pattern[k+1], (!((((str[j]) | (str[j+1]))^((pattern[k]) | (pattern[k+1]))) == 0)) ? "NO GOOD" : "STILL GOOD");
+                                                fprintf(stderr, "inside inner while loop\r\ntest: !((((str[%d]) | (str[%d])) ^ ((pattern[%d]) | (pattern[%d]))) == 0)\r\n\t((%c | %c) ^ (%c | %c)) == 0: %s\r\n", j, j+1, k, k+1, str[j], str[j+1], pattern[k], pattern[k+1], (!((((str[j]) | (str[j+1]))^((pattern[k]) | (pattern[k+1]))) == 0)) ? "NO GOOD" : "STILL GOOD");
+                                                fflush(stderr);
                                         }
                                         if (!((((str[j]) | (str[j+1])) ^ ((pattern[k]) | (pattern[k+1]))) == 0))
                                         {

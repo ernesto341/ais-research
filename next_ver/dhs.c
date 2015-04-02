@@ -38,6 +38,8 @@
 
 /* TO DO:
  *
+ * encrypt data in shared memory
+ * combine the two shared memory segments
  * ensure that pcktFingerPrint function handles hex substitutions?
  * handle non http packets in extractHttpHdr
  *
@@ -409,6 +411,9 @@ void write_data ( ppeer_info_t info )
         return;
 }
 
+/**
+ * @brief Returns true if character is in standard ascii A-F. Used when determining hex digits
+ */
 inline static int inAtoF(const char in)
 {
         char c = tolower(in);
@@ -419,6 +424,9 @@ inline static int inAtoF(const char in)
         return (0);
 }
 
+/**
+ * @brief converts a hex digit into its ascii character representation. Used to sanitize input from URL bar.
+ */
 inline static int hexConvert(const char * in)
 {
         if (!in || in[0] != '%' || strlen(in) < 3)
@@ -831,6 +839,7 @@ uint8_t extractHttpHdr (const char * udata)
                 hdr_data[j++] = udata[i++];
                 /* HERE
                  * maybe check to see if system is little endian or big endian?
+                 * this section checks for either little and big endian formated input, and could potentially result in erroneous 'end of header' message
                  */
                 if (i > 3 && (udata[i] == 0x0a && udata[i-1] == 0x0d && udata[i-2] == 0x0a && udata[i-3] == 0x0d))
                 {
@@ -861,7 +870,7 @@ uint8_t extractHttpHdr (const char * udata)
 }
 
 /**
- * @brief Function to dump Fingerprint and Uniqe tuple to shared memory for pickup by receive and pull
+ * @brief Function to dump Fingerprint and Uniqe tuple to two separate shared memory segments for pickup by receive and pull. Returns 0 on success.
  */
 inline uint8_t dumpToShm(void)
 {
@@ -1416,14 +1425,14 @@ int main (int argc , char *argv[])
         /** libntoh initialization process starts **/
         /*******************************************/
 
+        /* setup shared memory segments */
         initMem(&snc);
 
         /* fork and exec retrieve in retdir */
-
         char *null_args[] = {NULL};
         char *null_envp[] = {NULL};
 
-        if ((ret_pid = fork()) == 0) /* child */
+        if ((ret_pid = fork()) == 0) /* child - retrieve*/
         {
                 if (execve((char *)"./retdir/retrieve\0", null_args, null_envp) < 0)
                 {
@@ -1431,7 +1440,7 @@ int main (int argc , char *argv[])
                         shandler(-1);
                 }
         }
-        else
+        else /* parent - dhs */
         {
 
                 if ((t5Convert = (sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen)) < (sig_atomic_t *)0)

@@ -331,6 +331,74 @@ void Antibody::mutate() {
         }
 }
 
+string Antibody::dumpXml (void)
+{
+        ostringstream s;
+        s << "<xml>\n";
+        s << "<antibody_count>" << MAX_ANTIBODIES << "</antibody_count>\n";
+        s << "<class_count>" << CLASS_COUNT << "</class_count>\n";
+        s << "<alen>" << ALEN << "</alen>";
+        s << "\n";
+        for(int i = 0; i < ALEN; i++)
+        {
+                s << "<flag>";
+                /* flags - is the attribute expressed */
+                s << (int)(this->flags[i]);
+                s << "</flag>";
+                s << "\n";
+                s << "<attribute>";
+                /* attributes */
+                s << (int)(this->a[i]);
+                s << "</attribute>";
+                s << "\n";
+                /* offsets for ranges of values */
+                s << "<offset>";
+                s << (int)(this->offset[i]);
+                s << "</offset>";
+                s << "\n";
+                /* max values for each attrubute */
+                s << "<max>";
+                s << (int)(this->max[i]);
+                s << "</max>";
+                s << "\n";
+                /* commas to indicate ALEN */
+        }
+        // Statistics for this antibody
+        s << "<tests>";
+        s << (int)(this->tests);           // Total tests performed
+        s << "</tests>";
+        s << "\n";
+        s << "<positive>";
+        s << (int)(this->pos);             // Number of attacks labeled as attacks
+        s << "</positive>";
+        s << "\n";
+        s << "<false_positive>";
+        s << (int)(this->false_pos);       // Number of normal requests labeled as attacks
+        s << "</false_positive>";
+        s << "\n";
+        s << "<negative>";
+        s << (int)(this->neg);             // Number of normal requests labeled as normal
+        s << "</negative>";
+        s << "\n";
+        s << "<false_negative>";
+        s << (int)(this->false_neg);       // Number of attacks labeled as normal
+        s << "</false_negative>";
+        for(int i = 0; i < CLASS_COUNT; i++)
+        {
+                s << "<category>";
+                s << (int)(this->cat[i]);  // Count of matches in each classification category
+                s << "</category>";
+                s << "\n";
+                s << "<category_total>";
+                s << (int)(this->catTotal[i]);  // Count of total tests in each classification category
+                s << "</category_total>";
+                s << "\n";
+        }
+        s << "</xml>" << endl << endl;
+
+        return (s.str());
+}
+
 string Antibody::dump (void)
 {
         ostringstream s;

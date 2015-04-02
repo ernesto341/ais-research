@@ -1,5 +1,5 @@
 CFLAGS = -g -Wno-deprecated
-OFILES = antibody.o webdata.o heap.o mass.o random.o unknownweb.o
+OFILES = antibody.o webdata.o heap.o mass.o random.o unknownweb.o itoa.o import.o
 
 lifetime:	lifetime.cpp ${OFILES}
 	g++ $(CFLAGS) -o lifetime.1000 -DMAX_ANTIBODIES=1000 lifetime.cpp ${OFILES}
@@ -25,8 +25,14 @@ test:	antibody.o test.cpp
 unknownweb.o:	webdata.o unknownweb.h unknownweb.cpp
 	g++ $(CLFAGS) -c unknownweb.cpp
 
+itoa.o:	
+	gcc $(CFLAGS) -c itoa.c
+
 webdata.o:	antibody.h webdata.h webdata.cpp
 	g++ $(CFLAGS) -c webdata.cpp
+
+import.o:	
+	g++ $(CFLAGS) -c import.cpp
 
 heap.o:	antibody.h heap.h heap.cpp
 	g++ $(CFLAGS) -c heap.cpp

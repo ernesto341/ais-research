@@ -27,6 +27,9 @@ volatile sig_atomic_t ** retrieved_t5s = NULL;
 sig_atomic_t ct = 0;
 sig_atomic_t local_pos = 1;
 
+/**
+ * @brief signal handler. used for exit.
+ */
 void shandler ( int sign )
 {
         signal( SIGINT, &shandler );
@@ -49,6 +52,9 @@ void shandler ( int sign )
         exit( sign );
 }
 
+/**
+ * @brief Sets up signal handler and calls initialization functions
+ */
 inline static void setup (void)
 {
         signal( SIGINT, &shandler );
@@ -61,6 +67,9 @@ inline static void setup (void)
         aShmids();
 }
 
+/**
+ * @brief Main function. starts pull.
+ */
 int main (void)
 {
         setup();

@@ -1,9 +1,17 @@
+/* TO DO
+ *
+ * confirm data is properly formatted when reading from file
+ */
+
 #include <import.hpp>
 
 using namespace std;
 
 struct stat buf;
 
+/**
+ * @brief Function signaled by SIGUSR1 to initiate an import operation.
+ */
 void onDemandImport (int sign)
 {
         if (DEBUG)
@@ -21,6 +29,9 @@ void onDemandImport (int sign)
         do_import = 1;
 }
 
+/**
+ * @brief Generic resize function for character arrays.
+ */
 inline static void resizeChar(char ** a = 0, unsigned int * s = 0)
 {
         if (a == 0)
@@ -41,11 +52,17 @@ inline static void resizeChar(char ** a = 0, unsigned int * s = 0)
 unsigned int arr_size = 100;
 static bool checked = false;
 
+/**
+ * @brief Checks for the existence of a file.
+ */
 inline static bool Exists (const char * n)
 {
         return((bool)(stat(n, &buf) == 0));
 }
 
+/**
+ * @brief Imports champions antibody pool from champions.abs or another specified file. If no such file exists, this function tries to run the lifetime.25 binary to generate a champions pool
+ */
 Antibody ** importChamps (char * fin)
 {
         if (fin == (char *)0)
@@ -120,9 +137,12 @@ Antibody ** importChamps (char * fin)
         in.close();
         if (DEBUG)
         {
+                /* we use the following values for the entire module */
                 cerr << "Got alen: " << alen << endl;
                 cerr << "Got class_count: " << class_count << endl;
         }
+        /* HERE
+         * check for zero class_count, return failure */
         ab_count /= class_count;
         int data_size = strlen(data);
         if (DEBUG)
@@ -140,6 +160,8 @@ Antibody ** importChamps (char * fin)
 
         int j = 0, k = 0, l = 0, tmp = 0, begin = 0;
         i = 0;
+
+        /* read from file. assume good data. */
         while (i < class_count && l < data_size)
         {
                 j = 0;
@@ -286,7 +308,7 @@ Antibody ** importChamps (char * fin)
 
         cerr << endl << flush;
 
-        /* Excessive output
+        /* Excessive output for debugging
         */
         fprintf(stderr, "\n\nDone importing. Got the following:\n");
         for (int i = 0; i < class_count; i++)
@@ -303,6 +325,9 @@ Antibody ** importChamps (char * fin)
         return (pop);
 }
 
+/**
+ * @brief Thread function that continually checks for quit condition and updates champions pool on request (SIGUSR1)
+ */
 void * importManager (void * v)
 {
         if (DEBUG)

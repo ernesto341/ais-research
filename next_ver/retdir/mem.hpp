@@ -31,6 +31,9 @@ extern sig_atomic_t local_pos;
 extern char buf[];
 extern unsigned int i;
 
+/**
+ * @brief Frees allocated memory used to store local data for retrieve operation.
+ */
 inline void fData(void)
 {
         unsigned int i = 0;
@@ -63,6 +66,9 @@ inline void fData(void)
         }
 }
 
+/**
+ * @brief Detaches shared memory segments.
+ */
 inline void dShmids(void)
 {
         unsigned int i = 0;
@@ -77,6 +83,9 @@ inline void dShmids(void)
         }
 }
 
+/**
+ * @brief Allocates memory for local data storage.
+ */
 inline void iData(void)
 {
         unsigned int i = 0;
@@ -118,6 +127,9 @@ inline void iData(void)
         }
 }
 
+/**
+ * @brief Frees shared memory.
+ */
 inline void fShms(void)
 {
         if (t5shm)
@@ -130,6 +142,9 @@ inline void fShms(void)
         }
 }
 
+/**
+ * @brief Frees memory allocated to ids for shared memory.
+ */
 inline void fShmids(void)
 {
         if (t5shmid)
@@ -142,6 +157,9 @@ inline void fShmids(void)
         }
 }
 
+/**
+ * @brief Allocates memory for shared memory segment.
+ */
 inline void iShms(void)
 {
         char buf [102];
@@ -155,6 +173,9 @@ inline void iShms(void)
         }
 }
 
+/**
+ * @brief Allocates memory for and assigns shared memory IDs for existing shared memory segments.
+ */
 inline void iShmids(void)
 {
         unsigned int i = 0;
@@ -200,6 +221,9 @@ inline void iShmids(void)
         }
 }
 
+/**
+ * @brief Attaches to existing shared memory.
+ */
 inline void aShmids(void)
 {
         unsigned int i = 0;

@@ -8,6 +8,7 @@
 #include "antibody.h"
 #include "unknownweb.h"
 #include "mass.h"
+#include "import.hpp"
 using namespace std;
 
 #define VERBOSE_OUTPUT
@@ -15,10 +16,6 @@ using namespace std;
 
 #ifndef MAX_RUNS
 #define MAX_RUNS    5    // Number of simultaneous populations to test
-#endif
-
-#ifndef MAX_ANTIBODIES
-#define MAX_ANTIBODIES   25  // Number of antibodies per population
 #endif
 
 // Set defaults for command line parameters
@@ -315,20 +312,26 @@ void Report(Antibody a[CLASS_COUNT][MAX_ANTIBODIES])
 void Dump (Antibody c[CLASS_COUNT][MAX_ANTIBODIES])
 {
         ofstream o("champions.abs", ios::trunc);
+        ofstream p("Champions.xml", ios::trunc);
         for (int i = 0; i < CLASS_COUNT; i++)
         {
                 for (int j = 0; j < MAX_ANTIBODIES; j++)
                 {
                         o << champs[i][j].dump();
+                        p << champs[i][j].dumpXml();
                 }
         }
         o.close();
+        p.close();
 
         htmlReport(c);
         return;
 }
 
+char * use_existing = 000;
+
 int main(int argc, char *argv[]) {
+        srandom(time(NULL));
         char f[500], f2[500], f3[500], f4[500], f5[500], f6[500], f7[500], f8[500];
         ostrstream fname(f, 500, ios::out);
         ostrstream fname2(f2, 500, ios::out);
@@ -341,19 +344,33 @@ int main(int argc, char *argv[]) {
         char mname[500];
 
         if(argc != 6) {
-                cout << "Usage: " << argv[0] 
+                cout << endl << "Usage: " << endl << "\t" << argv[0] 
                         << " [max_generations] [mutation_percent] [agreement_threshold]"
-                        << " [crossover_percent] [self-test_threshold]" << endl;
+                        << " [crossover_percent] [self-test_threshold]" << endl << endl
+                        << "\t\t\t--- OR ---" << endl << endl
+                        << "\t" << argv[0] << " --existing <path_to_file>" << endl << endl
+                        << "\t\t\t--- OR ---" << endl << endl
+                        << "\t" << argv[0] << " -e <path_to_file>" << endl << endl;
                 cout << "Defaults: max_gen=" << MAX_ROUNDS << " self-test=" << BAD_THRESHOLD 
                         << " agree=" << TRAIN_AGREE << " xover=" << PR_XOVER
                         << " mutate=" << PR_MUTATION << endl;
         }
 
-        if(argc > 1) MAX_ROUNDS = atoi(argv[1]);
-        if(argc > 2) PR_MUTATION = atof(argv[2]);
-        if(argc > 3) TRAIN_AGREE = atoi(argv[3]);
-        if(argc > 4) PR_XOVER = atof(argv[4]);
-        if(argc > 5) BAD_THRESHOLD = atof(argv[5]);
+        if (argc == 3 && ((strcmp(argv[1], (const char *)"--existing") == 0) || strcmp(argv[1], (const char *)"-e") == 0))
+        {
+                size_t flen = strlen(argv[2]);
+                use_existing = new char [flen + 1];
+                strncpy(use_existing, argv[2], flen);
+                use_existing[flen] = '\0';
+        }
+        else
+        {
+                if(argc > 1) MAX_ROUNDS = atoi(argv[1]);
+                if(argc > 2) PR_MUTATION = atof(argv[2]);
+                if(argc > 3) TRAIN_AGREE = atoi(argv[3]);
+                if(argc > 4) PR_XOVER = atof(argv[4]);
+                if(argc > 5) BAD_THRESHOLD = atof(argv[5]);
+        }
 
         cerr << "Vars: " << MAX_ROUNDS << " " << PR_MUTATION << endl;
 
@@ -443,8 +460,35 @@ int main(int argc, char *argv[]) {
                 }
         }
 
+        if (use_existing != 000)
+        {
+                if (importChamps(use_existing) == 000)
+                {
+                        cerr << "Import operation failed for an unknown reason, starting fresh" << endl << flush;
+                        use_existing = 000;
+                        use_existing = 000;
+                        use_existing = 000;
+                }
+                /*
+                   Antibody ** t_pop = importChamps(use_existing);
+                   for (int i = 0; i < CLASS_COUNT; i++)
+                   {
+                   for (int j = 0; j < MAX_ANTIBODIES; j++)
+                   {
+                   memcpy(&(champs[i][j]), &(t_pop[i][j]), sizeof(Antibody) * 1);
+                   }
+                   }
+                   */
+        }
+        else
+        {
+        }
+
         for(int r = 0; r < MAX_RUNS; r++) {
-                initialGen();
+                if (use_existing == 000)
+                {
+                        initialGen();
+                }
                 fout << "Population " << setw(5) << r << endl;
                 cerr << "Population " << setw(5) << r << endl;
                 for(int i = 0; i < MAX_ROUNDS; i++) {
@@ -461,7 +505,10 @@ int main(int argc, char *argv[]) {
                         fout4 << setw(3) << i;
                         fout5 << setw(3) << i;
                         fout6 << setw(3) << i;
-                        testSelf();
+                        //if (use_existing == 000)
+                        {
+                                testSelf();
+                        }
                         train();
                         if (r == 0)
                         {
@@ -478,8 +525,8 @@ int main(int argc, char *argv[]) {
                                 {
                                         for (int k = 0; k < CLASS_COUNT; k++)
                                         {
-                                                //tmp_acc = pop[c][j].getCatCount(k) / pop[c][j].getCatTotal(k);
-                                                tmp_acc = pop[c][j]->getCatPerc(k);
+                                                tmp_acc = pop[c][j]->getCatCount(k) / pop[c][j]->getCatTotal(k);
+                                                //tmp_acc = pop[c][j]->getCatPerc(k);
                                                 /* and uniqueness measure? */
                                                 if (indepAccPerClass[c][j][k] < tmp_acc)
                                                 {
@@ -541,34 +588,6 @@ int main(int argc, char *argv[]) {
                 }
                 cerr << endl;
         }
-        /*
-           cerr << endl << "Champions population statistics:\n";
-           for(int i = 0; i < CLASS_COUNT; i++)
-           {
-           cerr << "Independent Per Class Accuracy:\n";
-           for(int j = 0; j < MAX_ANTIBODIES; j++)
-           {
-           for (int k = 0; k < CLASS_COUNT; k++)
-           {
-           cerr << indepAccPerClass[i][j][k];
-           if (k < CLASS_COUNT - 1)
-           {
-           cerr << ", ";
-           }
-           }
-           cerr << endl;
-           cerr << endl << "Antibody Dump:\n";
-           cerr << champs[i][j];
-           cerr << "\n\tAccuracy: ";
-           for (int k = 0; k < CLASS_COUNT; k++)
-           {
-           cerr << champs[i][j].getCatCount(k) << " / " << champs[i][j].getCatTotal(k) << " = " << champs[i][j].getCatPerc(k) << ", ";
-           }
-           cerr << endl;
-           }
-           cerr << endl;
-           }
-           */
         cerr << endl;
 
         Dump(champs);

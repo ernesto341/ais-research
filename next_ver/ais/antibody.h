@@ -1,6 +1,10 @@
 #ifndef __ANTIBODY_H__
 #define __ANTIBODY_H__
 
+#ifndef MAX_ANTIBODIES
+#define MAX_ANTIBODIES   25  // Number of antibodies per population
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -106,13 +110,14 @@ class Antibody {
                         catPerc[pos] = val;
                 }
 
-                void setCat(const int &pos, const int &val)
+                bool setCat(const int &pos, const int &val)
                 {
                         if (pos < 0 || pos >= CLASS_COUNT)
                         {
-                                return;
+                                return false;
                         }
                         cat[pos] = val;
+                        return true;
                 }
 
                 void setPos(const int &val)
@@ -176,6 +181,7 @@ class Antibody {
                         flags[pos] = val;
                 }
                 string dump(void);
+                string dumpXml(void);
 };
 
 #endif

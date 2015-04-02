@@ -31,6 +31,9 @@ volatile sig_atomic_t alen = 0;
 volatile sig_atomic_t class_count = 0;
 volatile sig_atomic_t ab_count = 0;
 
+/**
+ * @brief Testing data structure.
+ */
 typedef struct _test_param
 {
         uint8_t tnum; // thread number
@@ -40,18 +43,22 @@ typedef struct _test_param
         volatile sig_atomic_t flag; // signal to thread to start testing
         uint32_t attack; // whether or not the tested signature was determined to be an attack
         uint32_t attack_count; // how many antibodies returned attack
-        string debug_buf;
 } test_param, *ptest_param;
 
 queue<test_param> log_queue;
 
+/**
+ * @brief Function to increment our local position tracking variable in sync with the quantity of signatures defined in retglobals.
+ */
 inline static void inPos(void)
 {
         ((local_pos))++;
         ((local_pos)) = ((((local_pos)) % SIGQTY) != 0 ? (((local_pos)) % SIGQTY) : SIGQTY); // 1 - 5
 }
-// Check if expressed attributes match given input
-// Returns 1 if matches, 0 if not matches
+
+/**
+ * @brief Performs match operation for each antibody in the champions pool. Returns CLASS_COUNT+1 for not attack, otherwise integer representing class of attack identified.
+ */
 int doMatch(Antibody a, int *test)
 {
         a.incTests();
@@ -83,18 +90,15 @@ int doMatch(Antibody a, int *test)
         }
         cerr << "returning default case\n" << flush;
         return (class_count); // unknown attack - default case
-        return (class_count + 1); // not attack - default case
 }
 
-/* v is a test_param *, ie ptest_param */
+/**
+ * @brief Thread function to initiate testing and logging. Ensures mutual exclusion on champions pool. Takes a ptest_param parameter. Currently ignores fitness and tests on all antibodies regardless.
+ */
 void * testThread(void * v)
 {
         if (v != 000)
         {
-                /*
-                   fprintf(stderr, "\n\t\t[T] --- testThread: Begin\n");
-                   fflush(stderr);
-                   */
                 int tmp = 0, max = 0, c = 0;
                 int attacks[class_count + 2];
                 for (int i = 0; i < class_count + 2; i++)
@@ -134,6 +138,7 @@ void * testThread(void * v)
 
                 pthread_mutex_unlock(&champs_mutex);
 
+                /* calculating type of attack. Determined by greatest number of antibodies returning a particular class of attack. */
                 tmp = attacks[0];
                 for (int i = 1; i < class_count + 1; i++)
                 {
@@ -147,9 +152,11 @@ void * testThread(void * v)
 
                 fprintf(stderr, "\n\t\t[T] --- testThread: Something to log\n");
                 fflush(stderr);
+                /* add newest test result to logging queue */
                 pthread_mutex_lock(&log_mutex);
                 log_queue.push(*(ptest_param)(v));
                 pthread_mutex_unlock(&log_mutex);
+                /* signal completion of testing */
                 ((ptest_param)v)->flag = DONE;
         }
         else
@@ -160,9 +167,11 @@ void * testThread(void * v)
         return ((void *)0);
 }
 
+/**
+ * @brief Copies a test_param structure
+ */
 inline static void Copy(test_param & d, test_param s)
 {
-        d.debug_buf = s.debug_buf;
         d.attack = s.attack;
         d.attack_count = s.attack_count;
         unsigned int x = 0;
@@ -176,7 +185,9 @@ inline static void Copy(test_param & d, test_param s)
         }
 }
 
-/* child function that watches the queue for entries that need to be logged and logs new entries */
+/**
+ * @brief Thread function to perform logging operation.
+ */
 void * Stats (void * v)
 {
         if (DEBUG)
@@ -189,10 +200,6 @@ void * Stats (void * v)
                 pthread_mutex_lock(&log_mutex);
                 while (!log_queue.empty())
                 {
-                        /*
-                           fprintf(stderr, "\n\t\t[S] --- Stats: Something to log\n");
-                           fflush(stderr);
-                           */
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
@@ -224,10 +231,13 @@ void * Stats (void * v)
                 }
                 pthread_mutex_unlock(&log_mutex);
         }
-        /* HERE - dump overall statistics to log file */
+        /* HERE - on quit, dump overall statistics to log file */
         return ((void *)0);
 }
 
+/**
+ * @brief Function to convert the volatile sig_atomic shared memory data into a character array.
+ */
 inline static void Convert (char dst[t5TplLen], volatile sig_atomic_t src[t5TplLen])
 {
         unsigned int i = 0;
@@ -239,6 +249,9 @@ inline static void Convert (char dst[t5TplLen], volatile sig_atomic_t src[t5TplL
 }
 
 /* v is a test_param [MAX_THREADS] */
+/**
+ * @brief Thread function to manage testing threads. Spawns a new testing thread when new data is retrieved from shared memory. Tracks progress of testing of individual signatures and joins completed testing routines. Initiates logging thread. Takes an array of test_param objects.
+ */
 void * testMgr (void * v)
 {
         if (v != 000)
@@ -256,59 +269,26 @@ void * testMgr (void * v)
                         /* check all necessary testing params */
                         while (i < testing)
                         {
-                                //cerr << "testMgr, i = " << i << ", testing = " << testing << endl << flush;
-                                //cerr << "flag = " << ((ptest_param)v)[i].flag << endl << flush;
                                 if (((ptest_param)v)[i].flag == START)
                                 {
                                         ((ptest_param)v)[i].flag = WORKING;
                                         /* begin a test, pass (ptest_param)&((test_param *)v[i]), i.e., a ptest_param */
-                                        /* HERE - exit? if unable to spawn testing threads */
+                                        /* HERE - exit if unable to spawn testing threads? */
                                         if ((pthread_create(&(((ptest_param)v)[i].tid), NULL, testThread, (void *)(&(((ptest_param)v)[i])))) < 0)
                                         {
                                                 perror("pthread_create()");
                                         }
-                                        /*
-                                           else
-                                           {
-                                           if (DEBUG)
-                                           {
-                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_create succeeded, starting testing on a test_param struct\n");
-                                           fflush(stderr);
-                                           }
-                                           }
-                                           */
                                 }
                                 else if (((ptest_param)v)[i].flag == DONE)
                                 {
-                                        /* HERE - exit? if unable to return from testing threads */
+                                        /* HERE - exit if unable to return from testing threads? */
                                         if ((pthread_join((((ptest_param)v)[i].tid), NULL)) < 0)
                                         {
                                                 perror("pthread_join()");
                                         }
-                                        /*
-                                           else
-                                           {
-                                           if (DEBUG)
-                                           {
-                                           fprintf(stderr, "\n\t\t[r] --- testMgr: pthread_join succeeded, done testing on a test_param\n");
-                                           fflush(stderr);
-                                           }
-                                           }
-                                           */
-                                        //cerr << "about to decrement testing, testing = " << testing << "...\n" << flush;
                                         testing--;
-                                        //cerr << "testing decremented, testing = " << testing << "\n" << flush;
                                         ((ptest_param)v)[i].flag = COMPLETE;
                                 }
-                                /*
-                                   else if (((ptest_param)v)[i].flag == COMPLETE)
-                                   {
-                                   }
-                                   else
-                                   {
-                                   cerr << "\n\t\t[M] --- Thread " << i << " incomplete, flag = " << ((ptest_param)v)[i].flag << flush;
-                                   }
-                                   */
                                 i++;
                         }
                 }
@@ -322,6 +302,7 @@ void * testMgr (void * v)
                                 ct--;
                         }
                 }
+                /* wait for logging to complete */
                 if ((pthread_join(log_tid, NULL)) < 0)
                 {
                         perror("pthread_join()");
@@ -330,12 +311,14 @@ void * testMgr (void * v)
         return ((void *)0);
 }
 
-//void pull(Antibody ** pop, const int32_t pipefd)
+/**
+ * @brief Main operation. Init memory, mutexes, and begin testmanager. Accept a champions pool as a parameter, but default to importing one.
+ */
 void pull(Antibody ** pop)
 {
         if (pop == NULL)
         {
-                /* attempt to pull a population from file */
+                /* attempt to pull a population from file, or generate a new one */
                 /* maybe fork and exec breed and train module automatically, regularly */
                 if ((champs = importChamps()) == 0)
                 {
@@ -344,45 +327,11 @@ void pull(Antibody ** pop)
                         return;
                 }
 
-                /* excessive output
-                   if (DEBUG)
-                   {
-                   cout << "In main. Got the following:\n";
-                   for (int i = 0; i < class_count; i++)
-                   {
-                   cout << "Class " << i+1 << ":\n";
-                   for (int j = 0; j < ab_count; j++)
-                   {
-                   cout << "\t" << champs[i][j] << "\n";
-                   }
-                   cout << endl;
-                   }
-                   cout << endl << flush;
-                   }
-                   */
         }
         else
         {
                 champs = pop;
         }
-
-        /*
-           if (DEBUG)
-           {
-           cout << setw(20) << right << "Champs = \t" << champs << endl;
-           for (unsigned int i = 0; i < class_count; i++)
-           {
-           cout << setw(20) << right << "champs[" << i << "] = \t" << champs[i] << endl;
-           for (unsigned int j = 0; j < ab_count; j++)
-           {
-           cout << setw(20) << right << "champs[" << i << "][" << j << "] = \t" << champs[i][j] << endl;
-           }
-           }
-           cout << endl;
-           shm[CTL][FLAGS] = CDONE;
-           return;
-           }
-           */
 
         uint32_t i = 0, j = 0;
 
@@ -406,17 +355,15 @@ void pull(Antibody ** pop)
         {
                 params[i].flag = UNUSED;
                 params[i].tnum = i;
-                //                params[i].debug_buf = new string;
         }
         /* start testMgr with &params[] */
-        /* HERE - cleanup and exit */
         if ((pthread_create(&(test_mgr_tid), NULL, testMgr, (void *)(&(params)))) < 0)
         {
                 perror("pthread_create()");
-                /* HERE */
                 cleanup();
         }
         testing = 0;
+        /* start import manager. on failure, continue anyway */
         if ((pthread_create(&(import_mgr_tid), NULL, importManager, (void *)(0))) < 0)
         {
                 perror("pthread_create()");
@@ -429,32 +376,18 @@ void pull(Antibody ** pop)
                 /* setup champs update signal */
                 signal(SIGUSR1, &onDemandImport);
         }
-        /*
-           if (DEBUG)
-           {
-        // Retrieve
-        fprintf(stderr, "\tentering loop\n");
-        }
-        */
 
         bool started = false;
 
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
         {
-                /* only copy when dhs isn't writing and while there are pending headers to get
-                */
+                /* only copy when dhs isn't writing and while there are pending signatures to get */
                 while (shm[CTL][PEND] > 0)
                 {
                         if (shm[CTL][FLAGS] == PWTEN || shm[CTL][FLAGS] == CREAD)
                         {
-                                /*
-                                   if (DEBUG)
-                                   {
-                                // Retrieve
-                                fprintf(stderr, "\tshm[CTL][FLAGS] == PWTEN\n");
-                                }
-                                */
+                                /* pull */
                                 shm[CTL][FLAGS] = CRING;
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS] == 1 ? (SIGQTY) : (shm[CTL][POS] - 1))], sizeof(sig_atomic_t) * fngPntLen);
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(sig_atomic_t) * t5TplLen);
@@ -476,6 +409,7 @@ void pull(Antibody ** pop)
                                                 }
                                                 j++;
                                         }
+                                        /* optimize number of predefined threads */
                                         if (!started)
                                         {
                                                 fprintf(stderr, "Insufficient threads to process incoming signatures, testing = %d\n", testing);
@@ -487,30 +421,7 @@ void pull(Antibody ** pop)
                                         fprintf(stderr, "Insufficient threads to process incoming signatures, testing = %d\n", testing);
                                         fflush(stderr);
                                 }
-                                /*
-                                   if (DEBUG)
-                                   {
-                                   fprintf(stderr, "pos = %d, pend = %d\n", shm[CTL][POS], shm[CTL][PEND]);
-                                   fprintf(stderr, "\nsig:\n");
-                                   i = 0;
-                                   while (i < fngPntLen)
-                                   {
-                                   fprintf(stderr, "\t%d - %d", i, retrieved_sigs[ct][i]);
-                                   fprintf(stderr, "\n");
-                                   i++;
-                                   }
-                                   fprintf(stderr, "\t");
-                                   i = 0;
-                                   while (i < t5TplLen)
-                                   {
-                                   fprintf(stderr, "%c", retrieved_t5s[ct][i]);
-                                   i++;
-                                   }
-                                   fprintf(stderr, "\n");
-                                   fflush(stderr);
-                                   }
-                                   */
-                                /* keep an accurate record of our buffer position and dhs' buffer position */
+                                /* keep an accurate record of our buffer position and dhs's buffer position */
                                 ct = (ct+1)%SIGBUF;
                                 inPos();
 
@@ -533,7 +444,7 @@ void pull(Antibody ** pop)
         {
                 shm[CTL][FLAGS] = CDONE;
         }
-        /* join testMgr. since fork/logging is not a priority, make sure there is actually a child process before waiting for child process */
+        /* join importmanager. since not a priority, make sure there is actually a child process before waiting for child process */
         if (import_mgr_tid != 0)
         {
                 if ((pthread_join(import_mgr_tid, NULL)) < 0)
@@ -545,25 +456,23 @@ void pull(Antibody ** pop)
         {
                 perror("pthread_join()");
         }
-        for (i = 0; i < MAX_THREADS; i++)
-        {
-                //                delete(params[i].debug_buf);
-        }
 
         cleanup();
 
         exit(EXIT_SUCCESS);
 
-        /* dummy return */
+        /* dummy return, should never be used */
         return;
 }
 
+/**
+ * @brief Cleanup some allocated memory and destory mutexes.
+ */
 void cleanup(void)
 {
         delete champs;
         pthread_mutex_destroy(&champs_mutex);
         pthread_mutex_destroy(&log_mutex);
-        /* close log file */
         fout.close();
 }
 
