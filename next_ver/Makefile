@@ -68,20 +68,17 @@ prod: /usr/local/lib/libpcap.a
 	$(CC) -o dhs dhs.c /usr/local/lib/libpcap.a $(DHSFILES)
 
 veryclean: clean
+	rm -f *.log
+	rm -f *.dat
 	cd ais/ && make clean
 
 clean:
 	rm -f *.*.*.*:*-*.*.*.*:*
 	rm -f *~ *.bak
-	rm -f *.log
-	rm -f *.dat
 	rm -f *.o
 	rm -f *.gch
 	rm -f err
-	rm -f dhs_err
-	rm -f ret_err
 	rm -f core
-	rm -f ret
 	rm -f dhs
 	rm -f tester
 	rm -f $(RET)/retrieve

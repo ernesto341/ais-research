@@ -14,16 +14,23 @@ using namespace std;
 #define SIGBUF 50
 #endif
 
+static const uint32_t MAXURI = 2048;
+
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];
+extern uint32_t urishmkey[];
 
 extern int * shmid;
 extern int * t5shmid;
+extern int * urishmid;
 extern volatile sig_atomic_t ** shm;
+extern char ** urishm;
 extern volatile sig_atomic_t ** t5shm;
 
 extern volatile sig_atomic_t ** retrieved_sigs;
 extern volatile sig_atomic_t ** retrieved_t5s;
+/* HERE */
+extern char ** retrieved_uris;
 
 extern sig_atomic_t ct;
 extern sig_atomic_t local_pos;
@@ -37,16 +44,18 @@ extern unsigned int i;
 inline void fData(void)
 {
         unsigned int i = 0;
-        if (retrieved_sigs && retrieved_t5s)
+        if (retrieved_sigs && retrieved_t5s && retrieved_uris)
         {
                 while (i < SIGBUF)
                 {
                         free((sig_atomic_t *)retrieved_sigs[i]);
                         free((sig_atomic_t *)retrieved_t5s[i]);
+                        /* HERE */
                         i++;
                 }
                 free(retrieved_t5s);
                 free(retrieved_sigs);
+                //free(retrieved_uris);
         }
         else if (retrieved_sigs)
         {
@@ -55,6 +64,11 @@ inline void fData(void)
                         free((sig_atomic_t *)retrieved_sigs[i++]);
                 }
                 free(retrieved_sigs);
+        }
+                        /* HERE */
+        else if (retrieved_uris)
+        {
+                //free(retrieved_uris);
         }
         else if (retrieved_t5s)
         {
@@ -72,11 +86,14 @@ inline void fData(void)
 inline void dShmids(void)
 {
         unsigned int i = 0;
+        /* HERE - invalid next ptr. why?*/
+        //while (i < (SIGQTY + 1))
         while (i < (SIGQTY))
         {
                 if (i < SIGQTY)
                 {
                         shmdt((void *)t5shm[i]);
+                        shmdt((void *)urishm[i]);
                 }
                 shmdt((void *)shm[i]);
                 i++;
@@ -91,14 +108,15 @@ inline void iData(void)
         unsigned int i = 0;
         char buf [102];
         retrieved_t5s = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
-        retrieved_sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGBUF));
-        if (retrieved_t5s == NULL || retrieved_sigs == NULL)
+        retrieved_sigs = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * SIGBUF);
+        retrieved_uris = (char **)malloc(sizeof(char *) * SIGBUF);
+        if (retrieved_t5s == NULL || retrieved_sigs == NULL || retrieved_uris == NULL)
         {
                 if (DEBUG)
                 {
-                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
                         i = 0;
-                        while (i < 38)
+                        while (i < 37)
                         {
                                 putc(buf[i], stderr);
                         }
@@ -108,15 +126,17 @@ inline void iData(void)
         i = 0;
         while (i < SIGBUF)
         {
+                /* HERE */
                 retrieved_t5s[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * t5TplLen);
+                retrieved_uris[i] = (char *)malloc(sizeof(char) * MAXURI);
                 retrieved_sigs[i] = (volatile sig_atomic_t *)malloc(sizeof(sig_atomic_t) * fngPntLen);
-                if (retrieved_t5s[i] == NULL || retrieved_sigs[i] == NULL)
+                if (retrieved_t5s[i] == NULL || retrieved_sigs[i] == NULL || retrieved_uris[i] == NULL)
                 {
                         if (DEBUG)
                         {
-                                strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
+                                strncpy(buf, "Unable to allocate sufficient memory\n", 37);
                                 i = 0;
-                                while (i < 38)
+                                while (i < 37)
                                 {
                                         putc(buf[i], stderr);
                                 }
@@ -136,6 +156,10 @@ inline void fShms(void)
         {
                 free(t5shm);
         }
+        if (urishm)
+        {
+                //free(urishm);
+        }
         if (shm)
         {
                 free(shm);
@@ -151,6 +175,10 @@ inline void fShmids(void)
         {
                 free(t5shmid);
         }
+        if (urishmid)
+        {
+                //free(urishmid);
+        }
         if (shmid)
         {
                 free(shmid);
@@ -165,10 +193,11 @@ inline void iShms(void)
         char buf [102];
         shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY + 1));
         t5shm = (volatile sig_atomic_t **)malloc(sizeof(sig_atomic_t *) * (SIGQTY));
-        if (shm == NULL || t5shm == NULL)
+        urishm = (char **)malloc(sizeof(char *) * (SIGQTY));
+        if (shm == NULL || t5shm == NULL || urishm == NULL)
         {
-                strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                write(2, buf, 38);
+                strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                write(2, buf, 37);
                 _exit(-1);
         }
 }
@@ -183,12 +212,13 @@ inline void iShmids(void)
         srand(time(NULL));
         shmid = (int *)malloc(sizeof(int) * (SIGQTY + 1));
         t5shmid = (int *)malloc(sizeof(int) * (SIGQTY));
-        if (shmid == NULL || t5shmid == NULL)
+        urishmid = (int *)malloc(sizeof(int) * (SIGQTY));
+        if (shmid == NULL || t5shmid == NULL || urishmid == NULL)
         {
                 if (DEBUG)
                 {
-                        strncpy(buf, "Unable to allocate sufficient memory\r\n", 38);
-                        write(2, buf, 38);
+                        strncpy(buf, "Unable to allocate sufficient memory\n", 37);
+                        write(2, buf, 37);
                 }
                 _exit(-1);
         }
@@ -207,12 +237,14 @@ inline void iShmids(void)
                 if (i < SIGQTY)
                 {
                         t5shmid[i] = shmget(t5shmkey[i], sizeof(sig_atomic_t) * t5TplLen, 0666);
-                        if (t5shmid[i] < 0)
+                        /* HERE */
+                        urishmid[i] = shmget(urishmkey[i], sizeof(char) * MAXURI, 0666);
+                        if (t5shmid[i] < 0 || urishmid[i] < 0)
                         {
                                 if (DEBUG)
                                 {
-                                        strncpy(buf, "unable to get t5shm\n", 20);
-                                        write(2, buf, 20);
+                                        strncpy(buf, "unable to get t5 or uri shm\n", 28);
+                                        write(2, buf, 28);
                                 }
                                 _exit(-1);
                         }
@@ -241,11 +273,11 @@ inline void aShmids(void)
                 if (i < SIGQTY)
                 {
                         t5shm[i] = (volatile sig_atomic_t *)shmat(t5shmid[i], (void *) 0, 0);
-                        if ((void *)t5shm[i] == (void *)-1)
+                        urishm[i] = (char *)shmat(urishmid[i], (void *) 0, 0);
+                        if ((void *)t5shm[i] == (void *)-1 || (void *)urishm[i] == (void *)-1)
                         {
-                                strncpy(buf, "unable to attach t5shm", 16);
-                                strncat(buf, "\r\n", 2);
-                                write(2, buf, 18);
+                                strncpy(buf, "unable to attach t5 or uri shm\n", 25);
+                                write(2, buf, 25);
                                 _exit(-1);
                         }
                 }

@@ -422,6 +422,7 @@ Antibody ** importXml(char * h)
         ab_count = class_count = alen = 0;
         {
                 getline(in, buf, '<'); // end of data tag
+                cerr << "very begining, got data: " << buf << endl;
                 ab_count = atoi(buf.c_str());
                 /* end tag */
                 getline(in, buf, '>'); // end of closing tag
@@ -429,6 +430,7 @@ Antibody ** importXml(char * h)
         {
                 getline(in, buf, '>'); // end of open tag
                 getline(in, buf, '<'); // end of data tag
+                cerr << "very begining, got data: " << buf << endl;
                 class_count = atoi(buf.c_str());
                 /* end tag */
                 getline(in, buf, '>'); // end of closing tag
@@ -436,6 +438,7 @@ Antibody ** importXml(char * h)
         {
                 getline(in, buf, '>'); // end of closing tag
                 getline(in, buf, '<'); // end of data tag
+                cerr << "very begining, got data: " << buf << endl;
                 alen = atoi(buf.c_str());
                 /* end tag */
                 getline(in, buf, '>'); // end of closing tag
@@ -444,6 +447,7 @@ Antibody ** importXml(char * h)
         cerr << "got ab_count: " << ab_count << endl;
         cerr << "got class_count: " << class_count << endl;
         cerr << "got alen: " << alen << endl;
+        cerr << "buf: " << buf << endl;
         Antibody ** tmp_pop = 000;
         tmp_pop = new Antibody * [class_count];
         size_t i = 0, j = 0, pos = 0, iter = 0;
@@ -453,9 +457,11 @@ Antibody ** importXml(char * h)
         }
         i = 0;
         string category = "";
-        getline(in, buf, '>'); // end of open tag
+        cerr << "buf: " << buf << endl;
         while (in.good() && i < class_count)
         {
+                // get next opening tag
+                getline(in, buf, '>'); // end of opening tag
                 cerr << "pos: " << pos << endl;
                 //if (pos == 0)
                 {
@@ -494,13 +500,6 @@ Antibody ** importXml(char * h)
                 string tmp = buf;
                 getline(in, buf, '<'); // end of data tag
                 cerr << ", data: " << buf << endl;
-                if (buf[0] == ' ' || buf[0] == '\n')
-                {
-                        cerr << "space alone" << endl;
-                        cerr << "skipping: " << buf << endl;
-                        getline(in, buf, '>'); // end of closing tag
-                        continue;
-                }
 
                 /* HERE */
 
@@ -532,6 +531,7 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got a flag" << endl;
                         cerr << "pos / 4 = " << pos/4 << endl;
+                        tmp_pop[i][j].setFlag(pos/4, atoi(buf.c_str()));
                         ++pos;
                         continue;
                 }
@@ -539,6 +539,7 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got an attribute" << endl;
                         cerr << "pos / 4 = " << pos/4 << endl;
+                        tmp_pop[i][j].setAttr(pos/4, atoi(buf.c_str()));
                         ++pos;
                         continue;
                 }
@@ -546,6 +547,7 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got an offset" << endl;
                         cerr << "pos / 4 = " << pos/4 << endl;
+                        tmp_pop[i][j].setOffset(pos/4, atoi(buf.c_str()));
                         ++pos;
                         continue;
                 }
@@ -553,27 +555,32 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got a max" << endl;
                         cerr << "pos / 4 = " << pos/4 << endl;
+                        tmp_pop[i][j].setMax(pos/4, atoi(buf.c_str()));
                         ++pos;
                         continue;
                 }
                 else if (Contains((char *)(tmp.c_str()), (char *)"negative") && !(Contains((char *)tmp.c_str(), (char *)"false")))
                 {
                         cerr << "Got a negative" << endl;
+                        tmp_pop[i][j].setNeg(atoi(buf.c_str()));
                         continue;
                 }
                 else if (Contains((char *)(tmp.c_str()), (char *)"positive") && !(Contains((char *)tmp.c_str(), (char *)"false")))
                 {
                         cerr << "Got a positive" << endl;
+                        tmp_pop[i][j].setPos(atoi(buf.c_str()));
                         continue;
                 }
                 else if (Contains((char *)(tmp.c_str()), (char *)"positive"))
                 {
                         cerr << "Got a false positive" << endl;
+                        tmp_pop[i][j].setFalsePos(atoi(buf.c_str()));
                         continue;
                 }
                 else if (Contains((char *)(tmp.c_str()), (char *)"negative"))
                 {
                         cerr << "Got a false negative" << endl;
+                        tmp_pop[i][j].setFalseNeg(atoi(buf.c_str()));
                         pos ^= pos;
                         continue;
                 }
@@ -581,6 +588,7 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got a category" << endl;
                         cerr << "pos/2 = " << pos/2 << endl;
+                        tmp_pop[i][j].setCatTotal(pos/2, atoi(buf.c_str()));
                         ++pos;
                         continue;
                 }
@@ -588,6 +596,8 @@ Antibody ** importXml(char * h)
                 {
                         cerr << "Got a category total" << endl;
                         cerr << "pos/2 = " << pos/2 << endl;
+                        tmp_pop[i][j].setCat(pos/2, atoi(buf.c_str()));
+                        tmp_pop[i][j].setCatPerc(pos/2, (float)(tmp_pop[i][j].getCatCount())/(float)(tmp_pop[i][j].getCatTotal()));
                         ++pos;
                         continue;
                 }
@@ -687,7 +697,7 @@ Antibody ** importXml(char * h)
 
         cerr << endl << "importxml end, got " << iter << " antibodies" << endl;
 
-        return (000);
+        return (tmp_pop);
 }
 
 Antibody ** importChamps (char * fin)

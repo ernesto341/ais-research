@@ -12,6 +12,26 @@ struct stat buf;
 /**
  * @brief Function signaled by SIGUSR1 to initiate an import operation.
  */
+void onDemandRebreed (int sign)
+{
+        if (DEBUG)
+        {
+                cerr << "recieved rebreed signal!\n" << flush;
+        }
+        if (sign != SIGUSR2)
+        {
+                if (DEBUG)
+                {
+                        cerr << "onDemandRebreed signaled by invalid signal!\n" << flush;
+                }
+                return;
+        }
+        do_import = 2;
+}
+
+/**
+ * @brief Function signaled by SIGUSR1 to initiate an import operation.
+ */
 void onDemandImport (int sign)
 {
         if (DEBUG)
@@ -345,6 +365,11 @@ void * importManager (void * v)
                                 cerr << "import initiated!\n" << flush;
                         }
                         /* lock access to champs */
+                        /* In reference to the optimal use of time, I chose not to save the new, imported antibody pool in a temp var
+                         * and then lock the champs mutex and copy the new abs over, as
+                         *    1. Upon signaling of an import operation, we only want to use the new abs for all future testing, including any currently queued up; and
+                         *    2. The design of pull allows for SOME backup. This parameter is manually expandable in a header somewhere, probably retglobals
+                         */
                         pthread_mutex_lock(&champs_mutex);
                         champs = importChamps(fname);
                         /* log import success/failure */
@@ -352,6 +377,43 @@ void * importManager (void * v)
                         if (DEBUG)
                         {
                                 cerr << "In onDemandImport. Got the following:\n";
+                                for (int i = 0; i < class_count; i++)
+                                {
+                                        cerr << "Class " << i+1 << ":\n";
+                                        for (int j = 0; j < ab_count; j++)
+                                        {
+                                                cerr << "\t" << champs[i][j] << "\n";
+                                        }
+                                        cerr << endl;
+                                }
+                                cerr << endl << flush;
+                        }
+                        /* unlock access to champs */
+                        pthread_mutex_unlock(&champs_mutex);
+                        do_import = 0;
+                }
+                else if (do_import == 2)
+                {
+                        if (DEBUG)
+                        {
+                                cerr << "rebreed initiated!\n" << flush;
+                        }
+                        /* lock access to champs */
+                        /* In reference to the optimal use of time, I chose not to save the new, imported antibody pool in a temp var
+                         * and then lock the champs mutex and copy the new abs over, as
+                         *    1. Upon signaling of an import operation, we only want to use the new abs for all future testing, including any currently queued up; and
+                         *    2. The design of pull allows for SOME backup. This parameter is manually expandable in a header somewhere, probably retglobals
+                         */
+                        pthread_mutex_lock(&champs_mutex);
+                        /* HERE - change filename to -e Champions.abs*/
+                        char * tmp = (char *)malloc(sizeof(char) * (strlen(fname) + 25));
+
+                        champs = importChamps(fname);
+                        /* log import success/failure */
+
+                        if (DEBUG)
+                        {
+                                cerr << "In onDemandRebreed. Got the following:\n";
                                 for (int i = 0; i < class_count; i++)
                                 {
                                         cerr << "Class " << i+1 << ":\n";

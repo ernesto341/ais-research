@@ -14,8 +14,8 @@
 #ifndef __CONTAINS_H__
 #define __CONTAINS_H__
 
-#ifndef DEBUG
-#define DEBUG 0
+#ifndef DEBUG_LOCAL
+#define DEBUG_LOCAL 0
 #endif
 
 #include <stdio.h>
@@ -26,7 +26,7 @@ char * Contains (char * str, char * pattern)
 {
         if (str == NULL || pattern == NULL)
         {
-                if (DEBUG == 1)
+                if (DEBUG_LOCAL == 1)
                 {
                         fprintf(stderr, "In Contains, str or pattern are NULL\r\n");
                         fflush(stderr);
@@ -37,7 +37,7 @@ char * Contains (char * str, char * pattern)
         uint32_t pattern_len = strlen(pattern);
         if (&(str[0]) == &(pattern[0]) && str_len == pattern_len)
         {
-                if (DEBUG == 1)
+                if (DEBUG_LOCAL == 1)
                 {
                         fprintf(stderr, "In Contains, str == pattern\r\n");
                         fflush(stderr);
@@ -46,7 +46,7 @@ char * Contains (char * str, char * pattern)
         }
         if (pattern_len < 1)
         {
-                if (DEBUG == 1)
+                if (DEBUG_LOCAL == 1)
                 {
                         fprintf(stderr, "In Contains, pattern_len < 1\r\n");
                         fflush(stderr);
@@ -55,14 +55,14 @@ char * Contains (char * str, char * pattern)
         }
         if (str_len < pattern_len)
         {
-                if (DEBUG == 1)
+                if (DEBUG_LOCAL == 1)
                 {
                         fprintf(stderr, "In Contains, str_len < pattern_len\r\n");
                         fflush(stderr);
                 }
                 return (NULL);
         }
-        if (DEBUG == 1)
+        if (DEBUG_LOCAL == 1)
         {
                 fprintf(stderr, "\r\nIn Contains\r\ngot str = %s, pattern = %s\r\n", str, pattern);
                 fprintf(stderr, "str_len = %d, pattern_len = %d\r\n", str_len, pattern_len);
@@ -84,7 +84,7 @@ char * Contains (char * str, char * pattern)
                 return (NULL);
         }
         /* only check up to max len */
-        if (DEBUG == 1)
+        if (DEBUG_LOCAL == 1)
         {
                 fprintf(stderr, "\r\nabout to enter outer while loop with the following confitions:\r\n\r\nwhile ( i < %d )\r\ni starting at %d\r\n", str_len-pattern_len, i);
                 fflush(stderr);
@@ -92,14 +92,14 @@ char * Contains (char * str, char * pattern)
         while (i < str_len-pattern_len+1)
         {
                 /* check first and last chars for match */
-                if (DEBUG == 1)
+                if (DEBUG_LOCAL == 1)
                 {
                         fprintf(stderr, "first if test: str[%d] ^ pattern[%d] == 0\r\n\t%c ^ %c == 0: %s\r\n", i, 0, str[i], pattern[0], (((str[i]) ^ (pattern[0])) == 0) ? "TRUE" : "FALSE");
                         fflush(stderr);
                 }
                 if (((str[i]) ^ (pattern[0])) == 0)
                 {
-                        if (DEBUG == 1)
+                        if (DEBUG_LOCAL == 1)
                         {
                                 fprintf(stderr, "second if test: %c ^ %c == 0: %s\r\n", str[i + pattern_len-1], pattern[pattern_len-1], (((str[i + pattern_len-1]) ^ (pattern[pattern_len-1])) == 0) ? "TRUE" : "FALSE");
                                 fflush(stderr);
@@ -114,7 +114,7 @@ char * Contains (char * str, char * pattern)
                                 good = 0;
                                 while (j-i < pattern_len-2 && good == 0)
                                 {
-                                        if (DEBUG == 1)
+                                        if (DEBUG_LOCAL == 1)
                                         {
                                                 fprintf(stderr, "inside inner while loop\r\ntest: !((((str[%d]) | (str[%d])) ^ ((pattern[%d]) | (pattern[%d]))) == 0)\r\n\t((%c | %c) ^ (%c | %c)) == 0: %s\r\n", j, j+1, k, k+1, str[j], str[j+1], pattern[k], pattern[k+1], (!((((str[j]) | (str[j+1]))^((pattern[k]) | (pattern[k+1]))) == 0)) ? "NO GOOD" : "STILL GOOD");
                                                 fflush(stderr);

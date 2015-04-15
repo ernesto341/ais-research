@@ -42,6 +42,8 @@ static const uint32_t SIGQTY = 5;
 static unsigned char * hdr_data = 0;
 static uint32_t hdr_size = 850;
 
+static const uint32_t MAXURI = 2048;
+
 #endif
 
 /* globals.h */

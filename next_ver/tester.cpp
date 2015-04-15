@@ -88,6 +88,9 @@ int main (int argc, char *argv[], char *envp[])
 
         ifstream in_file;
         string filename = NORMALFILE;
+        string * uris = 000;
+        int uri_qty = 0;
+        int i = 0;
         /*
 
         if (argc >= 2)
@@ -108,9 +111,6 @@ int main (int argc, char *argv[], char *envp[])
 
         cerr << "Opened file with filename " << filename << endl << flush;
 
-        string * uris = 000;
-        int uri_qty = 0;
-        int i = 0;
         if (getUris(in_file, uris, uri_qty) == 000)
         {
                 cerr << "Couldn't get uris from file\n" << flush;
@@ -171,7 +171,7 @@ int main (int argc, char *argv[], char *envp[])
                 //uris[i].append("\"");
                 cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
                 uris[i].append(" &");
-                uris[i].insert(0, "iceweasel ");
+                uris[i].insert(0, "iceweasel -new-instance ");
                 /* HERE - fork and execve */
                 /* child */
                 if ((ret_pid[i] = fork()) == 0) /* child */

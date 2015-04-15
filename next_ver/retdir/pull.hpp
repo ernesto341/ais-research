@@ -47,15 +47,17 @@ extern uint32_t t5shmkey[];
 
 extern int * shmid;
 extern int * t5shmid;
+extern int * urishmid;
 extern volatile sig_atomic_t ** shm;
 extern volatile sig_atomic_t ** t5shm;
+extern char ** urishm;
 
 extern volatile sig_atomic_t ** retrieved_sigs;
 extern volatile sig_atomic_t ** retrieved_t5s;
+extern char ** retrieved_uris;
 
 extern sig_atomic_t ct;
 extern sig_atomic_t local_pos;
 
-//void pull(Antibody ** pop = NULL, const int32_t pipefd = -1);
-void pull(Antibody ** pop = NULL);
+void pull(void);
 

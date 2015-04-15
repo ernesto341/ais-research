@@ -31,6 +31,7 @@ extern bool quit;
 void * importManager (void *);
 Antibody ** importChamps (char * fin = 0);
 void onDemandImport (int);
+void onDemandRebreed (int);
 
 #endif
 

@@ -4,7 +4,6 @@ using namespace std;
 
 int status = 0;
 int32_t import_mgr_pid = -1;
-//int pipefd[2];
 
 volatile sig_atomic_t do_import = 0;
 
@@ -43,6 +42,7 @@ typedef struct _test_param
         volatile sig_atomic_t flag; // signal to thread to start testing
         uint32_t attack; // whether or not the tested signature was determined to be an attack
         uint32_t attack_count; // how many antibodies returned attack
+        char uri[MAXURI]; // what uri generated this signature
 } test_param, *ptest_param;
 
 queue<test_param> log_queue;
@@ -183,6 +183,8 @@ inline static void Copy(test_param & d, test_param s)
         {
                 d.sig[x] = s.sig[x];
         }
+	memcpy(d.uri, s.uri, MAXURI-1);
+	d.uri[MAXURI-1] = '\0';
 }
 
 /**
@@ -206,6 +208,7 @@ void * Stats (void * v)
                         if (tmp.attack_count >= AGREE)
                         {
                                 fout << "[A] --- Attack Identified --- [A]" << endl;
+                                //fout << "\tURI: " << tmp.uri << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
@@ -218,13 +221,13 @@ void * Stats (void * v)
                         else
                         {
                                 fout << "[N] --- Normal Traffic --- [N]" << endl;
+                                //fout << "\tURI: " << tmp.uri << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
                                 {
                                         fout << tmp.sig[i] << " ";
                                 }
-                                fout << endl;
                                 fout << "\n\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
                         }
                         fout << endl;
@@ -314,23 +317,15 @@ void * testMgr (void * v)
 /**
  * @brief Main operation. Init memory, mutexes, and begin testmanager. Accept a champions pool as a parameter, but default to importing one.
  */
-void pull(Antibody ** pop)
+void pull(void)
 {
-        if (pop == NULL)
+        /* attempt to pull a population from file, or generate a new one */
+        /* maybe fork and exec breed and train module automatically, regularly */
+        if ((champs = importChamps()) == 0)
         {
-                /* attempt to pull a population from file, or generate a new one */
-                /* maybe fork and exec breed and train module automatically, regularly */
-                if ((champs = importChamps()) == 0)
-                {
-                        cerr << "Unable to get antibodies to test against\nMaybe try running lifetime first?\nQuitting\n" << flush;
-                        shm[CTL][FLAGS] = CDONE;
-                        return;
-                }
-
-        }
-        else
-        {
-                champs = pop;
+                cerr << "Unable to get antibodies to test against\nMaybe try running lifetime first?\nQuitting\n" << flush;
+                shm[CTL][FLAGS] = CDONE;
+                return;
         }
 
         uint32_t i = 0, j = 0;
@@ -375,6 +370,8 @@ void pull(Antibody ** pop)
         {
                 /* setup champs update signal */
                 signal(SIGUSR1, &onDemandImport);
+                /* HERE */
+                signal(SIGUSR2, &onDemandRebreed);
         }
 
         bool started = false;
@@ -389,8 +386,13 @@ void pull(Antibody ** pop)
                         {
                                 /* pull */
                                 shm[CTL][FLAGS] = CRING;
+                                /* get signature from shm segment */
                                 memcpy((void *)retrieved_sigs[ct], (void *)shm[(shm[CTL][POS] == 1 ? (SIGQTY) : (shm[CTL][POS] - 1))], sizeof(sig_atomic_t) * fngPntLen);
+                                /* get unique tuple from shm segment */
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(sig_atomic_t) * t5TplLen);
+                                /* get uri from shm segment. copy until max, though there should be a null terminator where ever the uri ends, dubious it will be longer than max */
+                                memcpy((void *)retrieved_uris[ct], (void *)urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(char) * MAXURI);
+                                //cout << "pull got uri " << retrieved_uris[ct] << endl;
                                 if ((testing) < MAX_THREADS)
                                 {
                                         started = false;
@@ -399,7 +401,9 @@ void pull(Antibody ** pop)
                                         {
                                                 if (params[j].flag != START && params[j].flag != WORKING && params[j].flag != DONE && params[j].flag != LOG)
                                                 {
+                                                        /* setup new test param object */
                                                         memcpy((void *)&(params[j].sig), (void *)retrieved_sigs[ct], sizeof(sig_atomic_t) * fngPntLen);
+                                                        memcpy((void *)&(params[j].uri), (void *)retrieved_uris[ct], sizeof(char) * MAXURI);
                                                         /* convert sig_atomic_t to char */
                                                         Convert(params[j].tuple, retrieved_t5s[ct]);
                                                         /* these two lines signal the testMgr to spawn a testing thread */
