@@ -183,7 +183,7 @@ inline static void Copy(test_param & d, test_param s)
         {
                 d.sig[x] = s.sig[x];
         }
-	memcpy(d.uri, s.uri, MAXURI-1);
+	strncpy(d.uri, s.uri, MAXURI-1);
 	d.uri[MAXURI-1] = '\0';
 }
 
@@ -208,7 +208,7 @@ void * Stats (void * v)
                         if (tmp.attack_count >= AGREE)
                         {
                                 fout << "[A] --- Attack Identified --- [A]" << endl;
-                                //fout << "\tURI: " << tmp.uri << endl;
+                                fout << "\tURI: " << tmp.uri << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
@@ -221,7 +221,7 @@ void * Stats (void * v)
                         else
                         {
                                 fout << "[N] --- Normal Traffic --- [N]" << endl;
-                                //fout << "\tURI: " << tmp.uri << endl;
+                                fout << "\tURI: " << tmp.uri << endl;
                                 fout << "\t" << "Unique Tuple:    " << tmp.tuple << endl;
                                 fout << "\t" << "HTTP Signature:  \t";
                                 for (unsigned int i = 0; i < fngPntLen; i++)
@@ -376,6 +376,11 @@ void pull(void)
 
         bool started = false;
 
+	for (i = 0; i < SIGQTY; i++)
+	{
+		cout << "pull urishmid[" << i << "] = " << urishmid[i] << endl;
+	}
+
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
         {
@@ -391,7 +396,9 @@ void pull(void)
                                 /* get unique tuple from shm segment */
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(sig_atomic_t) * t5TplLen);
                                 /* get uri from shm segment. copy until max, though there should be a null terminator where ever the uri ends, dubious it will be longer than max */
-                                memcpy((void *)retrieved_uris[ct], (void *)urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(char) * MAXURI);
+				cout << "about to copy from urishm[" << (shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2)) << "], which has: " << urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))] << ", first char = " << (urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))][0]) << endl << flush;
+                                memcpy((void *)retrieved_uris[ct], (void *)(&(urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))][0])), sizeof(char) * MAXURI);
+				cout << "got " << retrieved_uris[ct] << endl << flush;
                                 //cout << "pull got uri " << retrieved_uris[ct] << endl;
                                 if ((testing) < MAX_THREADS)
                                 {

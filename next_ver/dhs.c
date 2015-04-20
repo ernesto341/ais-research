@@ -373,7 +373,7 @@ void write_hdr_data ( void )
 			strncat (path, ">    -  ", 8);
 		}
 		uint16_t t = snc.mem.sigs[CTL][POS] - 1;
-		char * tmp = itoa(snc.mem.sigs[(t > 0 ? t : SIGQTY)][i]);
+		tmp = itoa(snc.mem.sigs[(t > 0 ? t : SIGQTY)][i]);
 		strncat (path, tmp, strlen(tmp));
 		strncat (path, "\n", 1);
 		write ( fd , path , strlen(path) );
@@ -383,7 +383,7 @@ void write_hdr_data ( void )
 	write ( fd , "\n" , 1 );
 	close ( fd );
 	pending_more_hdr_data = 0;
-	free(hdr_data);
+	//free(hdr_data);
 	hdr_data = 0;
 
 	return;
@@ -535,8 +535,11 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 	char * ver_str;
 	cmd_str = strtok(tmp_hdr, (const char *)" ");
 
-	uri_str = strtok(NULL, (const char *)" ");
-	uri_len = (uint32_t)strlen(uri_str);
+	tmp = strtok(NULL, (const char *)" ");
+	uri_len = (uint32_t)strlen(tmp);
+	memcpy((void *)uri_str, (void *)tmp, (size_t)uri_len * sizeof(char));
+	uri_str[uri_len] ^= uri_str[uri_len];
+	memset((void *)(uri_str + uri_len + 1), (int)'Q', (size_t)(MAXURI - uri_len - 1));
 	i = 0;
 
 	//printf("pcktFingerPrint has uri as %s\n", uri_str);
@@ -581,7 +584,7 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 		shandler(0);
 	}
 
-	memcpy(target, uri_str, uri_len);
+	strncpy((char *)target, uri_str, uri_len);
 	const unsigned char * end = (const unsigned char *)(uri_str + (sizeof(char) * (uri_len-1)));
 	if (DEBUG)
 	{
@@ -788,8 +791,11 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 
 	if (sub)
 	{
-		free(sub);
+		//free(sub);
 	}
+
+	fprintf(stdout, "end of fingerprint\n\ttarget = %s\n\turi_str = %s\n", target, uri_str);
+	fflush(stdout);
 
 	return (fngPnt);
 }
@@ -799,9 +805,9 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
  */
 inline static void resizeHdr(void)
 {
-	unsigned char * tmp = 0;
-	tmp = (unsigned char *)malloc(sizeof(unsigned char) * hdr_size * 2);
-	if (tmp == 0)
+	unsigned char * tmp_str = 0;
+	tmp_str = (unsigned char *)malloc(sizeof(unsigned char) * hdr_size * 2);
+	if (tmp_str == 0)
 	{
 		if (DEBUG)
 		{
@@ -809,9 +815,9 @@ inline static void resizeHdr(void)
 		}
 		shandler(0);
 	}
-	memcpy(tmp, hdr_data, hdr_size);
+	memcpy(tmp_str, hdr_data, hdr_size);
 	free(hdr_data);
-	hdr_data = tmp;
+	hdr_data = tmp_str;
 	hdr_size *= 2;
 }
 
@@ -1069,7 +1075,12 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
 				extractSig();
 				/* HERE - dont need entire payload, just uri. only copy up to max length - FIX ME! */
 				//printf("dhs has uri_str %s\n", uri_str);
-				uri_len < MAXURI ? (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * uri_len))) : (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * (MAXURI-1))));
+				fprintf(stdout, "about to dump uri into shared memory\n\turi_len = %d\n\tMAXURI = %d\n\turi_str = %s\n", (int)uri_len, (int)MAXURI, uri_str);
+				fflush(stdout);
+				//uri_len < MAXURI ? (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * uri_len))) : (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * (MAXURI-1))));
+				memcpy((void *)(snc.smem.urishm[(snc.smem.shm[CTL][POS] - 1)]), (void *)uri_str, (size_t)(sizeof(char) * (uri_len < MAXURI ? uri_len : (MAXURI-1))));
+				fprintf(stdout, "done\n\tsnc.smem.urishm[%d] = %s\n", (int)(snc.smem.shm[CTL][POS] - 1), snc.smem.urishm[(snc.smem.shm[CTL][POS] - 1)]);
+				fflush(stdout);
 				ret = dumpToShm();
 				if(ret != 0)
 				{
@@ -1505,6 +1516,13 @@ int main (int argc , char *argv[])
 			fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
 
 			fflush(stderr);
+		}
+
+		int i = 0;
+		for (i = 0; i < SIGQTY; i++)
+		{
+			fprintf(stdout, "dhs urishmid[%d] = %d\n", (int)i, (int)snc.smem.urishmid[i]);
+			fflush(stdout);
 		}
 
 		/* capture starts */

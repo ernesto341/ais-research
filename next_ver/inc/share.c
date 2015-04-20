@@ -35,7 +35,7 @@ inline void fData(psnc_t snc)
                 memset(uri_str,'0', MAXURI);
                 memset(uri_str,'1', MAXURI);
                 memset(uri_str,'\0', MAXURI);
-                free(uri_str);
+                //free(uri_str);
                 uri_str = 000;
         }
         if (hdr_data != 000)
@@ -76,11 +76,11 @@ inline void fData(psnc_t snc)
                                 memset(snc->mem.uris[i], '\0', MAXURI);
                                 ++j;
                         }
-                        free(snc->mem.uris[i]);
+                        //free(snc->mem.uris[i]);
                         snc->mem.uris[i] = 000;
                         i++;
                 }
-                free(snc->mem.uris);
+                //free(snc->mem.uris);
                 snc->mem.uris = 000;
         }
         i = 0;
