@@ -290,8 +290,8 @@ alen	retdir/pull.cpp	/^volatile sig_atomic_t alen = 0;$/;"	v
 api_errors	inc/libntoh.c	/^static const char api_errors[][25] = {$/;"	v	file:
 arr_size	ais/import.cpp	/^unsigned int arr_size = 100;$/;"	v
 arr_size	retdir/import.cpp	/^unsigned int arr_size = 100;$/;"	v
-attack	retdir/pull.cpp	/^        uint32_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
-attack_count	retdir/pull.cpp	/^        uint32_t attack_count; \/\/ how many antibodies returned attack$/;"	m	struct:_test_param	file:
+attack	retdir/pull.cpp	/^        int32_t attack; \/\/ whether or not the tested signature was determined to be an attack$/;"	m	struct:_test_param	file:
+attack_count	retdir/pull.cpp	/^        int32_t attack_count; \/\/ how many antibodies returned attack$/;"	m	struct:_test_param	file:
 avgFitness	ais/lifetime.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 avgFitness	ais/lifetime_nounknown.cpp	/^float avgFitness[CLASS_COUNT];$/;"	v
 buf	ais/import.cpp	/^struct stat buf;$/;"	v	typeref:struct:stat
@@ -406,14 +406,14 @@ generateAntibody	ais/lifetime.cpp	/^void generateAntibody(int i, int j) {$/;"	f
 generateAntibody	ais/lifetime_nounknown.cpp	/^void generateAntibody(int i, int j) {$/;"	f
 generic_write_data	dhs.c	/^void generic_write_data ( void * data )$/;"	f
 get16bits	inc/sfhash.c	4;"	d	file:
-getAttr	ais/antibody.h	/^                inline int getAttr(const int i = -1) { return (i >= 0 && i < ALEN ? a[i] : -1); }$/;"	f	class:Antibody
-getCatCount	ais/antibody.h	/^                inline float getCatCount(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? cat[i] : -1); }$/;"	f	class:Antibody
-getCatPerc	ais/antibody.h	/^                inline float getCatPerc(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? catPerc[i] : -1); }$/;"	f	class:Antibody
-getCatTotal	ais/antibody.h	/^                inline int getCatTotal(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? catTotal[i] : -1); }$/;"	f	class:Antibody
+getAttr	ais/antibody.h	/^                inline int getAttr(int i) { return (i >= 0 && i < ALEN ? a[i] : -1); }$/;"	f	class:Antibody
+getCatCount	ais/antibody.h	/^                inline float getCatCount(int i) { return ((i >= 0 && i < CLASS_COUNT) ? cat[i] : -1); }$/;"	f	class:Antibody
+getCatPerc	ais/antibody.h	/^                inline float getCatPerc(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catPerc[i] : -1); }$/;"	f	class:Antibody
+getCatTotal	ais/antibody.h	/^                inline int getCatTotal(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catTotal[i] : -1); }$/;"	f	class:Antibody
 getDstPrt	dhs.c	/^inline uint32_t getDstPrt(const char * path)$/;"	f
-getFlag	ais/antibody.h	/^                inline int getFlag(const int i = -1) { return (i >= 0 && i < ALEN ? flags[i] : -1); }$/;"	f	class:Antibody
-getMax	ais/antibody.h	/^                inline int getMax(const int i = -1) { return (i >= 0 && i < ALEN ? max[i] : -1); }$/;"	f	class:Antibody
-getOff	ais/antibody.h	/^                inline int getOff(const int i = -1) { return (i >= 0 && i < ALEN ? offset[i] : -1); }$/;"	f	class:Antibody
+getFlag	ais/antibody.h	/^                inline int getFlag(int i) { return (i >= 0 && i < ALEN ? flags[i] : -1); }$/;"	f	class:Antibody
+getMax	ais/antibody.h	/^                inline int getMax(int i) { return (i >= 0 && i < ALEN ? max[i] : -1); }$/;"	f	class:Antibody
+getOff	ais/antibody.h	/^                inline int getOff(int i) { return (i >= 0 && i < ALEN ? offset[i] : -1); }$/;"	f	class:Antibody
 getSrcPrt	dhs.c	/^inline uint32_t getSrcPrt(const char * path)$/;"	f
 getUris	tester.cpp	/^string * getUris(istream & in_file, string *& data, int &uri_size)$/;"	f
 get_peer_info	dhs.c	/^ppeer_info_t get_peer_info ( unsigned char *payload , size_t payload_len , pntoh_tcp_tuple5_t tuple )$/;"	f
@@ -460,7 +460,7 @@ import_mgr_tid	retdir/pull.cpp	/^pthread_t import_mgr_tid;$/;"	v
 inAtoF	dhs.c	/^inline static int inAtoF(const char in)$/;"	f	file:
 inCtr	dhs.c	/^inline static void inCtr(sig_atomic_t *** s)$/;"	f	file:
 inPos	retdir/pull.cpp	/^inline static void inPos(void)$/;"	f	file:
-incTests	ais/antibody.h	/^                inline void incTests(const int ct = 1) { this->tests += ct; }$/;"	f	class:Antibody
+incTests	ais/antibody.h	/^                inline void incTests(int ct = 1) { this->tests += ct; }$/;"	f	class:Antibody
 indepAccPerClass	ais/lifetime.cpp	/^float indepAccPerClass[CLASS_COUNT][MAX_ANTIBODIES][CLASS_COUNT];$/;"	v
 init	inc/ipv4defrag.c	/^		unsigned short		init;$/;"	m	struct:__anon15	file:
 init	inc/ipv6defrag.c	/^		unsigned short	        init;$/;"	m	struct:__anon2	file:
@@ -522,6 +522,7 @@ main	ais/lifetime.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	ais/lifetime_nounknown.cpp	/^int main(int argc, char *argv[]) {$/;"	f
 main	dhs.c	/^int main (int argc , char *argv[])$/;"	f
 main	retdir/retrieve.cpp	/^int main (void)$/;"	f
+main	test.c	/^int main()$/;"	f
 main	tester.cpp	/^int main (int argc, char *argv[], char *envp[])$/;"	f
 match	ais/antibody.cpp	/^int Antibody::match(int *test)$/;"	f	class:Antibody
 mate	ais/antibody.cpp	/^void Antibody::mate(Antibody *m, Antibody **c1, Antibody **c2) {$/;"	f	class:Antibody
@@ -716,7 +717,7 @@ sessions_list	inc/tcpreassembly.c	/^        pntoh_tcp_session_t	sessions_list;$/
 setAttr	ais/antibody.h	/^                void setAttr(const int &pos, const int &val)$/;"	f	class:Antibody
 setCat	ais/antibody.h	/^                bool setCat(const int &pos, const int &val)$/;"	f	class:Antibody
 setCatPerc	ais/antibody.h	/^                void setCatPerc(const int &pos, const float &val)$/;"	f	class:Antibody
-setCatTotal	ais/antibody.h	/^                inline bool setCatTotal(const int i = -1, const int ct = -1) { if (i >= 0 && i < CLASS_COUNT) { this->catTotal[i] = ct; return (true); } return (false); }$/;"	f	class:Antibody
+setCatTotal	ais/antibody.h	/^                inline bool setCatTotal(int i, int ct) { if (i >= 0 && i < CLASS_COUNT) { this->catTotal[i] = ct; return (true); } return (false); }$/;"	f	class:Antibody
 setFalseNeg	ais/antibody.h	/^                void setFalseNeg(const int &val)$/;"	f	class:Antibody
 setFalsePos	ais/antibody.h	/^                void setFalsePos(const int &val)$/;"	f	class:Antibody
 setFlag	ais/antibody.h	/^                void setFlag(const int &pos, const int &val)$/;"	f	class:Antibody
@@ -755,6 +756,7 @@ status	retdir/pull.cpp	/^int status = 0;$/;"	v
 streams	inc/tcpreassembly.h	/^    ptcprs_streams_table_t 	streams;$/;"	m	struct:_tcp_session_
 syn_retries	inc/tcpreassembly.h	/^	unsigned int 		syn_retries;$/;"	m	struct:_tcp_stream_
 synack_retries	inc/tcpreassembly.h	/^	unsigned int 		synack_retries;$/;"	m	struct:_tcp_stream_
+t	retdir/import.cpp	/^Antibody ** t = 0;$/;"	v
 t5Convert	dhs.c	/^sig_atomic_t * t5Convert;$/;"	v
 t5TplLen	inc/globals.h	/^static const uint32_t t5TplLen = 44;$/;"	v
 t5TplLen	retdir/retglobals.h	/^static const uint32_t t5TplLen = 44;$/;"	v
