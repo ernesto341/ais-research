@@ -25,6 +25,7 @@ Antibody ** champs;
 pthread_mutex_t champs_mutex;
 pthread_mutex_t log_mutex;
 
+/* sig_atomic_t ~= signed int */
 volatile static sig_atomic_t testing = 0;
 volatile sig_atomic_t alen = 0;
 volatile sig_atomic_t class_count = 0;
@@ -40,8 +41,8 @@ typedef struct _test_param
         uint32_t sig[fngPntLen]; // signature to be tested
         char tuple[t5TplLen]; // t5 tuple
         volatile sig_atomic_t flag; // signal to thread to start testing
-        uint32_t attack; // whether or not the tested signature was determined to be an attack
-        uint32_t attack_count; // how many antibodies returned attack
+        int32_t attack; // whether or not the tested signature was determined to be an attack
+        int32_t attack_count; // how many antibodies returned attack
         char uri[MAXURI]; // what uri generated this signature
 } test_param, *ptest_param;
 
@@ -74,17 +75,19 @@ int doMatch(Antibody a, int *test)
         {
                 if(!a.getFlag(i))
                 {
-                        cerr << "!a.getFlag(" << i << "), continue\n" << flush;
                         continue;
                 }
                 int overf = (int)pow(2.0, (double)a.getMax(i)) + (int)pow(2.0, (double)a.getMax(i) - 1.0) - 2;
+		cerr << "Testing with given antibody and attribute " << i << ".\n\tAntibody classification: " << a.queryClassification() << ", test[" << i << "] = " << test[i] << ", testing if greater than overf, " << overf << endl << flush;
                 if (test[i] > overf)
                 {
                         cerr << "Actually signaling attack, classification of AB: " << a.queryClassification() << endl << flush;
                         return (a.queryClassification());  // Over max antibody match, attack
                 }
+		cerr << "Not an attack, is it normal?.\n\t" << "Testing test[" << i << "], " << test[i] << ", < ( a.getAttr(" << i << "), " << a.getAttr(i) << ", - a.getOff(" << i << "), " << a.getOff(i) << " (" << (a.getAttr(i) - a.getOff(i)) << ") ) OR > ( a.getAttr(" << i << "), " << a.getAttr(i) << ", + a.getOff(" << i << "), " << a.getOff(i) << " (" << (a.getAttr(i) + a.getOff(i)) << " )" << endl << flush;
                 if (test[i] < (a.getAttr(i) - a.getOff(i)) || test[i] > (a.getAttr(i) + a.getOff(i)))
                 {
+			cerr << "True! Returning Normal traffic\n" << flush;
                         return (class_count + 1);
                 }
         }
@@ -119,14 +122,17 @@ void * testThread(void * v)
                                         c = champs[i][j].queryClassification();
                                         cerr << "Testing with a(n) " << ((c >= 0 && c < class_count) ? CLASS_LABELS[c] : "Unknown Type") << " antibody" << flush;
                                         cerr << " with fitness: " << champs[i][j].fitness() << endl << flush;
+					/*
                                         cerr << "Category Percentages and Counts:\n";
                                         for (int k = 0; k < class_count; k++)
                                         {
                                                 cerr << "\t" << k << ": " << champs[i][j].getCatCount(k) << " / " << champs[i][j].getCatTotal(k) << " = " << champs[i][j].getCatPerc(k) << endl << flush;
                                         }
                                         cerr << endl << flush;
+					*/
                                         tmp = (doMatch( (champs[i][j]) , (int *)(((ptest_param)v)->sig) ));
-                                        cerr << "\tReturned " << CLASS_LABELS[tmp] << endl << flush;
+                                        cerr << "\tReturned " << tmp << ", associated with a " << CLASS_LABELS[tmp] << " attack." << endl << flush;
+					/* class_count + 1 == normal traffic */
                                         if (tmp != class_count + 1)
                                         {
                                                 ((ptest_param)v)->attack_count += 1;
@@ -205,6 +211,10 @@ void * Stats (void * v)
                         /* log new item to queue */
                         Copy(tmp, log_queue.front());
                         log_queue.pop();
+			if (!fout.is_open())
+			{
+				fout.open("./traffic.log\0", ios::app);
+			}
                         if (tmp.attack_count >= AGREE)
                         {
                                 fout << "[A] --- Attack Identified --- [A]" << endl;
@@ -231,6 +241,10 @@ void * Stats (void * v)
                                 fout << "\n\tNumber of Antibodies Signaling Attack: " << tmp.attack_count << endl;
                         }
                         fout << endl;
+			if (fout.is_open())
+			{
+				fout.close();
+			}
                 }
                 pthread_mutex_unlock(&log_mutex);
         }
@@ -336,7 +350,7 @@ void pull(void)
         char * n = (char *)"./traffic.log\0";
 
         /* open log file */
-        fout.open(n);
+        fout.open(n, ios::app);
         if (fout.fail())
         {
                 if (DEBUG)
@@ -370,16 +384,14 @@ void pull(void)
         {
                 /* setup champs update signal */
                 signal(SIGUSR1, &onDemandImport);
-                /* HERE */
                 signal(SIGUSR2, &onDemandRebreed);
         }
 
         bool started = false;
 
-	for (i = 0; i < SIGQTY; i++)
-	{
-		cout << "pull urishmid[" << i << "] = " << urishmid[i] << endl;
-	}
+	fout << endl << "Start: " << __DATE__ << " : " << __TIME__ << endl;
+	fout << "======================================================================" << endl << flush;
+	fout.close();
 
         /* accept signal from producer to quit */
         while (shm[CTL][FLAGS] != PDONE && shm[CTL][FLAGS] != CDONE)
@@ -396,10 +408,7 @@ void pull(void)
                                 /* get unique tuple from shm segment */
                                 memcpy((void *)retrieved_t5s[ct], (void *)t5shm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))], sizeof(sig_atomic_t) * t5TplLen);
                                 /* get uri from shm segment. copy until max, though there should be a null terminator where ever the uri ends, dubious it will be longer than max */
-				cout << "about to copy from urishm[" << (shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2)) << "], which has: " << urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))] << ", first char = " << (urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))][0]) << endl << flush;
                                 memcpy((void *)retrieved_uris[ct], (void *)(&(urishm[(shm[CTL][POS] == 1 ? (SIGQTY - 1) : (shm[CTL][POS] - 2))][0])), sizeof(char) * MAXURI);
-				cout << "got " << retrieved_uris[ct] << endl << flush;
-                                //cout << "pull got uri " << retrieved_uris[ct] << endl;
                                 if ((testing) < MAX_THREADS)
                                 {
                                         started = false;

@@ -75,15 +75,15 @@ class Antibody {
                 void mate(Antibody *, Antibody **, Antibody **);
                 void mutate();
 
-                inline int getFlag(const int i = -1) { return (i >= 0 && i < ALEN ? flags[i] : -1); }
-                inline int getAttr(const int i = -1) { return (i >= 0 && i < ALEN ? a[i] : -1); }
-                inline int getMax(const int i = -1) { return (i >= 0 && i < ALEN ? max[i] : -1); }
-                inline int getOff(const int i = -1) { return (i >= 0 && i < ALEN ? offset[i] : -1); }
-                inline void incTests(const int ct = 1) { this->tests += ct; }
-                inline bool setCatTotal(const int i = -1, const int ct = -1) { if (i >= 0 && i < CLASS_COUNT) { this->catTotal[i] = ct; return (true); } return (false); }
-                inline float getCatPerc(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? catPerc[i] : -1); }
-                inline int getCatTotal(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? catTotal[i] : -1); }
-                inline float getCatCount(const int i = -1) { return ((i >= 0 && i < CLASS_COUNT) ? cat[i] : -1); }
+                inline int getFlag(int i) { return (i >= 0 && i < ALEN ? flags[i] : -1); }
+                inline int getAttr(int i) { return (i >= 0 && i < ALEN ? a[i] : -1); }
+                inline int getMax(int i) { return (i >= 0 && i < ALEN ? max[i] : -1); }
+                inline int getOff(int i) { return (i >= 0 && i < ALEN ? offset[i] : -1); }
+                inline void incTests(int ct = 1) { this->tests += ct; }
+                inline bool setCatTotal(int i, int ct) { if (i >= 0 && i < CLASS_COUNT) { this->catTotal[i] = ct; return (true); } return (false); }
+                inline float getCatPerc(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catPerc[i] : -1); }
+                inline int getCatTotal(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catTotal[i] : -1); }
+                inline float getCatCount(int i) { return ((i >= 0 && i < CLASS_COUNT) ? cat[i] : -1); }
 
                 int queryTests()    { return tests; }
                 int queryPos()      { return pos; }

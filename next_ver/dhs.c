@@ -542,8 +542,6 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 	memset((void *)(uri_str + uri_len + 1), (int)'Q', (size_t)(MAXURI - uri_len - 1));
 	i = 0;
 
-	//printf("pcktFingerPrint has uri as %s\n", uri_str);
-
 	ver_str = strtok(NULL, (const char *)" \r\n");
 
 	int32_t cmd = strstr((const char *)cmd_str, (const char *)"GET") != 000 ? (int32_t)pow(2., 0.) : (strstr((const char *)cmd_str, (const char *)"POST") != 000 ? (int32_t)pow(2., 1.) : (strstr((const char *)cmd_str, (const char *)"HEAD") != 000 ? (int32_t)pow(2., 2.) : (int32_t)pow(2., 3.)));
@@ -793,9 +791,6 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 	{
 		//free(sub);
 	}
-
-	fprintf(stdout, "end of fingerprint\n\ttarget = %s\n\turi_str = %s\n", target, uri_str);
-	fflush(stdout);
 
 	return (fngPnt);
 }
@@ -1074,13 +1069,8 @@ void send_tcp_segment ( struct ip *iphdr , pntoh_tcp_callback_t callback )
 				}
 				extractSig();
 				/* HERE - dont need entire payload, just uri. only copy up to max length - FIX ME! */
-				//printf("dhs has uri_str %s\n", uri_str);
-				fprintf(stdout, "about to dump uri into shared memory\n\turi_len = %d\n\tMAXURI = %d\n\turi_str = %s\n", (int)uri_len, (int)MAXURI, uri_str);
-				fflush(stdout);
 				//uri_len < MAXURI ? (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * uri_len))) : (memcpy((char *)snc.smem.urishm[((snc.smem.shm[CTL][POS] - 1))], (char *)uri_str, (sizeof(char) * (MAXURI-1))));
 				memcpy((void *)(snc.smem.urishm[(snc.smem.shm[CTL][POS] - 1)]), (void *)uri_str, (size_t)(sizeof(char) * (uri_len < MAXURI ? uri_len : (MAXURI-1))));
-				fprintf(stdout, "done\n\tsnc.smem.urishm[%d] = %s\n", (int)(snc.smem.shm[CTL][POS] - 1), snc.smem.urishm[(snc.smem.shm[CTL][POS] - 1)]);
-				fflush(stdout);
 				ret = dumpToShm();
 				if(ret != 0)
 				{
@@ -1135,7 +1125,6 @@ void send_ipv4_fragment ( struct ip *iphdr , pipv4_dfcallback_t callback )
 	uint32_t		error;
 
 	total_len = ntohs( iphdr->ip_len );
-	printf("in dhs, got iphdr->ip_len = %d, total_len = %d\n", (int)(iphdr->ip_len), (int)total_len);
 
 	ntoh_ipv4_get_tuple4 ( iphdr , &ipt4 );
 
@@ -1516,13 +1505,6 @@ int main (int argc , char *argv[])
 			fprintf ( stderr , "\n[i] Max. IPv4 flows allowed: %d\n\n" , ntoh_ipv4_get_size ( ipv4_session ) );
 
 			fflush(stderr);
-		}
-
-		int i = 0;
-		for (i = 0; i < SIGQTY; i++)
-		{
-			fprintf(stdout, "dhs urishmid[%d] = %d\n", (int)i, (int)snc.smem.urishmid[i]);
-			fflush(stdout);
 		}
 
 		/* capture starts */

@@ -17,7 +17,7 @@
 using namespace std;
 
 #ifndef DEBUG
-#define DEBUG 1
+#define DEBUG 0
 #endif
 
 extern Antibody *pop[CLASS_COUNT][MAX_ANTIBODIES];
