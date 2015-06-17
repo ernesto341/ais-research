@@ -1,5 +1,5 @@
 #pragma once
-#define TARGET "http://localhost:80"
+#define TARGET "http://localhost"
 
 #ifndef _NORMALFILE
 #define _NORMALFILE

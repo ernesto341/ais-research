@@ -1,5 +1,5 @@
-CFLAGS = -g -Wno-deprecated
-OFILES = antibody.o webdata.o heap.o mass.o random.o unknownweb.o
+CFLAGS = -g -Wno-deprecated -O2
+OFILES = antibody.o webdata.o heap.o mass.o random.o unknownweb.o itoa.o import.o
 
 lifetime:	lifetime.cpp ${OFILES}
 	g++ $(CFLAGS) -o lifetime.1000 -DMAX_ANTIBODIES=1000 lifetime.cpp ${OFILES}
@@ -23,10 +23,16 @@ test:	antibody.o test.cpp
 	g++ $(CFLAGS) test.cpp antibody.o heap.o
 
 unknownweb.o:	webdata.o unknownweb.h unknownweb.cpp
-	g++ $(CLFAGS) -c unknownweb.cpp
+	g++ $(CFLAGS) -c unknownweb.cpp
+
+itoa.o:	
+	gcc $(CFLAGS) -c itoa.c
 
 webdata.o:	antibody.h webdata.h webdata.cpp
 	g++ $(CFLAGS) -c webdata.cpp
+
+import.o:	
+	g++ $(CFLAGS) -c import.cpp
 
 heap.o:	antibody.h heap.h heap.cpp
 	g++ $(CFLAGS) -c heap.cpp
@@ -41,4 +47,4 @@ random.o:	random.h random.cpp
 	g++ $(CFLAGS) -c random.cpp
 
 clean:	
-	rm -f *.o lifetime a.out core lifetime.25 lifetime.50 lifetime.75 lifetime.125 lifetime.250 lifetime.500 lifetime.1000 champions.abs *.*_*_*.*_*.
+	rm -f *.o lifetime a.out core lifetime.25 lifetime.50 lifetime.75 lifetime.125 lifetime.250 lifetime.500 lifetime.1000 champions.abs *.*_*_*.*_*. Champions_Report.html

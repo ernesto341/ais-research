@@ -8,6 +8,7 @@
 #include "antibody.h"
 #include "unknownweb.h"
 #include "mass.h"
+#include "import.hpp"
 using namespace std;
 
 #define VERBOSE_OUTPUT
@@ -17,10 +18,6 @@ using namespace std;
 #define MAX_RUNS    5    // Number of simultaneous populations to test
 #endif
 
-#ifndef MAX_ANTIBODIES
-#define MAX_ANTIBODIES   25  // Number of antibodies per population
-#endif
-
 // Set defaults for command line parameters
 int MAX_ROUNDS = 10;          // Maximum number of generations
 float PR_XOVER = 0.6;         // Percent crossover
@@ -28,6 +25,7 @@ float PR_MUTATION = 0.1;      // Percent mutation
 float BAD_THRESHOLD = 0.0002; // Threshold for bad antibodies in self-test
 int TRAIN_AGREE = 3;          // Number that must agree to mark attack
 
+float indepAccPerClass[CLASS_COUNT][MAX_ANTIBODIES][CLASS_COUNT];
 Antibody *pop[CLASS_COUNT][MAX_ANTIBODIES];
 Antibody champs[CLASS_COUNT][MAX_ANTIBODIES];
 float avgFitness[CLASS_COUNT];
@@ -60,7 +58,7 @@ void outputTrainedClasses(int);
 
 #define ALL 99
 
-void Copy(const int & c = 0)
+void Copy(const int & c = -1, const int & a = -1)
 {
         if (c < 0)
         {
@@ -78,28 +76,262 @@ void Copy(const int & c = 0)
                 }
                 return;
         }
-        for (int j = 0; j < MAX_ANTIBODIES; j++)
+        if (a < 0)
         {
-                memcpy(&(champs[c][j]), pop[c][j], sizeof(Antibody) * 1);
+                for (int j = 0; j < MAX_ANTIBODIES; j++)
+                {
+                        memcpy(&(champs[c][j]), pop[c][j], sizeof(Antibody) * 1);
+                }
+                return;
         }
+        memcpy(&(champs[c][a]), pop[c][a], sizeof(Antibody) * 1);
         return;
 }
 
-void Dump (const Antibody c[CLASS_COUNT][MAX_ANTIBODIES])
+void htmlReport (Antibody a[CLASS_COUNT][MAX_ANTIBODIES])
+{
+        ofstream o("Champions_Report.html", ios::trunc);
+
+        o << fixed;
+
+        o << "<html>";
+        o << "<head>";
+
+        o << "<style> tr {text-align:center;} td {text-align:center;} </style>";
+        o << "</head>";
+        o << "<body>";
+        o << "<table width=\"100%\" border=\"1\" align=\"center\">";
+        o << "<tr>";
+        o << "<td>";
+        o << "<strong>";
+        o << "Class";
+        o << "</strong>";
+        o << "</td>";
+        o << "<td>";
+        o << "<strong>";
+        o << "#";
+        o << "</strong>";
+        o << "</td>";
+        o << "<td>";
+        o << "<strong>";
+        o << "Fitness";
+        o << "</strong>";
+        o << "</td>";
+        o << "<td colspan=\"" << ALEN << "\">";
+        o << "<strong>";
+        o << "[ Attribute";
+        o << " | ";
+        o << "Offset ]";
+        o << "</strong>";
+        o << "</td>";
+        o << "<td colspan=\"" << CLASS_COUNT << "\">";
+        o << "<strong>";
+        o << "Accuracy Per Class";
+        o << "</strong>";
+        o << "</td>";
+        o << "</tr>";
+
+        for (int i = 0; i < CLASS_COUNT; i++)
+        {
+                for (int j = 0; j < MAX_ANTIBODIES; j++)
+                {
+                        if (j % 2 == 0)
+                        {
+                                o << "<tr bgcolor=\"#FFFF88\">";
+                        }
+                        else
+                        {
+                                o << "<tr bgcolor=\"#88FFFF\">";
+                        }
+                        o << "<td>";
+                        o << CLASS_LABELS[i];
+                        o << "</td>";
+                        o << "<td>";
+                        o << j + 1;
+                        o << "</td>";
+                        o << "<td>";
+                        o << setprecision(4) << setfill('0') << a[i][j].fitness();
+                        o << "</td>";
+                        o.unsetf(ios_base::floatfield);
+                        o << setfill('\0');
+                        for (int k = 0; k < ALEN; k++)
+                        {
+                                o << "<td>";
+                                o << " [ " << a[i][j].getAttr(k) << " | " << a[i][j].getOff(k) <<  " ] ";
+                                o << "</td>";
+                        }
+                        o << setfill('0');
+                        o << fixed;
+                        for (int k = 0; k < CLASS_COUNT; k++)
+                        {
+                                o << "<td>";
+                                o << setprecision(4) << setfill('0') << indepAccPerClass[i][j][k];
+                                o << "</td>";
+                        }
+                        o << "</tr>";
+                }
+                if (MAX_ANTIBODIES % 2 == 0)
+                {
+                        o << "<tr bgcolor=\"#FFFF88\">";
+                }
+                else
+                {
+                        o << "<tr bgcolor=\"88FFFF\">";
+                }
+                o << "<td><strong>Class</strong>";
+                o << "</td>";
+                o << "<td><strong>#</strong>";
+                o << "</td>";
+                o << "<td><strong>Fitness</strong>";
+                o << "</td>";
+                for (int j = 0; j < ALEN; j++)
+                {
+                        o << "<td><strong>";
+                        switch(j)
+                        {
+                                case 0:
+                                        o << "Cmd";
+                                        break;
+                                case 1:
+                                        o << "Proto";
+                                        break;
+                                case 2:
+                                        o << "Len";
+                                        break;
+                                case 3:
+                                        o << "Vars";
+                                        break;
+                                case 4:
+                                        o << "Percent";
+                                        break;
+                                case 5:
+                                        o << "Apos";
+                                        break;
+                                case 6:
+                                        o << "Plus";
+                                        break;
+                                case 7:
+                                        o << "Per";
+                                        break;
+                                case 8:
+                                        o << "BSlash";
+                                        break;
+                                case 9:
+                                        o << "OParen";
+                                        break;
+                                case 10:
+                                        o << "CParen";
+                                        break;
+                                case 11:
+                                        o << "FSlash";
+                                        break;
+                                case 12:
+                                        o << "LT";
+                                        break;
+                                case 13:
+                                        o << "GT";
+                                        break;
+                                default:
+                                        o << "<Unknown>";
+                                        break;
+                        }
+                        o << "</td>";
+                }
+                for (int j = 0; j < CLASS_COUNT; j++)
+                {
+                        o << "<td><strong>";
+                        o << CLASS_LABELS[j];
+                        o << "</strong>";
+                        o << "</td>";
+                }
+                o << "</tr>";
+        }
+
+        o << "</table>";
+        o << "</body>";
+        o << "</html>";
+
+        o.close();
+        return;
+}
+
+void Report(Antibody a[CLASS_COUNT][MAX_ANTIBODIES])
+{
+        ofstream rep("champions.rep", ios::trunc);
+        rep << setw(9) << "Class";
+        rep << setw(3) << "#";
+        rep << setw(9) << "Fitness";
+        rep << setw(9) << "Attribute";
+        rep << setw(3) << " - ";
+        rep << setw(6) << "Offset";
+        rep << setw(20) << "Accuracy Per Class";
+        rep << endl;
+        rep << setw(9) << "-----";
+        rep << setw(3) << "-";
+        rep << setw(9) << "-------";
+        rep << setw(9) << "-----------";
+        rep << setw(3) << "---";
+        rep << setw(8) << "--------";
+        rep << setw(20) << "------------------";
+        rep << endl;
+
+        for (int i = 0; i < CLASS_COUNT; i++)
+        {
+                rep << setw(9) << CLASS_LABELS[i];
+                for (int j = 0; j < MAX_ANTIBODIES; j++)
+                {
+                        if (j != 0)
+                        {
+                                rep << setw(9) << " ";
+                        }
+                        rep << setw(3) << j + 1;
+                        rep << setw(9) << a[i][j].fitness();
+                        for (int k = 0; k < ALEN; k++)
+                        {
+                                rep << setw(21) << " ";
+                                rep << setw(9) << right << a[i][j].getAttr(k);
+                                rep << setw(3) << " ";
+                                rep << setw(6) << left << a[i][j].getOff(k);
+                                if (k == 0)
+                                {
+                                        /* print next stuff */
+                                }
+                                rep << endl;
+                        }
+                        rep << endl;
+                }
+                rep << endl;
+        }
+        rep << endl;
+
+        rep.close();
+
+        return;
+}
+
+void Dump (Antibody c[CLASS_COUNT][MAX_ANTIBODIES])
 {
         ofstream o("champions.abs", ios::trunc);
+        ofstream p("Champions.xml", ios::trunc);
         for (int i = 0; i < CLASS_COUNT; i++)
         {
                 for (int j = 0; j < MAX_ANTIBODIES; j++)
                 {
                         o << champs[i][j].dump();
+                        p << champs[i][j].dumpXml();
                 }
         }
         o.close();
+        p.close();
+
+        htmlReport(c);
         return;
 }
 
+char * use_existing = 000;
+
 int main(int argc, char *argv[]) {
+        srandom(time(NULL));
         char f[500], f2[500], f3[500], f4[500], f5[500], f6[500], f7[500], f8[500];
         ostrstream fname(f, 500, ios::out);
         ostrstream fname2(f2, 500, ios::out);
@@ -112,19 +344,33 @@ int main(int argc, char *argv[]) {
         char mname[500];
 
         if(argc != 6) {
-                cout << "Usage: " << argv[0] 
+                cout << endl << "Usage: " << endl << "\t" << argv[0] 
                         << " [max_generations] [mutation_percent] [agreement_threshold]"
-                        << " [crossover_percent] [self-test_threshold]" << endl;
+                        << " [crossover_percent] [self-test_threshold]" << endl << endl
+                        << "\t\t\t--- OR ---" << endl << endl
+                        << "\t" << argv[0] << " --existing <path_to_file>" << endl << endl
+                        << "\t\t\t--- OR ---" << endl << endl
+                        << "\t" << argv[0] << " -e <path_to_file>" << endl << endl;
                 cout << "Defaults: max_gen=" << MAX_ROUNDS << " self-test=" << BAD_THRESHOLD 
                         << " agree=" << TRAIN_AGREE << " xover=" << PR_XOVER
                         << " mutate=" << PR_MUTATION << endl;
         }
 
-        if(argc > 1) MAX_ROUNDS = atoi(argv[1]);
-        if(argc > 2) PR_MUTATION = atof(argv[2]);
-        if(argc > 3) TRAIN_AGREE = atoi(argv[3]);
-        if(argc > 4) PR_XOVER = atof(argv[4]);
-        if(argc > 5) BAD_THRESHOLD = atof(argv[5]);
+        if (argc == 3 && ((strcmp(argv[1], (const char *)"--existing") == 0) || strcmp(argv[1], (const char *)"-e") == 0))
+        {
+                size_t flen = strlen(argv[2]);
+                use_existing = new char [flen + 1];
+                strncpy(use_existing, argv[2], flen);
+                use_existing[flen] = '\0';
+        }
+        else
+        {
+                if(argc > 1) MAX_ROUNDS = atoi(argv[1]);
+                if(argc > 2) PR_MUTATION = atof(argv[2]);
+                if(argc > 3) TRAIN_AGREE = atoi(argv[3]);
+                if(argc > 4) PR_XOVER = atof(argv[4]);
+                if(argc > 5) BAD_THRESHOLD = atof(argv[5]);
+        }
 
         cerr << "Vars: " << MAX_ROUNDS << " " << PR_MUTATION << endl;
 
@@ -205,11 +451,43 @@ int main(int argc, char *argv[]) {
                 }
         }
 
-        for(int r = 0; r < MAX_RUNS; r++) {
-                initialGen();
-                if (r == 0)
+        float tmp_acc = 0.f;
+        for(int i = 0; i < CLASS_COUNT; i++) {
+                for(int j = 0; j < MAX_ANTIBODIES; j++) {
+                        for(int k = 0; k < CLASS_COUNT; k++) {
+                                indepAccPerClass[i][j][k] = 0.f;
+                        }
+                }
+        }
+
+        if (use_existing != 000)
+        {
+                if (importChamps(use_existing) == 000)
                 {
-                        Copy(ALL);
+                        cerr << "Import operation failed for an unknown reason, starting fresh" << endl << flush;
+                        use_existing = 000;
+                        use_existing = 000;
+                        use_existing = 000;
+                }
+                /*
+                   Antibody ** t_pop = importChamps(use_existing);
+                   for (int i = 0; i < CLASS_COUNT; i++)
+                   {
+                   for (int j = 0; j < MAX_ANTIBODIES; j++)
+                   {
+                   memcpy(&(champs[i][j]), &(t_pop[i][j]), sizeof(Antibody) * 1);
+                   }
+                   }
+                   */
+        }
+        else
+        {
+        }
+
+        for(int r = 0; r < MAX_RUNS; r++) {
+                if (use_existing == 000)
+                {
+                        initialGen();
                 }
                 fout << "Population " << setw(5) << r << endl;
                 cerr << "Population " << setw(5) << r << endl;
@@ -227,15 +505,35 @@ int main(int argc, char *argv[]) {
                         fout4 << setw(3) << i;
                         fout5 << setw(3) << i;
                         fout6 << setw(3) << i;
-                        testSelf();
+                        //if (use_existing == 000)
+                        {
+                                testSelf();
+                        }
                         train();
+                        if (r == 0)
+                        {
+                                Copy(ALL);
+                        }
                         for(int c = 0; c < CLASS_COUNT; c++) {
                                 classAccuracy[r][i][c] = attack.labelAccuracy[c];
                                 averageAccuracy[i][c] += attack.labelAccuracy[c];
                                 if(attack.labelAccuracy[c] > bestAccuracy[i][c])
                                 {
                                         bestAccuracy[i][c] = attack.labelAccuracy[c];
-                                        Copy(c);
+                                }
+                                for (int j = 0; j < MAX_ANTIBODIES; j++)
+                                {
+                                        for (int k = 0; k < CLASS_COUNT; k++)
+                                        {
+                                                tmp_acc = pop[c][j]->getCatCount(k) / pop[c][j]->getCatTotal(k);
+                                                //tmp_acc = pop[c][j]->getCatPerc(k);
+                                                /* and uniqueness measure? */
+                                                if (indepAccPerClass[c][j][k] < tmp_acc)
+                                                {
+                                                        indepAccPerClass[c][j][k] = tmp_acc;
+                                                        Copy(c, j);
+                                                }
+                                        }
                                 }
                         }
                         outputTrainedClasses(i);
@@ -287,19 +585,6 @@ int main(int argc, char *argv[]) {
                 cerr << setw(5) << i;
                 for(int j = 0; j < CLASS_COUNT; j++) {
                         cerr << setw(10) << bestAccuracy[i][j];
-                }
-                cerr << endl;
-        }
-        cerr << endl << "Champions population statistics:\n";
-        cerr << endl;
-        for(int i = 0; i < CLASS_COUNT; i++)
-        {
-                cerr << "Class " << i+1 << ":\n";
-                for(int j = 0; j < MAX_ANTIBODIES; j++)
-                {
-                        cerr << "\t" << j+1 << " - ";
-                        cerr << champs[i][j];
-                        cerr << endl;
                 }
                 cerr << endl;
         }
@@ -514,3 +799,4 @@ void outputTrainedClasses(int i) {
 
         fout7 << endl;
 }
+

@@ -1,10 +1,13 @@
 #ifndef __ANTIBODY_H__
 #define __ANTIBODY_H__
 
+#ifndef MAX_ANTIBODIES
+#define MAX_ANTIBODIES   25  // Number of antibodies per population
+#endif
+
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <fstream>
 using namespace std;
 
 // HTTP request antibody.
@@ -22,7 +25,8 @@ const int ALEN = 14;
 // data file is labeled with one category. For every attack this antibody
 // matches, it will track the associated categories.
 const int CLASS_COUNT = 6;
-const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };
+const char CLASS_LABELS[CLASS_COUNT + 2][15] = { "info", "traversal", "sql", "buffer", "script", "xss", "Unknown", "Normal" };
+//const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };
 
 class Antibody {
         public:
@@ -40,8 +44,8 @@ class Antibody {
                 static const int FORWARD = 11;    // Number of // chars in request
                 static const int LT = 12;         // Number of < chars in request
                 static const int GT = 13;         // Number of > chars in request
-        private:
 
+        private:
                 // Antibody characteristics
                 int flags[ALEN];     // Is this attribute being expressed in this antibody?
                 int a[ALEN];         // Attributes, indexed by const ints above
@@ -56,27 +60,30 @@ class Antibody {
                 int false_neg;       // Number of attacks labeled as normal
 
                 int cat[CLASS_COUNT];  // Count of matches in each classification category
+                int catTotal[CLASS_COUNT]; // Count of total tests performed in each category
                 float catPerc[CLASS_COUNT];
 
                 void setMax();       // Initialize the max values
                 void randomInit();   // Randomize the attribute/offset values
         public:
-                string debug_buf;
                 Antibody();                     // Create a random antibody
                 Antibody(int *, int *, int *);  // Antibody w/ given attributes
                 Antibody(Antibody &);
 
-                int match_debug(int *);    // Returns 1 = attack, 0 = normal
                 int match(int *);    // Returns 1 = attack, 0 = normal
                 float fitness(int cl = -1);
                 void mate(Antibody *, Antibody **, Antibody **);
                 void mutate();
 
-                inline int getFlag(const int i = -1) { return (i > 0 && i < ALEN ? flags[i] : -1); }
-                inline int getAttr(const int i = -1) { return (i > 0 && i < ALEN ? a[i] : -1); }
-                inline int getMax(const int i = -1) { return (i > 0 && i < ALEN ? max[i] : -1); }
-                inline int getOff(const int i = -1) { return (i > 0 && i < ALEN ? offset[i] : -1); }
-                inline void incTests(const int ct = 1) { this->tests += ct; }
+                inline int getFlag(int i) { return (i >= 0 && i < ALEN ? flags[i] : -1); }
+                inline int getAttr(int i) { return (i >= 0 && i < ALEN ? a[i] : -1); }
+                inline int getMax(int i) { return (i >= 0 && i < ALEN ? max[i] : -1); }
+                inline int getOff(int i) { return (i >= 0 && i < ALEN ? offset[i] : -1); }
+                inline void incTests(int ct = 1) { this->tests += ct; }
+                inline bool setCatTotal(int i, int ct) { if (i >= 0 && i < CLASS_COUNT) { this->catTotal[i] = ct; return (true); } return (false); }
+                inline float getCatPerc(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catPerc[i] : -1); }
+                inline int getCatTotal(int i) { return ((i >= 0 && i < CLASS_COUNT) ? catTotal[i] : -1); }
+                inline float getCatCount(int i) { return ((i >= 0 && i < CLASS_COUNT) ? cat[i] : -1); }
 
                 int queryTests()    { return tests; }
                 int queryPos()      { return pos; }
@@ -103,13 +110,14 @@ class Antibody {
                         catPerc[pos] = val;
                 }
 
-                void setCat(const int &pos, const int &val)
+                bool setCat(const int &pos, const int &val)
                 {
                         if (pos < 0 || pos >= CLASS_COUNT)
                         {
-                                return;
+                                return false;
                         }
                         cat[pos] = val;
+                        return true;
                 }
 
                 void setPos(const int &val)
@@ -173,6 +181,7 @@ class Antibody {
                         flags[pos] = val;
                 }
                 string dump(void);
+                string dumpXml(void);
 };
 
 #endif

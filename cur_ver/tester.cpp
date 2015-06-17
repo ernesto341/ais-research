@@ -1,6 +1,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <unistd.h>
+#include <signal.h>
 #include <string.h>
 #include <stdint.h>
 #include <fstream>
@@ -85,7 +87,11 @@ int main (int argc, char *argv[], char *envp[])
         }
 
         ifstream in_file;
-        string filename = INFILE;
+        string filename = NORMALFILE;
+        string * uris = 000;
+        int uri_qty = 0;
+        int i = 0;
+        /*
 
         if (argc >= 2)
         {
@@ -93,7 +99,7 @@ int main (int argc, char *argv[], char *envp[])
                 in_file.open(filename.c_str());
                 if (in_file.fail())
                 {
-                        filename = INFILE;
+                        filename = NORMALFILE;
                 }
         }
         in_file.open(filename.c_str());
@@ -105,22 +111,6 @@ int main (int argc, char *argv[], char *envp[])
 
         cerr << "Opened file with filename " << filename << endl << flush;
 
-        string * uris = 000;
-        int uri_qty = 0;
-        int i = 0;
-        CURL *curl;
-        CURLcode res;
-        curl = curl_easy_init();
-        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(curl, CURLOPT_FRESH_CONNECT, 1);
-        curl_easy_setopt(curl, CURLOPT_FORBID_REUSE, 1);
-        curl_easy_setopt(curl, CURLOPT_CONNECT_ONLY, 1);
-        if (!curl)
-        {
-                fprintf(stderr, "Unable to get curl handle\n");
-                fflush(stderr);
-                exit(EXIT_FAILURE);
-        }
         if (getUris(in_file, uris, uri_qty) == 000)
         {
                 cerr << "Couldn't get uris from file\n" << flush;
@@ -137,15 +127,63 @@ int main (int argc, char *argv[], char *envp[])
                 //uris[i].append("\"");
 
                 cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
-                curl_easy_setopt(curl, CURLOPT_URL, uris[i].c_str());
-                res = curl_easy_perform(curl);
-                if (res != CURLE_OK)
+                uris[i].append(" &");
+                uris[i].insert(0, "iceweasel ");
+                system(uris[i].c_str());
+                fib(30);
+        }
+        */
+        if (argc >= 3)
+        {
+                filename = argv[2];
+                in_file.open(filename.c_str());
+                if (in_file.fail())
                 {
-                        fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
-                        fflush(stderr);
+                        filename = ATTACKFILE;
                 }
         }
-        curl_easy_cleanup(curl);
+        else
+        {
+                filename = ATTACKFILE;
+        }
+        in_file.open(filename.c_str());
+        if (in_file.fail())
+        {
+                cerr << "Unable to open file for reading" << endl << flush;
+                exit(EXIT_FAILURE);
+        }
+
+        cerr << "Opened file with filename " << filename << endl << flush;
+        if (getUris(in_file, uris, uri_qty) == 000)
+        {
+                cerr << "Couldn't get uris from file\n" << flush;
+                exit(EXIT_FAILURE);
+        }
+        in_file.close();
+        int ret_pid[uri_qty];
+        for (i = 0; i < uri_qty; i++)
+        {
+                if (uris[i][0] != '/')
+                {
+                        uris[i].insert(0, "/");
+                }
+                uris[i].insert(0, TARGET);
+                //uris[i].append("\"");
+                cerr << "Command " << i+1 << ": " << uris[i] << endl << flush;
+                uris[i].append(" &");
+                uris[i].insert(0, "iceweasel -new-instance ");
+                /* HERE - fork and execve */
+                /* child */
+                if ((ret_pid[i] = fork()) == 0) /* child */
+                {
+                        system(uris[i].c_str());
+                }
+                else /* parent */
+                {
+                        fib(40);
+                        kill (ret_pid[i], SIGKILL);
+                }
+        }
 
         return (0);
 }

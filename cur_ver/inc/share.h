@@ -21,10 +21,11 @@
 #include <itoa.h>
 #include <globals.h>
 
-//extern unsigned char * hdr_data;
-//extern uint32_t hdr_size;
 extern uint32_t shmkey[];
+extern uint32_t urishmkey[];
 extern uint32_t t5shmkey[];
+
+extern char * uri_str;
 
 char buf[1024];
 

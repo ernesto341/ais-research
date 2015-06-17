@@ -17,7 +17,7 @@ using namespace std;
 
 #define DEBUG 1
 
-#define AGREE 7
+#define AGREE 3
 
 #ifndef SIGBUF
 #define SIGBUF 50
@@ -28,7 +28,7 @@ using namespace std;
 #endif
 
 #ifndef MIN_FITNESS
-#define MIN_FITNESS 70
+#define MIN_FITNESS .30
 #endif
 
 #ifndef MAX_THREADS
@@ -47,15 +47,17 @@ extern uint32_t t5shmkey[];
 
 extern int * shmid;
 extern int * t5shmid;
+extern int * urishmid;
 extern volatile sig_atomic_t ** shm;
 extern volatile sig_atomic_t ** t5shm;
+extern char ** urishm;
 
 extern volatile sig_atomic_t ** retrieved_sigs;
 extern volatile sig_atomic_t ** retrieved_t5s;
+extern char ** retrieved_uris;
 
 extern sig_atomic_t ct;
 extern sig_atomic_t local_pos;
 
-//void pull(Antibody ** pop = NULL, const int32_t pipefd = -1);
-void pull(Antibody ** pop = NULL);
+void pull(void);
 

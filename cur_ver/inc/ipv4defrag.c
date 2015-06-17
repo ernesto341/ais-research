@@ -314,7 +314,10 @@ int ntoh_ipv4_add_fragment ( pntoh_ipv4_session_t session , pntoh_ipv4_flow_t fl
 
 	/* too short length */
 	if ( len <= sizeof(struct ip) )
+   {
+           //printf("\n[n]\t-\tlength recieved: %d, should be %d\n", (int)len, (int)(sizeof(struct ip)));
 		return NTOH_INCORRECT_LENGTH;
+   }
 
 	/* get IP header and data length */
 	if ( ( iphdr_len = 4 * ( iphdr->ip_hl ) ) < sizeof(struct ip) )
