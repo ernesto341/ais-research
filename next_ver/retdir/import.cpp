@@ -118,13 +118,9 @@ Antibody ** importChamps (char * fin)
 				{
 					system(Exists((const char *)("./../ais/lifetime.25\0")) ? (char *)("cd ./../ais/ && ./lifetime.25 && cd ../retdir/\0") : (Exists((const char *)("./ais/lifetime.25\0")) ? (char *)("cd ./ais/ && ./lifetime.25 && cd ../\0") : (char *)("")));
 					checked = true;
-					//while(!Exists((const char *)("./../ais/champions.abs\0")) && !Exists((const char *)("./ais/champions.abs\0")));
 
 					t = importChamps((char *)(0));
-					if (t)
-					{
-						checked = false;
-					}
+					checked = false;
 					return (t);
 				}
 				else
@@ -166,6 +162,8 @@ Antibody ** importChamps (char * fin)
 			return (t);
 		}
 	}
+
+	/* ok, do the import operation */
 	char * data = 0;
 	data = (char *)malloc(sizeof(char) * arr_size);
 	if (!data)

@@ -142,6 +142,11 @@ void shandler ( int sign )
 	}
 
 	freeMem(&snc);
+	if (tmp)
+	{
+		free (tmp);
+		tmp = 000;
+	}
 
 	if (t5Convert)
 	{
@@ -533,10 +538,28 @@ int * pcktFingerPrint(const unsigned char * curPcktData, const uint32_t dataLen)
 	char * tmp_hdr = (char *)curPcktData;
 	char * cmd_str;
 	char * ver_str;
+	char * t_tmp;
 	cmd_str = strtok(tmp_hdr, (const char *)" ");
 
 	tmp = strtok(NULL, (const char *)" ");
 	uri_len = (uint32_t)strlen(tmp);
+	if (uri_len > MAXURI || uri_len < 1)
+	{
+		fprintf(stderr, "Length of URI too long to handle, truncating...\n");
+		fflush(stderr);
+		t_tmp = (char *)malloc(sizeof(char) * MAXURI);
+		strncpy(t_tmp, tmp, MAXURI - 2);
+		t_tmp[MAXURI - 1] = '\0';
+		if (tmp)
+		{
+			free(tmp);
+			tmp = 000;
+		}
+		tmp = (char *)malloc(sizeof(char) * MAXURI);
+		memcpy(tmp, t_tmp, MAXURI);
+		free (t_tmp);
+		t_tmp = 000;
+	}
 	memcpy((void *)uri_str, (void *)tmp, (size_t)uri_len * sizeof(char));
 	uri_str[uri_len] ^= uri_str[uri_len];
 	memset((void *)(uri_str + uri_len + 1), (int)'Q', (size_t)(MAXURI - uri_len - 1));

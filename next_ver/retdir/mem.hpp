@@ -14,7 +14,7 @@ using namespace std;
 #define SIGBUF 50
 #endif
 
-static const uint32_t MAXURI = 2048;
+static const uint32_t MAXURI = 20480;
 
 extern uint32_t shmkey[];
 extern uint32_t t5shmkey[];

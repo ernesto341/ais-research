@@ -6,6 +6,7 @@
 #define __A_HEAP_H__
 
 #include <iostream>
+#include <unistd.h>
 #include "antibody.h"
 using namespace std;
 

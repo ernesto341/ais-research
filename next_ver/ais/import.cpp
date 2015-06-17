@@ -687,7 +687,7 @@ Antibody ** importXml(char * h)
 				cerr << "pos/2 = " << pos/2 << endl;
 			}
 			tmp_pop[i][j].setCat(pos/2, atoi(buf.c_str()));
-			tmp_pop[i][j].setCatPerc(pos/2, (float)(tmp_pop[i][j].getCatCount())/(float)(tmp_pop[i][j].getCatTotal()));
+			tmp_pop[i][j].setCatPerc(pos/2, (float)(tmp_pop[i][j].getCatCount(pos/2))/(float)(tmp_pop[i][j].getCatTotal(pos/2)));
 			++pos;
 			continue;
 		}

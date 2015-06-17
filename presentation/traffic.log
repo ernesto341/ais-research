@@ -1,0 +1,25 @@
+[A] --- Attack Identified --- [A]
+	Unique Tuple:    127.0.0.1:52014-127.0.0.1:80
+	HTTP Signature:  	1 4 72 0 1 0 0 0 0 0 0 0 0 0 
+	Number of Antibodies Signaling Attack: 7
+
+[N] --- Normal Traffic --- [N]
+	Unique Tuple:    127.0.0.1:52023-127.0.0.1:80
+	HTTP Signature:  	1 4 19 0 0 0 0 0 0 0 0 0 0 0 
+	Number of Antibodies Signaling Attack: 0
+
+[N] --- Normal Traffic --- [N]
+	Unique Tuple:    127.0.0.1:52024-127.0.0.1:80
+	HTTP Signature:  	1 4 683 0 0 0 0 0 0 0 0 0 0 0 
+	Number of Antibodies Signaling Attack: 1
+
+[A] --- Attack Identified --- [A]
+	Unique Tuple:    127.0.0.1:52029-127.0.0.1:80
+	HTTP Signature:  	1 4 767 0 0 0 0 0 0 0 0 0 0 0 
+	Number of Antibodies Signaling Attack: 30
+
+[N] --- Normal Traffic --- [N]
+	Unique Tuple:    127.0.0.1:52034-127.0.0.1:80
+	HTTP Signature:  	1 4 29 0 0 0 0 0 0 0 0 0 0 0 
+	Number of Antibodies Signaling Attack: 0
+

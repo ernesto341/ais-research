@@ -22,15 +22,21 @@ The 'listen.sh' file uses netcat to setup a basic listener on the localhost on p
    IMPORTANT: 'listen.sh' and, subsequently, the active netcat listener, must manually be killed upon completion. Unless you don't care.
 When using 'listen.sh' and 'tester', start dhs on the local loopback interface.
 
-With version 0.6 and later, a report is generated showing the champions antibodies in HTML and XMLformats.
+With version 0.6 and later, a report is generated showing the champions antibodies in HTML and XML formats.
 
 TO DO:
+Return which type of attack has been identified and how many antibodies identified an attack
 Need mutex/semaphore on shm? Is my stupid vsigatomic only working by chance? This is only a guess.
 Setup COMPLETE signal mask for all processes.
 Encrypt data in shared memory segments.
 Modularize packet capture and specially issue permissions for net_raw and net_bind, whatever else needed. Ensure reduced permission set for all other modules.
-Return which type of attack has been identified and how many antibodies identified an attack
-maybe continue breeding generations until fitness reaches min level?
+maybe automatically continue breeding generations until fitness reaches min level?
+Some globals are repeated between retrieve and dhs - combine them.
+continue work to ensure rebreed operation is successful.
+actually use the xml format for import operations, or make a converter to .abs format for import.
 
-
+Issues:
 INTERMITTENT MEMORY ERROR ON CLEANUP/^C ON DHS
+
+
+There appears to be an issue with antibody development - im getting matching values for overf when calculated in pull.cpp after brand new breeds with lifetime.25 (10, 766) in buffer classified antibodies

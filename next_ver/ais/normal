@@ -12,7 +12,7 @@
 /admin/logout.php GET 1.0 17 0 0 0 0 0 0 0 0 0 0 0
 /admin/logout.php GET 1.1 17 0 0 0 0 0 0 0 0 0 0 0
 /banner.html GET 1.0 12 0 0 0 0 0 0 0 0 0 0 0
-/cgi-sys/showusage GET 0 18 0 0 0 0 0 0 0 0 0 0 0 /cgi-sys/showusage
+/cgi-sys/showusage GET 0 18 0 0 0 0 0 0 0 0 0 0 0
 /cleric.html GET 1.0 12 0 0 0 0 0 0 0 0 0 0 0
 /commands.html GET 1.0 14 0 0 0 0 0 0 0 0 0 0 0
 /cp/fileManager?exDir=./malevolence-logs&exLanguage=english&exFileName=access-log&exOP=edit&exSort= GET 1.0 99 5 0 0 0 0 0 0 0 0 0 0

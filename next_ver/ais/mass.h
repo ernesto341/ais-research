@@ -12,6 +12,7 @@
 #define __A_MASS_H__
 
 #include <iostream>
+#include <unistd.h>
 #include "heap.h"
 #include "antibody.h"
 using namespace std;
