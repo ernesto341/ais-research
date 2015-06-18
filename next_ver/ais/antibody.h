@@ -25,8 +25,7 @@ const int ALEN = 14;
 // data file is labeled with one category. For every attack this antibody
 // matches, it will track the associated categories.
 const int CLASS_COUNT = 6;
-const char CLASS_LABELS[CLASS_COUNT + 2][15] = { "info", "traversal", "sql", "buffer", "script", "xss", "Unknown", "Normal" };
-//const char CLASS_LABELS[CLASS_COUNT][15] = { "info", "traversal", "sql", "buffer", "script", "xss" };
+const char CLASS_LABELS[CLASS_COUNT + 2][15] = { "Info\0", "Traversal\0", "SQL\0", "Buffer\0", "Script\0", "XSS\0", "Unknown\0", "Normal\0" };
 
 class Antibody {
         public:

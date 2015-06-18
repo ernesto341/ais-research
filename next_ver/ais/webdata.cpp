@@ -11,7 +11,6 @@ Webdata::Webdata(char *inf, int f) {
 	char buf[2000];
 	ifstream fin(inf);
 	float tmp = 0.0;
-	int blah;
 
 	flag = f;
 	lines = 0;

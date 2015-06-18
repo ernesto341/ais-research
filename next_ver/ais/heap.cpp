@@ -30,8 +30,6 @@ void AntibodyHeap::formHeap(int l, int h) {
 }
 
 AntibodyHeap::AntibodyHeap(Antibody **d, int l, int c) {
-	Antibody *tmp;
-
 	cls = c;
 	len = l;
 	try

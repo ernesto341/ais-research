@@ -92,7 +92,7 @@ int doMatch(Antibody a, int *test)
 		}
 	}
 	cerr << "returning default case\n" << flush;
-	return (class_count + 1);
+	return (class_count + 1); // normal traffic
 	return (class_count); // unknown attack - default case
 }
 

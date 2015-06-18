@@ -1,9 +1,12 @@
 #include <iostream>
-#include <strstream>
+//#include <strstream>
+//#include <sstream>
+#include <fstream>
 #include <iomanip>
 #include <fstream>
 #include <cmath>
 #include <cstring>
+#include <string>
 #include <cstdlib>
 #include "antibody.h"
 #include "unknownweb.h"
@@ -14,18 +17,19 @@ using namespace std;
 #define VERBOSE_OUTPUT
 //#undef VERBOSE_OUTPUT
 
-#ifndef MAX_RUNS
-#define MAX_RUNS    5    // Number of simultaneous populations to test
+#ifndef _MAX_RUNS
+#define _MAX_RUNS    15    // Number of simultaneous populations to test
 #endif
 
 // Set defaults for command line parameters
-int MAX_ROUNDS = 10;          // Maximum number of generations
+int MAX_ROUNDS = 100;          // Maximum number of generations
 float PR_XOVER = 0.6;         // Percent crossover
-float PR_MUTATION = 0.1;      // Percent mutation
+float PR_MUTATION = 0.3;      // Percent mutation
 float BAD_THRESHOLD = 0.0002; // Threshold for bad antibodies in self-test
 int TRAIN_AGREE = 3;          // Number that must agree to mark attack
 float MAX_NEG = .4;	      // Maximum false negative rate for a class. Currently unused.
 float MIN_ACC = .5;	      // Minimum accuracy requirement for a class
+int MAX_RUNS = _MAX_RUNS;
 
 float indepAccPerClass[CLASS_COUNT][MAX_ANTIBODIES][CLASS_COUNT];
 Antibody *pop[CLASS_COUNT][MAX_ANTIBODIES];
@@ -335,17 +339,10 @@ char * use_existing = 000;
 
 int main(int argc, char *argv[]) {
 	srandom(time(NULL));
-	char f[500], f2[500], f3[500], f4[500], f5[500], f6[500], f7[500], f8[500];
-	ostrstream fname(f, 500, ios::out);
-	ostrstream fname2(f2, 500, ios::out);
-	ostrstream fname3(f3, 500, ios::out);
-	ostrstream fname4(f4, 500, ios::out);
-	ostrstream fname5(f5, 500, ios::out);
-	ostrstream fname6(f6, 500, ios::out);
-	ostrstream fname7(f7, 500, ios::out);
-	ostrstream fname8(f8, 500, ios::out);
+	string fname = "", fname2 = "", fname3 = "", fname4 = "", fname5 = "", fname6 = "", fname7 = "", fname8 = "";
 	char mname[500];
 	bool cont = false;
+	int MA = MAX_ANTIBODIES;
 
 	if(argc != 6) {
 		cout << endl << "Usage: " << endl << "\t" << argv[0] 
@@ -389,63 +386,118 @@ int main(int argc, char *argv[]) {
 	unknown.setThreshold((TRAIN_AGREE*2));
 	logNeg = 0;
 
-	sprintf(mname, "res/unknown.%d_%d_%f_%f", MAX_ANTIBODIES, MAX_ROUNDS,
+	sprintf(mname, "res/unknown.%d_%d_%f_%f", MA, MAX_ROUNDS,
 			PR_XOVER, PR_MUTATION);
 	mystery.open(mname);
+	fname += "res/fitness.";
+	fname += MA;
+	fname += "_";
+	fname += MAX_ROUNDS;
+	fname += "_";
+	fname += PR_XOVER;
+	fname += "_";
+	fname += PR_MUTATION;
+	fname += "\0";
+	fout.open(fname.c_str());
 
-	fname << "res/fitness." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout.open(f);
+	cerr << fname << endl;
 
-	cerr << f << endl;
-
-	fname2 << "res/details." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout2.open(f2);
+	fname2 += "res/details.";
+	fname2 += MA;
+	fname2 += "_";
+	fname2 += MAX_ROUNDS;
+	fname2 += "_";
+	fname2 += PR_XOVER;
+	fname2 += "_";
+	fname2 += PR_MUTATION;
+	fname2 += "\0";
+	fout2.open(fname2.c_str());
 
 #ifdef VERBOSE_OUTPUT
-	fname3 << "res/full." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout3.open(f3);
+	fname3 += "res/full.";
+	fname3 += MA;
+	fname3 += "_";
+	fname3 += MAX_ROUNDS;
+	fname3 += "_";
+	fname3 += PR_XOVER;
+	fname3 += "_";
+	fname3 += PR_MUTATION;
+	fname3 += "\0";
+	fout3.open(fname3.c_str());
 #endif
 
-	fname4 << "res/bad." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout4.open(f4);
+	fname4 += "res/bad.";
+	fname4 += MA;
+	fname4 += "_";
+	fname4 += MAX_ROUNDS;
+	fname4 += "_";
+	fname4 += PR_XOVER;
+	fname4 += "_";
+	fname4 += PR_MUTATION;
+	fname4 += "\0";
+	fout4.open(fname4.c_str());
 
-	fname5 << "res/false_pos." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout5.open(f5);
+	fname5 += "res/false_pos.";
+	fname5 += MA;
+	fname5 += "_";
+	fname5 += MAX_ROUNDS;
+	fname5 += "_";
+	fname5 += PR_XOVER;
+	fname5 += "_";
+	fname5 += PR_MUTATION;
+	fname5 += "\0";
+	fout5.open(fname5.c_str());
 
-	fname6 << "res/false_neg." << MAX_ANTIBODIES << "_" << MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout6.open(f6);
+	fname6 += "res/false_neg.";
+	fname6 += MA;
+	fname6 += "_";
+	fname6 += MAX_ROUNDS;
+	fname6 += "_";
+	fname6 += PR_XOVER;
+	fname6 += "_";
+	fname6 += PR_MUTATION;
+	fname6 += "\0";
+	fout6.open(fname6.c_str());
 
-	fname7 << "res/classifications." << MAX_ANTIBODIES << "_"<< MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout7.open(f7);
+	fname7 += "res/classifications.";
+	fname7 += MA;
+	fname7 += "_";
+	fname7 += MAX_ROUNDS;
+	fname7 += "_";
+	fname7 += PR_XOVER;
+	fname7 += "_";
+	fname7 += PR_MUTATION;
+	fname7 += "\0";
+	fout7.open(fname7.c_str());
 
-	fname8 << "res/missed." << MAX_ANTIBODIES << "_"<< MAX_ROUNDS << "_"
-		<< PR_XOVER << "_" << PR_MUTATION << ends;
-	fout8.open(f8);
+	fname8 += "res/missed.";
+	fname8 += MA;
+	fname8 += "_";
+	fname8 += MAX_ROUNDS;
+	fname8 += "_";
+	fname8 += PR_XOVER;
+	fname8 += "_";
+	fname8 += PR_MUTATION;
+	fname8 += "\0";
+	fout8.open(fname8.c_str());
 
 #ifdef VERBOSE_OUTPUT
-	fout3 << "#Parameters: MAX_ROUNDS = " << MAX_ROUNDS << " MAX_ANTIBODIES = "
-		<< MAX_ANTIBODIES << endl 
+	fout3 << "#Parameters: MAX_ROUNDS = " << MAX_ROUNDS << " MA = "
+		<< MA << endl 
 		<< "#            PR_XOVER = " << PR_XOVER << " PR_MUTATION = " 
 		<< PR_MUTATION << endl
 		<< "#            BAD_THRESHOLD = " << BAD_THRESHOLD
 		<< "  TRAIN_AGREE = " << TRAIN_AGREE << endl;
 #endif
-	fout << "#Parameters: MAX_ROUNDS = " << MAX_ROUNDS << " MAX_ANTIBODIES = "
-		<< MAX_ANTIBODIES << endl 
+	fout << "#Parameters: MAX_ROUNDS = " << MAX_ROUNDS << " MA = "
+		<< MA << endl 
 		<< "#            PR_XOVER = " << PR_XOVER << " PR_MUTATION = " 
 		<< PR_MUTATION << endl
 		<< "#            BAD_THRESHOLD = " << BAD_THRESHOLD
 		<< "  TRAIN_AGREE = " << TRAIN_AGREE << endl;
 
 	for(int i = 0; i < CLASS_COUNT; i++) {
-		for(int j = 0; j < MAX_ANTIBODIES; j++) {
+		for(int j = 0; j < MA; j++) {
 			pop[i][j] = NULL;
 			for(int k = 0; k < CLASS_COUNT; k++) {
 				indepAccPerClass[i][j][k] = 0.f;
@@ -472,7 +524,7 @@ int main(int argc, char *argv[]) {
 		   Antibody ** t_pop = importChamps(use_existing);
 		   for (int i = 0; i < CLASS_COUNT; i++)
 		   {
-		   for (int j = 0; j < MAX_ANTIBODIES; j++)
+		   for (int j = 0; j < MA; j++)
 		   {
 		   memcpy(&(champs[i][j]), &(t_pop[i][j]), sizeof(Antibody) * 1);
 		   }
@@ -482,7 +534,7 @@ int main(int argc, char *argv[]) {
 	else
 	{
 	}
-	//do
+	do
 	{
 		cont = false;
 		for(int r = 0; r < MAX_RUNS; r++) {
@@ -528,7 +580,7 @@ int main(int argc, char *argv[]) {
 					{
 						bestAccuracy[c] = bestAccuracyGeneration[i][c];
 					}
-					for (int j = 0; j < MAX_ANTIBODIES; j++)
+					for (int j = 0; j < MA; j++)
 					{
 						for (int k = 0; k < CLASS_COUNT; k++)
 						{
@@ -559,7 +611,7 @@ int main(int argc, char *argv[]) {
 		{
 			cout << "\t" << setw(15) << setfill(' ') << CLASS_LABELS[i] << " - %" << setprecision(2) << fixed << setfill('0') << bestAccuracy[i] * 100.f << endl << endl << flush;
 			cout << CLASS_LABELS[i] << " Antibody Traits:\n";
-			for (int j = 0; j < MAX_ANTIBODIES; j++)
+			for (int j = 0; j < MA; j++)
 			{
 				cout << " [" << j << "] : " << champs[i][j] << endl;
 			}
@@ -567,14 +619,14 @@ int main(int argc, char *argv[]) {
 			if (bestAccuracy[i] < MIN_ACC)
 			{
 				cont = true;
-				for (int j = 0; j < MAX_ANTIBODIES; j++)
+				for (int j = 0; j < MA; j++)
 				{
 					generateAntibody(i, j);
 				}
 			}
 		}
 	}
-	//while (cont);
+	while (cont);
 	for(int r = 0; r < MAX_RUNS; r++) {
 		cerr << "Overall classification stats for Population " << r << endl;
 		cerr << left << setw(5) << "Gen";
@@ -782,9 +834,10 @@ void nextGen(float accuracy[]) {
 		}
 
 		while(k < MAX_ANTIBODIES) {
-			pop[i][k++] = survivors.deleteRandom(MAX_ANTIBODIES - k);
+			pop[i][k] = survivors.deleteRandom(MAX_ANTIBODIES - k);
 #ifdef VERBOSE_OUTPUT
-			fout3 << "Next gen (survivor) " << k-1 << ": " << *pop[i][k-1];
+			fout3 << "Next gen (survivor) " << k << ": " << *pop[i][k];
+			k++;
 #endif
 		}
 		parents.killHeap();

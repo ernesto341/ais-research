@@ -14,12 +14,12 @@ using namespace std;
 #undef TEST_UNKNOWN
 #undef OUTPUT_INFO
 
-#ifndef MAX_RUNS
-#define MAX_RUNS    5    // Number of simultaneous populations to test
+#ifndef _MAX_RUNS
+#define _MAX_RUNS    5    // Number of simultaneous populations to test
 #endif
 
-#ifndef MAX_ANTIBODIES
-#define MAX_ANTIBODIES   25  // Number of antibodies per population
+#ifndef _MAX_ANTIBODIES
+#define _MAX_ANTIBODIES   25  // Number of antibodies per population
 #endif
 
 // Set defaults for command line parameters
@@ -28,6 +28,8 @@ float PR_XOVER = 0.6;         // Percent crossover
 float PR_MUTATION = 0.1;      // Percent mutation
 float BAD_THRESHOLD = 0.0002; // Threshold for bad antibodies in self-test
 int TRAIN_AGREE = 3;          // Number that must agree to mark attack
+int MAX_ANTIBODIES = _MAX_ANTIBODIES;
+int MAX_RUNS = _MAX_RUNS;
 
 Antibody *pop[CLASS_COUNT][MAX_ANTIBODIES];
 float avgFitness[CLASS_COUNT];

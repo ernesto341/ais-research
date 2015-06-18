@@ -471,7 +471,7 @@ Antibody ** importXml(char * h)
 	}
 	Antibody ** tmp_pop = 000;
 	tmp_pop = new Antibody * [class_count];
-	size_t i = 0, j = 0, pos = 0, iter = 0;
+	int i = 0, j = 0, pos = 0, iter = 0;
 	for (i = 0; i < ab_count; i++)
 	{
 		tmp_pop[i] = new Antibody();

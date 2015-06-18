@@ -1,4 +1,4 @@
-CFLAGS = -g -Wno-deprecated -O2
+CFLAGS = -ggdb -O2 -Wall -Wextra --std=c++11
 OFILES = antibody.o webdata.o heap.o mass.o random.o unknownweb.o itoa.o import.o
 
 lifetime:	lifetime.cpp ${OFILES}
@@ -23,13 +23,13 @@ test:	antibody.o test.cpp
 	g++ $(CFLAGS) test.cpp antibody.o heap.o
 
 unknownweb.o:	webdata.o unknownweb.h unknownweb.cpp
-	g++ $(CFLAGS) -c unknownweb.cpp
+	g++ $(CFLAGS) -Wno-unused-parameter -c unknownweb.cpp
 
 itoa.o:	
-	gcc $(CFLAGS) -c itoa.c
+	gcc -ggdb -O2 -Wall -Wextra -c itoa.c
 
 webdata.o:	antibody.h webdata.h webdata.cpp
-	g++ $(CFLAGS) -c webdata.cpp
+	g++ $(CFLAGS) -Wno-unused-parameter -c webdata.cpp
 
 import.o:	
 	g++ $(CFLAGS) -c import.cpp
